@@ -1,5 +1,7 @@
 public class Lexico {
 
+    private int F = 100;
+
     public static char caracter;
     public static int linea;
     public static int cursor;
