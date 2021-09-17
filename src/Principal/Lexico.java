@@ -1,3 +1,7 @@
+package Principal;
+
+import Principal.AccionSemantica;
+
 public class Lexico {
 
     private int F = 100;
@@ -5,7 +9,6 @@ public class Lexico {
     public static char caracter;
     public static int linea;
     public static int cursor;
-
 
 
     //TOKENS SIN ASCII
@@ -63,13 +66,21 @@ public class Lexico {
               { F,  F,  F,  F,  F,  F,  F,  F,  F,  F,  F,  F,  F,  F,  F,  F,  F,  F,  F,  F}, //13
               { F,  F,  F,  F,  F,  F,  F,  F,  F,  F,  F,  F,  F,  F,  F,  F,  F,  F,  F,  F}, //14
               { F,  F,  F,  F,  F,  F,  F,  F,  F,  F,  F,  F,  F,  F,  F,  F,  F,  F,  F,  F}, //15
-
-
+              { F,  F,  F,  F,  F,  F,  F,  F,  F,  F,  F,  F,  F,  F,  F,  F,  F,  F,  F,  F}, //16
+              {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,  F, -1, -1, -1, -1, -1, -1}, //17
+              {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,  F, -1, -1, -1, -1, -1}, //18
     };
 
 
 
     private AccionSemantica[][] matrizAcciones;
+
+
+
+
+
+
+
 
 
 

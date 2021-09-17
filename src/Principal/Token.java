@@ -1,3 +1,5 @@
+package Principal;
+
 public class Token {
 
     private String lexema;
