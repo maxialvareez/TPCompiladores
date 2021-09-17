@@ -1,11 +1,11 @@
 package AccionesSemanticas;
 
 
-import Principal.AccionSemantica;
+import Principal.Accion;
 import Principal.Token;
 
 
-public class AccionSemantica1 extends AccionSemantica {
+public class AccionSemantica1 extends Accion {
 
     public AccionSemantica1() {
     }

@@ -1,11 +1,11 @@
-package AccionesSemanticas;
+package Errores;
 
 import Principal.Accion;
 import Principal.Token;
 
-public class AccionSemantica6 extends Accion {
+public class Error3 extends Accion {
 
-    public AccionSemantica6() {
+    public Error3() {
     }
 
     @Override
