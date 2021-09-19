@@ -4,14 +4,17 @@ package Principal;
 import AccionesSemanticas.*;
 import ErroresLexicos.*;
 
+import java.util.HashMap;
+
 public class Lexico {
 
     private int F = 100;
 
+    public static StringBuilder codigoFuente;
     public static char caracter;
     public static int linea;
     public static int cursor;
-
+    public static HashMap<String,Integer> palabrasReservadas;
 
     //TOKENS SIN ASCII
     public static final int IDE = 257;
@@ -20,23 +23,30 @@ public class Lexico {
     public static final int MENOR_IGUAL = 260;
     public static final int IGUAL_IGUAL = 261;
     public static final int DISTINTO = 262;
-    public static final int CTE_DOUBLE = 263;
-    public static final int CADENA = 264;
+    public static final int ASIGNACION = 263;
+    public static final int CTE_DOUBLE = 264;
+    public static final int CADENA = 265;
 
 
     //PALABRAS RESERVADAS
-    public static final int IF = 265;
-    public static final int THEN = 266;
-    public static final int ENDIF = 267;
+    public static final int IF = 266;
+    public static final int THEN = 267;
+    public static final int ENDIF = 268;
     public static final int PRINT = 3;
     public static final int FUNC = 4;
     public static final int RETURN = 5;
     public static final int BEGIN = 6;
     public static final int END = 7;
     public static final int BREAK = 8;
-    public static final int ULONG = 9;
-    public static final int DOUBLE = 10;
-    public static final int REPEAT = 11;
+    public static final int ULONG = 10;
+    public static final int DOUBLE = 11;
+    public static final int REPEAT = 12;
+    public static final int PRE = 13;
+    public static final int TRY = 14;
+    public static final int CATCH = 15;
+    public static final int TYPEDEF = 16;
+    public static final int UINT = 17;   //Enteros sin signo
+
 
     //OPERADORES
 
@@ -119,13 +129,7 @@ public class Lexico {
             {err6, err6, err6, err6, err6, err6, err6, err6, err6, err6, err6, err6, err6, err6, as19, err6, err6, err6, err6, err6}, //18
     };
 
+    public Lexico() {
 
-
-
-
-
-
-
-
-
+    }
 }

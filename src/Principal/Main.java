@@ -45,6 +45,7 @@ public class Main {
 
         System.out.println("Contenido del archivo: " + codigo);
 
+
         //-------------- FIN CARGA DE ARCHIVO --------------
 
        // Principal.Lexico l1 = new Principal.Lexico(codigo);

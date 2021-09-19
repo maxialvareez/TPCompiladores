@@ -1,6 +1,7 @@
 package AccionesSemanticas;
 
 import Principal.Accion;
+import Principal.Lexico;
 import Principal.Token;
 
 public class AccionSemantica12 extends Accion {
@@ -10,6 +11,7 @@ public class AccionSemantica12 extends Accion {
 
     @Override
     public Token ejecutar() {
-        return null;
+
+        return (new Token(Lexico.MAYOR_IGUAL));
     }
 }

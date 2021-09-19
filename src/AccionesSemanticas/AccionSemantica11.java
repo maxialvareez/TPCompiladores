@@ -1,6 +1,7 @@
 package AccionesSemanticas;
 
 import Principal.Accion;
+import Principal.Lexico;
 import Principal.Token;
 
 public class AccionSemantica11 extends Accion {
@@ -10,6 +11,8 @@ public class AccionSemantica11 extends Accion {
 
     @Override
     public Token ejecutar() {
-        return null;
+
+        return (new Token(Lexico.DISTINTO));
+
     }
 }
