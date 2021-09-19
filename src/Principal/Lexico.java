@@ -2,7 +2,7 @@ package Principal;
 
 
 import AccionesSemanticas.*;
-import Errores.*;
+import ErroresLexicos.*;
 
 public class Lexico {
 

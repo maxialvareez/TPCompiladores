@@ -1,7 +1,6 @@
 package AccionesSemanticas;
 
-import Principal.Accion;
-import Principal.Token;
+import Principal.*;
 
 public class AccionSemantica2 extends Accion {
 
@@ -10,6 +9,7 @@ public class AccionSemantica2 extends Accion {
 
     @Override
     public Token ejecutar() {
+        buffer = buffer + Lexico.caracter;
         return null;
     }
 }

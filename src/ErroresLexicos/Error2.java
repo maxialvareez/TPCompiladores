@@ -1,11 +1,11 @@
-package Errores;
+package ErroresLexicos;
 
 import Principal.Accion;
 import Principal.Token;
 
-public class Error4 extends Accion {
+public class Error2 extends Accion {
 
-    public Error4() {
+    public Error2() {
     }
 
     @Override
