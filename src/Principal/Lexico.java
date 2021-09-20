@@ -108,7 +108,7 @@ public class Lexico {
     private Accion[][] matrizAcciones = {
 
             // L     l     d     E     _     +     -     %    =     <     >     *     :     &      |     .   bl     tb    \n    otros
-            { as1,  as1,  as1,  as1,  as1,  as6,  as6,  as1, null, null, null, null, null, null, null,  as6, null, null, null,  as6}, //0
+            { as1,  as1,  as1,  as1,  as1,  as6,  as6, null, null, null, null, null, null, null, null,  as6, null, null, null,  as6}, //0
             { as2,  as2,  as2,  as2,  as2,  as3,  as3,  as3,  as3,  as3,  as3,  as3,  as3,  as3,  as3,  as3,  as3,  as3,  as3,  as3}, //1
             { as4,  as4,  as2,  as4,  as4,  as4,  as4,  as4,  as4,  as4,  as4,  as4,  as4,  as4,  as4,  as2,  as4,  as4,  as4,  as4}, //2
             { as5,  as5,  as2,  as2,  as5,  as5,  as5,  as5,  as5,  as5,  as5,  as5,  as5,  as5,  as5,  as5,  as5,  as5,  as5,  as5}, //3
@@ -118,7 +118,7 @@ public class Lexico {
             { as5,  as5,  as2,  as5,  as5,  as5,  as5,  as5,  as5,  as5,  as5,  as5,  as5,  as5,  as5,  as5,  as5,  as5,  as5,  as5}, //7
             { as7,  as7,  as7,  as7,  as7,  as7,  as7,  as7,  as7,  as7,  as7, null,  as7,  as7,  as7,  as7,  as7,  as7,  as7,  as7}, //8
             {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null}, //9
-            { as2,  as2,  as2,  as2,  as2, null,  as2,  as2,  as2,  as2,  as2,  as2,  as2,  as2,  as2,  as2,  as2,  as2, err3,  as2}, //10
+            { as2,  as2,  as2,  as2,  as2, null,  as2,  as8,  as2,  as2,  as2,  as2,  as2,  as2,  as2,  as2,  as2,  as2, err3,  as2}, //10
             {err4, err4, err4, err4, err4, err4, err4, err4, err4, err4, err4, err4, err4, err4, err4, err4, err4, err4,  as2, err4}, //11
             {err3, err3, err3, err3, err3, null, err3, err3, err3, err3, err3, err3, err3, err3, err3, err3, err3, err3, err3, err3}, //12
             { as7,  as7,  as7,  as7,  as7,  as7,  as7,  as7,   as9, as7, as11,  as7,  as7,  as7,  as7,  as7,  as7,  as7,  as7,  as7}, //13
@@ -130,6 +130,13 @@ public class Lexico {
     };
 
     public Lexico() {
+
+
+        linea = 1;
+        cursor = 0;
+        this.codigoFuente = codigoFuente;
+
+        caracter = codigoFuente.charAt(cursor);
 
         palabrasReservadas = new Hashtable<>();
         palabrasReservadas.put("IF",IF);
@@ -154,9 +161,84 @@ public class Lexico {
     }
 
 
+    public Token getToken() {
+        int estadoActual = 0;
+        int columna = -1;
+        Token token = null;
+
+        while ( (cursor < codigoFuente.length())) { // mientras no llego al final del codigo
+            caracter = codigoFuente.charAt(cursor);
+            cursor++;
+            columna = getColumna(caracter);
+            if (columna != -1) { // si no es un caracter invalido
+                if (matrizAcciones[estadoActual][columna] != null) // si hay una AS
+                    token = matrizAcciones[estadoActual][columna].ejecutar(); //ejecuto la AS correspondiente
+
+                estadoActual = matrizTransiciones[estadoActual][columna]; // transicion de estado siempre
+                if ((estadoActual == F) && (token != null))//si estoy en final (tengo un token listo para devolver)
+                    return token;
+                else if (estadoActual == -1)
+                    return token;//estadoActual = 0;//DEBERIA IR A FINALo al inicio?
+                if (estadoActual == F)
+                    estadoActual = 0;
+            } else { // error por caracter invalido
+                return new Error0().ejecutar();
+            }
+            if (caracter == '\n')
+                linea++;
+        }
+        return new Token(0); //Token = 0 de fin de archivo
+    }
+
+    private int getColumna(char caracter) {
 
 
+        if (caracter == 69)
+            return 3 ; // 'E'
+        if ((caracter >= 65) && (caracter <= 90))
+            return 0; // LETRAS mayusculas
+        if ((caracter >= 97) && (caracter <= 122))
+            return 1; // letras minusculas
+        if ((caracter >= 48) && (caracter <= 57))
+            return 2; // digitos
+        if (caracter == 95)
+            return 4; // _
+        if (caracter == 43)
+            return 5; // +
+        if (caracter == 45)
+            return 6; // -
+        if (caracter == 37)
+            return 7; // %
+        if (caracter == 61)
+            return 8; // =
+        if (caracter == 60)
+            return 9; // <
+        if (caracter == 62)
+            return 10; // >
+        if (caracter == 42)
+            return 11; //*
+        if (caracter == 58)
+            return 12; //:
+        if (caracter==38)
+            return 13; //&
+        if (caracter == 124)
+            return 14; //|
+        if (caracter == 46)
+            return 15; // .
+        if ((caracter == 32))
+            return 16; // blanco
+        if (caracter == 9)
+            return 17; //TAB
+        if (caracter == 10 )
+            return 18; // \n
+        if (caracter == 34 || caracter == 44 || caracter == 47 || caracter == 41 || caracter == 40 || caracter == 123 || caracter == 125 || caracter == 59 ||caracter == 33)
+            return 19; // 'otros'
+
+
+        return -1; //caracter no valido
+    }
 }
+
 
 
 

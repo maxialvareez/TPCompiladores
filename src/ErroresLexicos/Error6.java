@@ -1,6 +1,7 @@
 package ErroresLexicos;
 
 import Principal.Accion;
+import Principal.Lexico;
 import Principal.Token;
 
 public class Error6 extends Accion {
@@ -10,6 +11,11 @@ public class Error6 extends Accion {
 
     @Override
     public Token ejecutar() {
-        return null;
+
+
+        buffer += "|";
+        Lexico.cursor --;
+        System.out.println("Warning:Se espera un | y recibe otra cosa");
+        return (new Token(Lexico.OR));
     }
 }

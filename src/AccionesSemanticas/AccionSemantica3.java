@@ -17,9 +17,9 @@ public class AccionSemantica3 extends Accion {
         }
 
         else {
-                if (buffer.length() > 20) {
-                    buffer = buffer.substring(0, 20);
-                    System.out.println("Warning: en la linea " + Lexico.linea + " un identificador superó el limite de 20 caracteres, por lo que fue cortado");
+                if (buffer.length() > 22) {
+                    buffer = buffer.substring(0, 21);
+                    System.out.println("Warning: en la linea " + Lexico.linea + " un identificador superó el limite de 22 caracteres, por lo que fue cortado");
                 }
                 if (!Main.tSimbolos.existeLexema(buffer)) {
                     Main.tSimbolos.agregarSimbolo(buffer, Lexico.IDE);
