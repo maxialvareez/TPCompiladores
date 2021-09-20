@@ -11,7 +11,7 @@ public class AccionSemantica6 extends Accion {
 
     @Override
     public Token ejecutar() {
-
-        return (new Token((int) Lexico.caracter));
+        System.out.println("[Lexico | Linea " + Lexico.linea + "] Se detecto un token -> " + Lexico.caracter);
+        return (new Token( Lexico.caracter));
     }
 }

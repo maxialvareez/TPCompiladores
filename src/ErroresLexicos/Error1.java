@@ -10,6 +10,7 @@ public class Error1 extends Accion {
 
     @Override
     public Token ejecutar() {
+
         return null;
     }
 }

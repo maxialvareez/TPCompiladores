@@ -4,7 +4,7 @@ package Principal;
 import AccionesSemanticas.*;
 import ErroresLexicos.*;
 
-import java.util.HashMap;
+import java.util.Hashtable;
 
 public class Lexico {
 
@@ -14,7 +14,7 @@ public class Lexico {
     public static char caracter;
     public static int linea;
     public static int cursor;
-    public static HashMap<String,Integer> palabrasReservadas;
+    public static Hashtable<String,Integer> palabrasReservadas;
 
     //TOKENS SIN ASCII
     public static final int IDE = 257;
@@ -26,31 +26,28 @@ public class Lexico {
     public static final int ASIGNACION = 263;
     public static final int CTE_DOUBLE = 264;
     public static final int CADENA = 265;
+    public static final int AND = 266;
+    public static final int OR = 267;
 
 
     //PALABRAS RESERVADAS
-    public static final int IF = 266;
-    public static final int THEN = 267;
-    public static final int ENDIF = 268;
-    public static final int PRINT = 3;
-    public static final int FUNC = 4;
-    public static final int RETURN = 5;
-    public static final int BEGIN = 6;
-    public static final int END = 7;
-    public static final int BREAK = 8;
-    public static final int ULONG = 10;
-    public static final int DOUBLE = 11;
-    public static final int REPEAT = 12;
-    public static final int PRE = 13;
-    public static final int TRY = 14;
-    public static final int CATCH = 15;
-    public static final int TYPEDEF = 16;
-    public static final int UINT = 17;   //Enteros sin signo
-
-
-    //OPERADORES
-
-    public static final int MAS = 12; //si se recibiera un identificador que se llame asi, lo tomaria como una palabra reservada
+    public static final int IF = 268;
+    public static final int THEN = 269;
+    public static final int ENDIF = 270;
+    public static final int PRINT = 271;
+    public static final int FUNC = 272;
+    public static final int RETURN = 273;
+    public static final int BEGIN = 274;
+    public static final int END = 275;
+    public static final int BREAK = 276;
+    public static final int ULONG = 277;
+    public static final int DOUBLE = 278;
+    public static final int REPEAT = 279;
+    public static final int PRE = 280;
+    public static final int TRY = 281;
+    public static final int CATCH = 282;
+    public static final int TYPEDEF = 283;
+    public static final int UINT = 284;
 
 
     //ACCIONES SEMANTICAS
@@ -64,9 +61,12 @@ public class Lexico {
     Accion as7 = new AccionSemantica7();
     Accion as8 = new AccionSemantica8();
     Accion as9 = new AccionSemantica9();
-    Accion as10 = new AccionSemantica10();
     Accion as11 = new AccionSemantica11();
     Accion as12 = new AccionSemantica12();
+    Accion as14 = new AccionSemantica14();
+    Accion as16 = new AccionSemantica16();
+    Accion as18 = new AccionSemantica18();
+    Accion as19 = new AccionSemantica19();
 
 
     //ERRORES
@@ -121,15 +121,42 @@ public class Lexico {
             { as2,  as2,  as2,  as2,  as2, null,  as2,  as2,  as2,  as2,  as2,  as2,  as2,  as2,  as2,  as2,  as2,  as2, err3,  as2}, //10
             {err4, err4, err4, err4, err4, err4, err4, err4, err4, err4, err4, err4, err4, err4, err4, err4, err4, err4,  as2, err4}, //11
             {err3, err3, err3, err3, err3, null, err3, err3, err3, err3, err3, err3, err3, err3, err3, err3, err3, err3, err3, err3}, //12
-            {as10, as10, as10, as10, as10, as10, as10, as10,  as9, as10, as11, as10, as10, as10, as10, as10, as10, as10, as10, as10}, //13
-            {as13, as13, as13, as13, as13, as13, as13, as13, as12, as13, as13, as13, as13, as13, as13, as13, as13, as13, as13, as13}, //14
-            {as15, as15, as15, as15, as15, as15, as15, as15, as14, as15, as15, as15, as15, as15, as15, as15, as15, as15, as15, as15}, //15
-            {as17, as17, as17, as17, as17, as17, as17, as17, as16, as17, as17, as17, as17, as17, as17, as17, as17, as17, as17, as17}, //16
+            { as7,  as7,  as7,  as7,  as7,  as7,  as7,  as7,   as9, as7, as11,  as7,  as7,  as7,  as7,  as7,  as7,  as7,  as7,  as7}, //13
+            { as7,  as7,  as7,  as7,  as7,  as7,  as7,  as7, as12,  as7,  as7,  as7,  as7,  as7,  as7,  as7,  as7,  as7,  as7,  as7}, //14
+            { as7,  as7,  as7,  as7,  as7,  as7,  as7,  as7, as14,  as7,  as7,  as7,  as7,  as7,  as7,  as7,  as7,  as7,  as7,  as7}, //15
+            { as7,  as7,  as7,  as7,  as7,  as7,  as7,  as7, as16,  as7,  as7,  as7,  as7,  as7,  as7,  as7,  as7,  as7,  as7,  as7}, //16
             {err5, err5, err5, err5, err5, err5, err5, err5, err5, err5, err5, err5, err5, as18, err5, err5, err5, err5, err5, err5}, //17
             {err6, err6, err6, err6, err6, err6, err6, err6, err6, err6, err6, err6, err6, err6, as19, err6, err6, err6, err6, err6}, //18
     };
 
     public Lexico() {
 
+        palabrasReservadas = new Hashtable<>();
+        palabrasReservadas.put("IF",IF);
+        palabrasReservadas.put("THEN",THEN);
+        palabrasReservadas.put("ENDIF",ENDIF);
+        palabrasReservadas.put("PRINT",PRINT);
+        palabrasReservadas.put("FUNC",FUNC);
+        palabrasReservadas.put("RETURN",RETURN);
+        palabrasReservadas.put("BEGIN",BEGIN);
+        palabrasReservadas.put("END",END);
+        palabrasReservadas.put("BREAK",BREAK);
+        palabrasReservadas.put("ULONG",ULONG);
+        palabrasReservadas.put("DOUBLE",DOUBLE);
+        palabrasReservadas.put("REPEAT",REPEAT);
+        palabrasReservadas.put("PRE",PRE);
+        palabrasReservadas.put("TRY",TRY);
+        palabrasReservadas.put("CATCH",CATCH);
+        palabrasReservadas.put("TYPEDEF",TYPEDEF);
+        palabrasReservadas.put("UINT",UINT);
+
+
     }
+
+
+
+
 }
+
+
+

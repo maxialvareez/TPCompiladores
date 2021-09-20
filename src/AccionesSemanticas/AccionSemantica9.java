@@ -11,7 +11,7 @@ public class AccionSemantica9 extends Accion {
 
     @Override
     public Token ejecutar() {
-
+        System.out.println("[Lexico | Linea " + Lexico.linea + "] Se detecto un token -> " + Lexico.MENOR_IGUAL);
         return (new Token(Lexico.MENOR_IGUAL));
     /*
         if (buffer == "<=")

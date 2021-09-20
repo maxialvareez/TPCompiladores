@@ -11,8 +11,10 @@ public class AccionSemantica3 extends Accion {
     public Token ejecutar() {
         Lexico.cursor--;
 
-        if (Lexico.palabrasReservadas.containsKey(buffer))
+        if (Lexico.palabrasReservadas.containsKey(buffer)) {
+            System.out.println("[Lexico | Linea " + Lexico.linea + "] Se detecto un token de Palabra Reservada -> " + buffer);
             return (new Token(Lexico.palabrasReservadas.get(buffer)));
+        }
 
         else {
                 if (buffer.length() > 20) {
