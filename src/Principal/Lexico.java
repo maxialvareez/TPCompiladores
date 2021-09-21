@@ -234,7 +234,6 @@ public class Lexico {
         if (caracter == 34 || caracter == 44 || caracter == 47 || caracter == 41 || caracter == 40 || caracter == 123 || caracter == 125 || caracter == 59 ||caracter == 33)
             return 19; // 'Otros'
 
-
         return -1; // Caracter no válido.
     }
 }
