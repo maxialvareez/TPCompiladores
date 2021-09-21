@@ -167,28 +167,27 @@ public class Lexico {
         int columna = -1;
         Token token = null;
 
-        while ( (cursor < codigoFuente.length())) { // mientras no llego al final del codigo
+        while ( (cursor < codigoFuente.length())) { // Mientras no llegue al final del código fuente.
             caracter = codigoFuente.charAt(cursor);
             cursor++;
             columna = getColumna(caracter);
-            if (columna != -1) { // si no es un caracter invalido
-                if (matrizAcciones[estadoActual][columna] != null) // si hay una AS
+            if (columna != -1) { // Si no es un caracter inválido
+                if (matrizAcciones[estadoActual][columna] != null) // Acción semántica
                     token = matrizAcciones[estadoActual][columna].ejecutar();
-
                 estadoActual = matrizTransiciones[estadoActual][columna];
-                if ((estadoActual == F) && (token != null))//si estoy en final (tengo un token listo para devolver)
+                if ((estadoActual == F) && (token != null))// Si llegue a final y hay un token que retornar
                     return token;
                 else if (estadoActual == -1)
                     return token;
                 if (estadoActual == F)
                     estadoActual = 0;
-            } else { // error por caracter invalido
-                return new Error0().ejecutar();
+            } else {
+                return new Error0().ejecutar(); // Error caracter inválido
             }
             if (caracter == '\n')
                 linea++;
         }
-        return new Token(0); //Token = 0 de fin de archivo
+        return new Token(0); // Token = 0 de fin de archivo
     }
 
     private int getColumna(char caracter) {
@@ -197,11 +196,11 @@ public class Lexico {
         if (caracter == 69)
             return 3 ; // 'E'
         if ((caracter >= 65) && (caracter <= 90))
-            return 0; // LETRAS mayusculas
+            return 0; // Letras Mayúsculas
         if ((caracter >= 97) && (caracter <= 122))
-            return 1; // letras minusculas
+            return 1; // Letras Minúsculas
         if ((caracter >= 48) && (caracter <= 57))
-            return 2; // digitos
+            return 2; // Dígitos
         if (caracter == 95)
             return 4; // _
         if (caracter == 43)
@@ -227,16 +226,16 @@ public class Lexico {
         if (caracter == 46)
             return 15; // .
         if ((caracter == 32))
-            return 16; // blanco
+            return 16; // Blanco
         if (caracter == 9)
-            return 17; //TAB
+            return 17; // TAB
         if (caracter == 10 )
             return 18; // \n
         if (caracter == 34 || caracter == 44 || caracter == 47 || caracter == 41 || caracter == 40 || caracter == 123 || caracter == 125 || caracter == 59 ||caracter == 33)
-            return 19; // 'otros'
+            return 19; // 'Otros'
 
 
-        return -1; //caracter no valido
+        return -1; // Caracter no válido.
     }
 }
 
