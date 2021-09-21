@@ -173,13 +173,13 @@ public class Lexico {
             columna = getColumna(caracter);
             if (columna != -1) { // si no es un caracter invalido
                 if (matrizAcciones[estadoActual][columna] != null) // si hay una AS
-                    token = matrizAcciones[estadoActual][columna].ejecutar(); //ejecuto la AS correspondiente
+                    token = matrizAcciones[estadoActual][columna].ejecutar();
 
-                estadoActual = matrizTransiciones[estadoActual][columna]; // transicion de estado siempre
+                estadoActual = matrizTransiciones[estadoActual][columna];
                 if ((estadoActual == F) && (token != null))//si estoy en final (tengo un token listo para devolver)
                     return token;
                 else if (estadoActual == -1)
-                    return token;//estadoActual = 0;//DEBERIA IR A FINALo al inicio?
+                    return token;
                 if (estadoActual == F)
                     estadoActual = 0;
             } else { // error por caracter invalido

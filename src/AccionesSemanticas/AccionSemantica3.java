@@ -18,7 +18,7 @@ public class AccionSemantica3 extends Accion {
 
         else {
                 if (buffer.length() > 22) {
-                    buffer = buffer.substring(0, 21);
+                    buffer = buffer.substring(0, 22);
                     System.out.println("Warning: en la linea " + Lexico.linea + " un identificador superó el limite de 22 caracteres, por lo que fue cortado");
                 }
                 if (!Main.tSimbolos.existeLexema(buffer)) {

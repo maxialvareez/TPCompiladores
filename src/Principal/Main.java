@@ -43,7 +43,8 @@ public class Main {
 
         StringBuilder codigo = new StringBuilder(getCodigo(br));
 
-        System.out.println("Contenido del archivo: " + codigo);
+        System.out.println("Contenido del archivo: ");
+        System.out.println(codigo);
 
 
         //-------------- FIN CARGA DE ARCHIVO --------------
