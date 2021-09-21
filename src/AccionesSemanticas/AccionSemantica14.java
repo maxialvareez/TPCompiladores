@@ -1,6 +1,8 @@
 package AccionesSemanticas;
 
-import Principal.*;
+import Principal.Accion;
+import Principal.Lexico;
+import Principal.Token;
 
 public class AccionSemantica14 extends Accion {
 
@@ -9,7 +11,7 @@ public class AccionSemantica14 extends Accion {
 
     @Override
     public Token ejecutar() {
-        System.out.println("[Lexico | Linea " + Lexico.linea + "] Se detecto un token -> " + Lexico.IGUAL_IGUAL);
-        return (new Token(Lexico.IGUAL_IGUAL));
+        System.out.println("[Lexico | Linea " + Lexico.linea + "] Se detecto un token ->  :=");
+        return (new Token(Lexico.ASIGNACION));
     }
 }

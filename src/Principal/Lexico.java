@@ -19,15 +19,15 @@ public class Lexico {
     //TOKENS SIN ASCII
     public static final int IDE = 257;
     public static final int CTE_UINT = 258;
-    public static final int MAYOR_IGUAL = 259;
-    public static final int MENOR_IGUAL = 260;
-    public static final int IGUAL_IGUAL = 261;
-    public static final int DISTINTO = 262;
-    public static final int ASIGNACION = 263;
+    public static final int MAYOR_IGUAL = 259; // >=
+    public static final int MENOR_IGUAL = 260; // <=
+    public static final int IGUAL_IGUAL = 261; // ==
+    public static final int DISTINTO = 262;   // <>
+    public static final int ASIGNACION = 263; // :=
     public static final int CTE_DOUBLE = 264;
     public static final int CADENA = 265;
-    public static final int AND = 266;
-    public static final int OR = 267;
+    public static final int AND = 266;  // &&
+    public static final int OR = 267; // ||
 
 
     //PALABRAS RESERVADAS
@@ -61,12 +61,13 @@ public class Lexico {
     Accion as7 = new AccionSemantica7();
     Accion as8 = new AccionSemantica8();
     Accion as9 = new AccionSemantica9();
+    Accion as10 = new AccionSemantica10();
     Accion as11 = new AccionSemantica11();
     Accion as12 = new AccionSemantica12();
+    Accion as13 = new AccionSemantica13();
     Accion as14 = new AccionSemantica14();
+    Accion as15 = new AccionSemantica15();
     Accion as16 = new AccionSemantica16();
-    Accion as18 = new AccionSemantica18();
-    Accion as19 = new AccionSemantica19();
 
 
     //ERRORES
@@ -80,12 +81,12 @@ public class Lexico {
 
 
     private int [][] matrizTransiciones = {
-
-             // L   l   d   E   _   +   -   %   =   <   >   *   :   &   |   .  bl   tb \n  otros
+             // 0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17  18  19
+             // L   l   d   E   _   +   -   %   =   <   >   *   :   &   |   .  bl  tb  \n  otros
               { 1,  1,  2,  1,  1,  F,  F, 10, 15, 13, 14,  8, 16, 17, 18,  4,  0,  0,  0,  F}, //0
               { 1,  1,  1,  1,  1,  F,  F,  F,  F,  F,  F,  F,  F,  F,  F,  F,  F,  F,  F,  F}, //1
               { F,  F,  2,  F,  F,  F,  F,  F,  F,  F,  F,  F,  F,  F,  F,  3,  F,  F,  F,  F}, //2
-              { F,  F,  F,  F,  F,  5,  F,  F,  F,  F,  F,  F,  F,  F,  F,  F,  F,  F,  F,  F}, //3
+              { F,  F,  3,  5,  F,  F,  F,  F,  F,  F,  F,  F,  F,  F,  F,  F,  F,  F,  F,  F}, //3
               {-1, -1,  3, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}, //4
               {-1, -1,  7, -1, -1,  6,  6, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}, //5
               {-1, -1,  7, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}, //6
@@ -106,9 +107,9 @@ public class Lexico {
 
 
     private Accion[][] matrizAcciones = {
-
+            // 0     1     2     3     4     5     6     7    8     9    10    11    12    13     14    15   16     17    18    19
             // L     l     d     E     _     +     -     %    =     <     >     *     :     &      |     .   bl     tb    \n    otros
-            { as1,  as1,  as1,  as1,  as1,  as6,  as6, null, null, null, null, null, null, null, null,  as6, null, null, null,  as6}, //0
+            { as1,  as1,  as1,  as1,  as1,  as6,  as6, as10, null, null, null, null, null, null, null,  as1, null, null, null,  as6}, //0
             { as2,  as2,  as2,  as2,  as2,  as3,  as3,  as3,  as3,  as3,  as3,  as3,  as3,  as3,  as3,  as3,  as3,  as3,  as3,  as3}, //1
             { as4,  as4,  as2,  as4,  as4,  as4,  as4,  as4,  as4,  as4,  as4,  as4,  as4,  as4,  as4,  as2,  as4,  as4,  as4,  as4}, //2
             { as5,  as5,  as2,  as2,  as5,  as5,  as5,  as5,  as5,  as5,  as5,  as5,  as5,  as5,  as5,  as5,  as5,  as5,  as5,  as5}, //3
@@ -119,22 +120,22 @@ public class Lexico {
             { as7,  as7,  as7,  as7,  as7,  as7,  as7,  as7,  as7,  as7,  as7, null,  as7,  as7,  as7,  as7,  as7,  as7,  as7,  as7}, //8
             {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null}, //9
             { as2,  as2,  as2,  as2,  as2, null,  as2,  as8,  as2,  as2,  as2,  as2,  as2,  as2,  as2,  as2,  as2,  as2, err3,  as2}, //10
-            {err4, err4, err4, err4, err4, err4, err4, err4, err4, err4, err4, err4, err4, err4, err4, err4, err4, err4,  as2, err4}, //11
+            {err4, err4, err4, err4, err4, err4, err4, err4, err4, err4, err4, err4, err4, err4, err4, err4, err4, err4, null, err4}, //11
             {err3, err3, err3, err3, err3, null, err3, err3, err3, err3, err3, err3, err3, err3, err3, err3, err3, err3, err3, err3}, //12
             { as7,  as7,  as7,  as7,  as7,  as7,  as7,  as7,   as9, as7, as11,  as7,  as7,  as7,  as7,  as7,  as7,  as7,  as7,  as7}, //13
             { as7,  as7,  as7,  as7,  as7,  as7,  as7,  as7, as12,  as7,  as7,  as7,  as7,  as7,  as7,  as7,  as7,  as7,  as7,  as7}, //14
-            { as7,  as7,  as7,  as7,  as7,  as7,  as7,  as7, as14,  as7,  as7,  as7,  as7,  as7,  as7,  as7,  as7,  as7,  as7,  as7}, //15
-            { as7,  as7,  as7,  as7,  as7,  as7,  as7,  as7, as16,  as7,  as7,  as7,  as7,  as7,  as7,  as7,  as7,  as7,  as7,  as7}, //16
-            {err5, err5, err5, err5, err5, err5, err5, err5, err5, err5, err5, err5, err5, as18, err5, err5, err5, err5, err5, err5}, //17
-            {err6, err6, err6, err6, err6, err6, err6, err6, err6, err6, err6, err6, err6, err6, as19, err6, err6, err6, err6, err6}, //18
+            { as7,  as7,  as7,  as7,  as7,  as7,  as7,  as7, as13,  as7,  as7,  as7,  as7,  as7,  as7,  as7,  as7,  as7,  as7,  as7}, //15
+            { as7,  as7,  as7,  as7,  as7,  as7,  as7,  as7, as14,  as7,  as7,  as7,  as7,  as7,  as7,  as7,  as7,  as7,  as7,  as7}, //16
+            {err5, err5, err5, err5, err5, err5, err5, err5, err5, err5, err5, err5, err5, as15, err5, err5, err5, err5, err5, err5}, //17
+            {err6, err6, err6, err6, err6, err6, err6, err6, err6, err6, err6, err6, err6, err6, as16, err6, err6, err6, err6, err6}, //18
     };
 
-    public Lexico() {
+    public Lexico(StringBuilder codigo) {
 
 
         linea = 1;
         cursor = 0;
-        this.codigoFuente = codigoFuente;
+        this.codigoFuente = codigo;
 
         caracter = codigoFuente.charAt(cursor);
 

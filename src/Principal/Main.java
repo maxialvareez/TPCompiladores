@@ -48,6 +48,11 @@ public class Main {
 
         //-------------- FIN CARGA DE ARCHIVO --------------
 
-       // Principal.Lexico l1 = new Principal.Lexico(codigo);
+        Lexico l1 = new Lexico(codigo);
+
+        Token t = l1.getToken();
+        while (t.getId() != 0){
+            l1.getToken();
+        }
     }
 }

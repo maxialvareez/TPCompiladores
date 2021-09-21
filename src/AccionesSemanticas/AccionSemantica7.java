@@ -13,8 +13,8 @@ public class AccionSemantica7 extends Accion {
     public Token ejecutar() {
         Lexico.cursor --;
         char valor = Lexico.codigoFuente.charAt(Lexico.cursor -1);
-        System.out.println("[Lexico | Linea " + Lexico.linea + "] Se detecto un token -> " + valor);
-        return(new Token (valor));   //PROBAR SI FUNCIONA
+        System.out.println("[Lexico | Linea " + Lexico.linea + "] Se detecto un token ->  " + valor);
+        return(new Token (valor));
 
     }
 }
