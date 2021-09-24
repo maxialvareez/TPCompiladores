@@ -48,7 +48,7 @@ public class Lexico {
     public static final int CATCH = 282;
     public static final int TYPEDEF = 283;
     public static final int UINT = 284;
-
+    public static final int ENDREPEAT = 285;
 
     //ACCIONES SEMANTICAS
 
@@ -157,7 +157,7 @@ public class Lexico {
         palabrasReservadas.put("CATCH",CATCH);
         palabrasReservadas.put("TYPEDEF",TYPEDEF);
         palabrasReservadas.put("UINT",UINT);
-
+        palabrasReservadas.put ("ENDREPEAT", ENDREPEAT);
 
     }
 
