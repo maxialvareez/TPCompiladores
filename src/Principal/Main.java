@@ -1,7 +1,7 @@
 package Principal;
 
 import java.io.*;
-
+import Sintactico.*;
 public class Main {
 
     private static BufferedReader codigo;
@@ -51,9 +51,14 @@ public class Main {
 
         Lexico l1 = new Lexico(codigo);
 
+        Parser p = new Parser(l1);
+        p.run();
+
+/*
         Token t = l1.getToken();
         while (t.getId() != 0){
             l1.getToken();
         }
+ */
     }
 }

@@ -40,6 +40,9 @@ public class TablaSimbolos {
             System.out.println("Lexema: " + lexema + ", id: " + simbolos.get(lexema));
         }
     }
-
+    public void modificarSimbolo(String lexemaviejo, String lexemaNuevo) {
+        simbolos.remove(lexemaviejo);
+        simbolos.put(lexemaNuevo, Lexico.CTE_DOUBLE);
+    }
 
 }

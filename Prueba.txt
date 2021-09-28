@@ -1,0 +1,20 @@
+programita
+
+DOUBLE numero;
+
+FUNC sumar (DOUBLE n)
+UINT entero;
+BEGIN
+entero := n;
+IF (n&&2 -n || 2) THEN
+n:=3;
+ENDIF;
+RETURN (n+1);
+END;
+
+BEGIN 
+
+numero := 2;
+numero := 4;
+
+END

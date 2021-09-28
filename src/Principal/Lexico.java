@@ -17,7 +17,26 @@ public class Lexico {
     public static Hashtable<String,Integer> palabrasReservadas;
 
 
-    //PALABRAS RESERVADAS
+
+
+
+
+    //Tokens compuestos o sin valor ASCII
+    public static final int IDENTIFICADOR = 257;
+    public static final int CTE_UINT = 258;
+    public static final int MAYOR_IGUAL = 259; // >=
+    public static final int MENOR_IGUAL = 260; // <=
+    public static final int IGUAL_IGUAL = 261; // ==
+    public static final int DISTINTO = 262;   // <>
+    public static final int ASIGNACION = 263; // :=
+    public static final int CTE_DOUBLE = 264;
+    public static final int CADENA = 265;
+    public static final int AND = 266;  // &&
+    public static final int OR = 267; // ||
+
+
+
+    //Palabras reservadas
     public static final int IF = 268;
     public static final int THEN = 269;
     public static final int ENDIF = 270;
@@ -36,21 +55,7 @@ public class Lexico {
     public static final int TYPEDEF = 283;
     public static final int UINT = 284;
     public static final int ENDREPEAT = 285;
-
-
-
-    //TOKENS SIN ASCII
-    public static final int IDE = 257;
-    public static final int CTE_UINT = 258;
-    public static final int MAYOR_IGUAL = 259; // >=
-    public static final int MENOR_IGUAL = 260; // <=
-    public static final int IGUAL_IGUAL = 261; // ==
-    public static final int DISTINTO = 262;   // <>
-    public static final int ASIGNACION = 263; // :=
-    public static final int CTE_DOUBLE = 264;
-    public static final int CADENA = 265;
-    public static final int AND = 266;  // &&
-    public static final int OR = 267; // ||
+    public static final int ELSE = 286;
 
 
 
@@ -163,6 +168,7 @@ public class Lexico {
         palabrasReservadas.put("TYPEDEF",TYPEDEF);
         palabrasReservadas.put("UINT",UINT);
         palabrasReservadas.put ("ENDREPEAT", ENDREPEAT);
+        palabrasReservadas.put("ELSE", ELSE);
 
     }
 
