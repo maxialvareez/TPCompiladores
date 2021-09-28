@@ -201,8 +201,9 @@ public class Lexico {
         return new Token(0); // Token = 0 de fin de archivo
     }
 
-    private int getColumna(char caracter) {
 
+
+    private int getColumna(char caracter) {
 
         if (caracter == 69)
             return 3 ; // 'E'

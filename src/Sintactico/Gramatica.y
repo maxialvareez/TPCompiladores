@@ -39,7 +39,7 @@ error_bloque_ejecutable : bloque_sentencias END {System.out.println("Error sint�
    			 
 sentencia_ejecucion : control ';'
 		    		| seleccion ';'
-		   	 	| impresion ';'
+		   	 	    | impresion ';'
 		    		| invocacion ';' 
 		    		| asignacion ';'
 		    		| error_ejecucion
@@ -48,16 +48,17 @@ sentencia_ejecucion : control ';'
 error_ejecucion: control error {System.out.println("Error sintáctico: Linea " + Lexico.linea + " se detectó una sentencia mal declarada, falta ';'");}
                 | seleccion error {System.out.println("Error sintáctico: Linea " + Lexico.linea + " se detectó una sentencia mal declarada, falta ';'");}
                 | impresion error {System.out.println("Error sintáctico: Linea " + Lexico.linea + " se detectó una sentencia mal declarada, falta ';'");}
-           	 | asignacion error {System.out.println("Error sintáctico: Linea " + Lexico.linea + " se detectó una sentencia mal declarada, falta ';'");}
+           	       | asignacion error {System.out.println("Error sintáctico: Linea " + Lexico.linea + " se detectó una sentencia mal declarada, falta ';'");}
              	 | invocacion error {System.out.println("Error sintáctico: Linea " + Lexico.linea + " se detectó una sentencia mal declarada, falta ';'");}
                	 ;
 
 
 declaracion : tipo lista_de_variables ';'{System.out.println("[Parser | Linea " + Lexico.linea + "] se detectó una declaracion de variables");}
-    	    | funcion';'
-    	    | TYPEDEF IDENTIFICADOR '=' funcion ';'
+    	    | tipo funcion';'
+    	    | TYPEDEF IDENTIFICADOR '=' tipo funcion_type ';'
     	    | error_declaracion
             ;
+
 
 error_declaracion : tipo lista_de_variables error {System.out.println("Error sintáctico: Linea " + Lexico.linea + " se detectó una sentencia mal declarada, falta ';'");}
            	  |  funcion error {System.out.println("Error sintáctico: Linea " + Lexico.linea + " se detectó una sentencia mal declarada, falta ';'");}
@@ -167,8 +168,17 @@ parametro : tipo IDENTIFICADOR
 	  | error_parametro
 	  ;
 
+
 error_parametro :  tipo error {System.out.println("Error sintáctico: Linea " + Lexico.linea + " se detectó un parámetro mal declarado, falta el nombre identificador");}
 		 ;
+
+
+funcion_type: FUNC '(' tipo ')' bloque_type
+            ;
+
+bloque_type: IDENTIFICADOR lista_de_variables
+            ;
+
 
 
 bloque_funcion : bloque_declarativo bloque_ejecucion_funcion
