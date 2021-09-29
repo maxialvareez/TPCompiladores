@@ -12,6 +12,10 @@ ENDIF;
 RETURN (n+1);
 END;
 
+TYPEDEF hola = UINT FUNC (UINT)
+hola x,y,z
+
+
 BEGIN 
 
 numero := 2;

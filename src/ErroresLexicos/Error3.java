@@ -10,7 +10,7 @@ public class Error3 extends Accion {
     @Override
     public Token ejecutar() {
 
-        System.out.println("Error Lexico: en la linea " + Lexico.linea + ": se debe colocar un signo '+' antes y despues de un salto de linea");
+        System.out.println("[ERROR LEXICO] [Linea " + Lexico.linea + "] {Se debe colocar un signo '+' antes y después de un salto de linea}");
         Lexico.cursor --;
         while ((Lexico.codigoFuente.charAt(Lexico.cursor) != '%') && (Lexico.cursor <= (Lexico.codigoFuente.length()-1)))      //Desecha la cadena completa
             Lexico.cursor ++;

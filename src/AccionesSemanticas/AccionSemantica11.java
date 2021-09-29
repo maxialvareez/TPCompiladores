@@ -12,7 +12,7 @@ public class AccionSemantica11 extends Accion {
     @Override
     public Token ejecutar() {
 
-        System.out.println("[Lexico | Linea " + Lexico.linea + "] Se detecto un token ->  <>");
+        System.out.println("[Lexico] [Linea " + Lexico.linea + "] {Token detectado} >>  <>");
         return (new Token(Lexico.DISTINTO));
 
     }

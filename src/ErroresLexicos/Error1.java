@@ -12,7 +12,7 @@ public class Error1 extends Accion {
     @Override
     public Token ejecutar() {
         Lexico.cursor --;
-        System.out.println("Se espera un digito pero se recibe un caracter que no lo es");
+        System.out.println("[ERROR LEXICO] [Linea " + Lexico.linea + "] {Se espera un digito pero se recibe un caracter que no lo es}");
         return null;
     }
 }

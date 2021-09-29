@@ -14,7 +14,7 @@ public class Error5 extends Accion {
 
         buffer += "&";
         Lexico.cursor --;
-        System.out.println("Warning:Se espera un & y recibe otra cosa");
+        System.out.println("[WARNING] [Linea " + Lexico.linea + "] {Se espera un & y recibe otro caracter}");
         return (new Token(Lexico.AND));
     }
 }

@@ -1,7 +1,6 @@
 package ErroresLexicos;
+import Principal.*;
 
-import Principal.Accion;
-import Principal.Token;
 
 public class Error0 extends Accion {
     public Error0() {
@@ -9,7 +8,7 @@ public class Error0 extends Accion {
 
     @Override
     public Token ejecutar() {
-        System.out.println("El caracter que se ingreso es invalido");
+        System.out.println("[ERROR LEXICO] [Linea "+ Lexico.linea + "] {El caracter que se ingreso es invalido}");
         return null;
     }
 }
