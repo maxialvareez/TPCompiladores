@@ -22,12 +22,14 @@ bloque_declarativo : declaracion
 				|bloque_declarativo declaracion
                    ;
 
-bloque_ejecutable : BEGIN bloque_sentencias END
+bloque_ejecutable :BEGIN bloque_sentencias END
 		  | error_bloque_ejecutable
                   ;
 
+
+
 bloque_sentencias: sentencia_ejecucion
-	| bloque_sentencias sentencia_ejecucion
+                |bloque_sentencias sentencia_ejecucion
 	;
  
 
@@ -71,7 +73,7 @@ tipo : UINT
      | DOUBLE
      ;
 
-control : REPEAT'('IDENTIFICADOR'='CTE_UINT';'condicion';' CTE_UINT')' bloque_control ENDREPEAT {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Sentencia REPEAT}");}
+control : REPEAT'('IDENTIFICADOR ASIGNACION CTE_UINT';'condicion';' CTE_UINT')' bloque_control ENDREPEAT {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Sentencia REPEAT}");}
 	| error_control
 	;
 
@@ -227,17 +229,17 @@ condicion : expresion
 	  | condicion OR expresion {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Se realizó la operación: " + $1.sval + "||" + $3.sval + "}");}
 	  ;
 
-expresion: expresionn
-	    | expresion AND expresionn {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Se realizó la operación: " + $1.sval + "&&" + $3.sval+ "}");}
+expresion: expresion1
+	    | expresion AND expresion1 {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Se realizó la operación: " + $1.sval + "&&" + $3.sval+ "}");}
 	    ;
 
-expresionn: expresionnn
-		| expresionn comparador expresionnn {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Se realizó la operación: " + $1.sval +$2.sval+ $3.sval + "}");}
+expresion1: expresion2
+		| expresion1 comparador expresion2 {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Se realizó la operación: " + $1.sval +$2.sval+ $3.sval + "}");}
 
 
-expresionnn: termino
-	  | expresionnn '+' termino {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Se realizó la operación: " + $1.sval +"+"+ $3.sval+ "}");}
-	  | expresionnn '-' termino {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Se realizó la operación: " + $1.sval +"-"+ $3.sval+ "}");}
+expresion2: termino
+	  | expresion2 '+' termino {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Se realizó la operación: " + $1.sval +"+"+ $3.sval+ "}");}
+	  | expresion2 '-' termino {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Se realizó la operación: " + $1.sval +"-"+ $3.sval+ "}");}
 	  ;
 
 termino : termino '*' factor {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Se realizó la operación: " + $1.sval +"*"+ $3.sval+ "}");}
