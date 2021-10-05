@@ -60,5 +60,8 @@ public class Main {
             l1.getToken();
         }
  */
+        System.out.println("\n -----TABLA DE SIMBOLOS------");
+        tSimbolos.printTablaSimbolos();
+
     }
 }

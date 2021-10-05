@@ -23,7 +23,7 @@ public class Lexico {
 
     //Tokens compuestos o sin valor ASCII
     public static final int IDENTIFICADOR = 257;
-    public static final int CTE_UINT = 258;
+    public static final int CTE_ULONG = 258;
     public static final int MAYOR_IGUAL = 259; // >=
     public static final int MENOR_IGUAL = 260; // <=
     public static final int IGUAL_IGUAL = 261; // ==
@@ -53,9 +53,8 @@ public class Lexico {
     public static final int TRY = 281;
     public static final int CATCH = 282;
     public static final int TYPEDEF = 283;
-    public static final int UINT = 284;
-    public static final int ENDREPEAT = 285;
-    public static final int ELSE = 286;
+    public static final int ENDREPEAT = 284;
+    public static final int ELSE = 285;
 
 
 
@@ -166,7 +165,6 @@ public class Lexico {
         palabrasReservadas.put("TRY",TRY);
         palabrasReservadas.put("CATCH",CATCH);
         palabrasReservadas.put("TYPEDEF",TYPEDEF);
-        palabrasReservadas.put("UINT",UINT);
         palabrasReservadas.put ("ENDREPEAT", ENDREPEAT);
         palabrasReservadas.put("ELSE", ELSE);
 

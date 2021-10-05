@@ -3,22 +3,14 @@ programita
 DOUBLE numero;
 
 FUNC sumar (DOUBLE n)
-UINT entero;
+ULONG entero;
 BEGIN
-entero := n;
-IF (n&&2 -n || 2) THEN
+IF (n&&2||4) THEN
 n:=3;
 ENDIF;
 RETURN (n+1/2);
 END;
 
-TYPEDEF hola = UINT FUNC (UINT)
-hola x,y,z
-
-
 BEGIN
-
-numero := 2;
-numero := 4;
-
+n:=2;
 END

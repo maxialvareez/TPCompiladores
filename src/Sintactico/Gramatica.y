@@ -3,7 +3,7 @@ package Sintactico;
 import Principal.*;
 %}
 
-%token IDENTIFICADOR CTE_UINT MAYOR_IGUAL MENOR_IGUAL IGUAL_IGUAL DISTINTO ASIGNACION CTE_DOUBLE CADENA AND OR IF THEN ENDIF PRINT FUNC RETURN BEGIN END BREAK ULONG DOUBLE REPEAT PRE TRY CATCH TYPEDEF UINT ENDREPEAT ELSE
+%token IDENTIFICADOR CTE_ULONG MAYOR_IGUAL MENOR_IGUAL IGUAL_IGUAL DISTINTO ASIGNACION CTE_DOUBLE CADENA AND OR IF THEN ENDIF PRINT FUNC RETURN BEGIN END BREAK ULONG DOUBLE REPEAT PRE TRY CATCH TYPEDEF  ENDREPEAT ELSE
 
 %start programa
 
@@ -69,25 +69,25 @@ error_declaracion : tipo lista_de_variables error {System.out.println("[ERROR SI
 
 
 
-tipo : UINT
+tipo : ULONG
      | DOUBLE
      ;
 
-control : REPEAT'('IDENTIFICADOR ASIGNACION CTE_UINT';'condicion';' CTE_UINT')' bloque_control ENDREPEAT {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Sentencia REPEAT}");}
+control : REPEAT'('IDENTIFICADOR ASIGNACION CTE_ULONG';'condicion';' CTE_ULONG')' bloque_control ENDREPEAT {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Sentencia REPEAT}");}
 	| error_control
 	;
 
-error_control : REPEAT IDENTIFICADOR '=' CTE_UINT ';' condicion ';' CTE_UINT ')' bloque_control ENDREPEAT{System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {REPEAT mal declarado, falta '('}");}
-	 | REPEAT '('  '=' CTE_UINT ';' condicion ';' CTE_UINT ')' bloque_control ENDREPEAT {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {REPEAT mal declarado, falta el identificador }");}
-	 | REPEAT'('IDENTIFICADOR   CTE_UINT';'condicion';' CTE_UINT')'bloque_control ENDREPEAT {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {REPEAT mal declarado, falta '='}");}
-	 | REPEAT'('IDENTIFICADOR'='        ';'condicion';' CTE_UINT')'bloque_control ENDREPEAT {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {REPEAT mal declarado, falta una constante UINT}");}
-	 | REPEAT'('IDENTIFICADOR'='CTE_UINT   condicion';' CTE_UINT')'bloque_control ENDREPEAT {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {REPEAT mal declarado, falta ';'}");}
-	 | REPEAT'('IDENTIFICADOR'='CTE_UINT';'         ';' CTE_UINT')'bloque_control ENDREPEAT {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {REPEAT mal declarado, falta la condición}");}
-	 | REPEAT'('IDENTIFICADOR'='CTE_UINT';'condicion    CTE_UINT')'bloque_control ENDREPEAT {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {REPEAT mal declarado, falta ';'}");}
-	 | REPEAT'('IDENTIFICADOR'='CTE_UINT';'condicion';'        ')'bloque_control ENDREPEAT {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {REPEAT mal declarado, falta una constante CTE_UINT}");}
-	 | REPEAT'('IDENTIFICADOR'='CTE_UINT';'condicion';'CTE_UINT   bloque_control ENDREPEAT {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {REPEAT mal declarado, falta ')'}");}
-	 | REPEAT'('IDENTIFICADOR'='CTE_UINT';'condicion';'CTE_UINT')'               ENDREPEAT{System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {REPEAT mal declarado, falta el bloque de sentencias}");}
-	 | REPEAT'('IDENTIFICADOR'='CTE_UINT';'condicion';'CTE_UINT')' bloque_control          {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {REPEAT mal declarado, falta indicar el fin del ciclo con ENDREPEAT}");}
+error_control : REPEAT IDENTIFICADOR '=' CTE_ULONG ';' condicion ';' CTE_ULONG ')' bloque_control ENDREPEAT{System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {REPEAT mal declarado, falta '('}");}
+	 | REPEAT '('  '=' CTE_ULONG ';' condicion ';' CTE_ULONG ')' bloque_control ENDREPEAT {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {REPEAT mal declarado, falta el identificador }");}
+	 | REPEAT'('IDENTIFICADOR   CTE_ULONG';'condicion';' CTE_ULONG')'bloque_control ENDREPEAT {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {REPEAT mal declarado, falta '='}");}
+	 | REPEAT'('IDENTIFICADOR'='        ';'condicion';' CTE_ULONG')'bloque_control ENDREPEAT {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {REPEAT mal declarado, falta una constante ULONG}");}
+	 | REPEAT'('IDENTIFICADOR'='CTE_ULONG   condicion';' CTE_ULONG')'bloque_control ENDREPEAT {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {REPEAT mal declarado, falta ';'}");}
+	 | REPEAT'('IDENTIFICADOR'='CTE_ULONG';'         ';' CTE_ULONG')'bloque_control ENDREPEAT {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {REPEAT mal declarado, falta la condición}");}
+	 | REPEAT'('IDENTIFICADOR'='CTE_ULONG';'condicion    CTE_ULONG')'bloque_control ENDREPEAT {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {REPEAT mal declarado, falta ';'}");}
+	 | REPEAT'('IDENTIFICADOR'='CTE_ULONG';'condicion';'        ')'bloque_control ENDREPEAT {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {REPEAT mal declarado, falta una constante CTE_ULONG}");}
+	 | REPEAT'('IDENTIFICADOR'='CTE_ULONG';'condicion';'CTE_ULONG   bloque_control ENDREPEAT {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {REPEAT mal declarado, falta ')'}");}
+	 | REPEAT'('IDENTIFICADOR'='CTE_ULONG';'condicion';'CTE_ULONG')'               ENDREPEAT{System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {REPEAT mal declarado, falta el bloque de sentencias}");}
+	 | REPEAT'('IDENTIFICADOR'='CTE_ULONG';'condicion';'CTE_ULONG')' bloque_control          {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {REPEAT mal declarado, falta indicar el fin del ciclo con ENDREPEAT}");}
 	 ;
 
 bloque_control : sentencia_control
@@ -103,7 +103,7 @@ error_sentencia_control : BREAK error {System.out.println("Error sintáctico: Li
                	 	;
 
 asignacion : IDENTIFICADOR ASIGNACION condicion
-	   	  |error_asignacion;	
+	   	  |error_asignacion;
 	   ;
 
 
@@ -200,13 +200,13 @@ bloque_ejecucion_funcion : BEGIN bloque_sentencias RETURN '('condicion')' ';' EN
    			 ;			
 
 error_bloque_ejecucion_funcion :       bloque_sentencias RETURN '('condicion')' ';' END  {System.out.println("Error sintáctico: Linea " + Lexico.linea + " se detectó un error en una funcion, falta el BEGIN");}
-				|BEGIN                   RETURN '('condicion')' ';' END  {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {rror en una funcion, falta el bloque de sentencias ejecutables");}
-				|BEGIN bloque_sentencias        '('condicion')' ';' END  {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {rror en una funcion, falta el RETURN");}
-				|BEGIN bloque_sentencias RETURN    condicion')' ';' END  {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {rror en una funcion, falta '(' ");}
-				|BEGIN bloque_sentencias RETURN '('         ')' ';' END  {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {rror en una funcion, falta indicar el retorno");}
-				|BEGIN bloque_sentencias RETURN '('condicion    ';' END  {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {rror en una funcion, falta ')' ");}
-				|BEGIN bloque_sentencias RETURN '('condicion')'     END  {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {rror en una funcion, falta ';' ");}
-				|BEGIN bloque_sentencias RETURN '('condicion')' ';' error  {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {rror en una funcion, falta el END ");}
+				|BEGIN                   RETURN '('condicion')' ';' END  {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Error en una funcion, falta el bloque de sentencias ejecutables");}
+				|BEGIN bloque_sentencias        '('condicion')' ';' END  {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Error en una funcion, falta el RETURN");}
+				|BEGIN bloque_sentencias RETURN    condicion')' ';' END  {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Error en una funcion, falta '(' ");}
+				|BEGIN bloque_sentencias RETURN '('         ')' ';' END  {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Error en una funcion, falta indicar el retorno");}
+				|BEGIN bloque_sentencias RETURN '('condicion    ';' END  {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Error en una funcion, falta ')' ");}
+				|BEGIN bloque_sentencias RETURN '('condicion')'     END  {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Error en una funcion, falta ';' ");}
+				|BEGIN bloque_sentencias RETURN '('condicion')' ';' error  {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Error en una funcion, falta el END ");}
 
 				       PRE '('condicion')' bloque_sentencias RETURN '('condicion')' ';' END  {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Error en una funcion, falta el BEGIN}");}
 				|BEGIN PRE '('condicion')'                   RETURN '('condicion')' ';' END  {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Error en una funcion, falta el bloque de sentencias ejecutables}");}
@@ -226,30 +226,30 @@ error_bloque_ejecucion_funcion :       bloque_sentencias RETURN '('condicion')' 
 
 
 condicion : expresion
-	  | condicion OR expresion {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Se realizó la operación: " + $1.sval + "||" + $3.sval + "}");}
+	  | condicion OR expresion {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Se realizó la operación OR }");}
 	  ;
 
 expresion: expresion1
-	    | expresion AND expresion1 {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Se realizó la operación: " + $1.sval + "&&" + $3.sval+ "}");}
+	    | expresion AND expresion1 {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Se realizó la operación: AND}");}
 	    ;
 
 expresion1: expresion2
-		| expresion1 comparador expresion2 {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Se realizó la operación: " + $1.sval +$2.sval+ $3.sval + "}");}
+		| expresion1 comparador expresion2 {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Se realizó la operación: " +  $2.sval + "}");}
 
 
 expresion2: termino
-	  | expresion2 '+' termino {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Se realizó la operación: " + $1.sval +"+"+ $3.sval+ "}");}
-	  | expresion2 '-' termino {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Se realizó la operación: " + $1.sval +"-"+ $3.sval+ "}");}
+	  | expresion2 '+' termino {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Se realizó la operación: SUMA }");}
+	  | expresion2 '-' termino {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Se realizó la operación: RESTA}");}
 	  ;
 
-termino : termino '*' factor {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Se realizó la operación: " + $1.sval +"*"+ $3.sval+ "}");}
-	| termino '/' factor  {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Se realizó la operación: " + $1.sval +"/"+ $3.sval+ "}");}
+termino : termino '*' factor {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Se realizó la operación: MULTIPLICACIÓN}");}
+	| termino '/' factor  {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Se realizó la operación: DIVISION}");}
 	| factor
         ;
 
 
 factor 	: CTE_DOUBLE {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Constante DOUBLE: " + $1.sval);}
-        | CTE_UINT {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Constante UINT: " + $1.sval);}
+        | CTE_ULONG {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Constante ULONG: " + $1.sval);}
         | '-' factor {chequearFactorNegado();}
 	    | IDENTIFICADOR {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Identificador: " + $1.sval +"}");}
         ;
@@ -289,16 +289,16 @@ public void yyerror(String s){
 public void chequearFactorNegado(){
 	String lexema = yylval.sval;
 	int id = Main.tSimbolos.getId(lexema);
-	if(id == Lexico.CTE_UINT){
-		System.out.println("Error sintáctico: Linea " + Lexico.linea + " se detectó una constante UINT fuera de rango");
+	if(id == Lexico.CTE_ULONG){
+		System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Se detectó una constante ULONG fuera de rango}");
 		Main.tSimbolos.eliminarSimbolo(lexema);
 	}
 	else if (id == Lexico.CTE_DOUBLE) {
-		double valor = -1*Double.parseDouble(lexema.replace('d','e'));
+		double valor = -1*Double.parseDouble(lexema);
 		if(( valor > 2.2250738585272014e-308 && valor < 1.7976931348623157e+308) || (valor > -1.7976931348623157e+308 && valor < -2.2250738585072014e-308) || (valor == 0.0))
                 	Main.tSimbolos.modificarSimbolo(lexema, String.valueOf(valor));
                 else {
-                	System.out.println("Error sintáctico: Linea " + Lexico.linea + " se detectó una constante DOUBLE fuera de rango");
+                	System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "]  {Se detectó una constante DOUBLE fuera de rango}");
 	               	Main.tSimbolos.eliminarSimbolo(lexema);
 	 	}
 	}

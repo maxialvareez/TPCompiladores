@@ -13,9 +13,9 @@ public class AccionSemantica4 extends Accion {
         int valor = Integer.parseInt(buffer);
 
         if ((valor >= 0) && (valor <= Math.pow(2,32) - 1)) {
-            System.out.println("[Lexico] [Linea " + Lexico.linea + "] {Se detectó un token de tipo Entero sin signo} >> " + buffer);
-            Main.tSimbolos.agregarSimbolo(buffer,Lexico.CTE_UINT);
-            return (new Token(buffer, Lexico.CTE_UINT));
+            System.out.println("[Lexico] [Linea " + Lexico.linea + "] {Se detectó un token de tipo Entero Largo Sin Signo} >> " + buffer);
+            Main.tSimbolos.agregarSimbolo(buffer,Lexico.CTE_ULONG);
+            return (new Token(buffer, Lexico.CTE_ULONG));
         }
         else{
             System.out.println("[ERROR LEXICO] [Linea " + Lexico.linea + "] {Valor de tipo UINT fuera de rango}");
