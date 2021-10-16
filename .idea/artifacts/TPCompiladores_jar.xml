@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="TPCompiladores:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/TPCompiladores_jar</output-path>
+    <root id="archive" name="TPCompiladores.jar">
+      <element id="module-output" name="TPCompiladores" />
+    </root>
+  </artifact>
+</component>

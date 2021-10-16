@@ -53,8 +53,7 @@ public class Lexico {
     public static final int TRY = 281;
     public static final int CATCH = 282;
     public static final int TYPEDEF = 283;
-    public static final int ENDREPEAT = 284;
-    public static final int ELSE = 285;
+    public static final int ELSE = 284;
 
 
 
@@ -165,7 +164,6 @@ public class Lexico {
         palabrasReservadas.put("TRY",TRY);
         palabrasReservadas.put("CATCH",CATCH);
         palabrasReservadas.put("TYPEDEF",TYPEDEF);
-        palabrasReservadas.put ("ENDREPEAT", ENDREPEAT);
         palabrasReservadas.put("ELSE", ELSE);
 
     }
