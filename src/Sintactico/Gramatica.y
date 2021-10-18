@@ -189,7 +189,16 @@ error_parametro :  tipo error {System.out.println("[ERROR SINTÁCTICO] [Linea " 
 
 
 funcion_type: FUNC '(' tipo ')' ';' bloque_type
+            |error_funcion_type
             ;
+
+error_funcion_type:  '(' tipo ')' ';' bloque_type {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Falta la palabra FUNC}");}
+                    |FUNC  tipo ')' ';' bloque_type {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Función TYPE mal declarada, falta un '('}");}
+                    |FUNC '('  ')' ';' bloque_type {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Función TYPE mal declarada, falta indicar el tipo}");}
+                    |FUNC '(' tipo  ';' bloque_type {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Función TYPE mal declarada, falta un ')'}");}
+                    |FUNC '(' tipo ')'  bloque_type {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Función TYPE mal declarada, falta un ';'}");}
+                    |FUNC '(' tipo ')' ';' error  {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Función TYPE mal declarada, falta un el bloque de dicha función}");}
+                    ;
 
 bloque_type: IDENTIFICADOR lista_de_variables
             ;
