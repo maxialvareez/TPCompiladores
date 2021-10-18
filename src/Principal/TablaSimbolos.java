@@ -12,7 +12,7 @@ public class TablaSimbolos {
     }
 
     public Integer getId(String s ){
-        if (simbolos.contains(s))
+        if (simbolos.containsKey(s))
             return simbolos.get(s);
         else
             return null;

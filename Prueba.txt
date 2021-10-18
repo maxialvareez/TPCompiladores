@@ -1,11 +1,32 @@
 programita
 DOUBLE numero;
 ULONG a,b,d;
+ULONG k;
+DOUBLE j;
+ULONG FUNC f1 (DOUBLE dou)
+ULONG c,d,e
+DOUBLE g;
 BEGIN
-d := d;
-REPEAT (a := 5; i < d; 5)
+c:= 4;
+d:= 5;
+g:= 1.4;
+IF (a <> 55) THEN
 BEGIN
-s := d;
-s := 2;
-END;;
+s :=s;
+a :=f;
+END;
+ELSE
+BEGIN
+d := -2 ;
+d := -3;
+END;
+ENDIF;
+END;
+TYPEDEF f2 = ULONG FUNC (ULONG);
+f2 x, y, z;
+BEGIN
+
+j := -0.4;
+
+
 END
