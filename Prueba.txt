@@ -1,8 +1,17 @@
 programita
+
 DOUBLE numero;
 ULONG a,b,d;
 ULONG k;
 DOUBLE j;
+
+ULONG FUNC f(ULONG x)
+ULONG y, z;
+BEGIN
+PRE: (x > 3);
+RETURN (x + 1);
+END;
+
 ULONG FUNC f1 (DOUBLE dou)
 ULONG c,d,e
 DOUBLE g;
@@ -24,9 +33,14 @@ ENDIF;
 END;
 TYPEDEF f2 = ULONG FUNC (ULONG);
 f2 x, y, z;
+
 BEGIN
 
 j := -0.4;
 
+REPEAT (i = 1; i<10; 1)
+BEGIN
+i:= 1;
+END;
 
 END
