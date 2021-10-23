@@ -9,7 +9,8 @@ import Principal.*;
 
 
 %%
-programa : IDENTIFICADOR bloque_declarativo bloque_ejecutable {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Programa llamado " +$1.sval + "}");}
+programa : IDENTIFICADOR bloque_declarativo bloque_ejecutable {System.out.println("[Sintáctico] [Linea " + Lexico.linea + '"] {Programa llamado " +$1.sval + "'}");}
+         |IDENTIFICADOR  bloque_ejecutable {System.out.println("[Sintáctico] [Linea " + Lexico.linea + '"] {Programa llamado " +$1.sval + "'}");}
          | error_programa
          ;
 
