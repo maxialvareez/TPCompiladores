@@ -40,13 +40,21 @@ error_bloque_ejecutable : bloque_sentencias END {System.out.println("[ERROR SINT
 
 
    			 
-sentencia_ejecucion : control ';'
-		    		| seleccion ';'
-		   	 	    | impresion ';'
-		    		| invocacion ';' 
-		    		| asignacion ';'
-		    		| error_ejecucion
+sentencia_ejecucion : sentencia_ejecutable
+                      try_catch ';'
+                      |error_sentencia_ejecucion
 		    		;
+
+error_sentencia_ejecucion: 	try_catch error {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Sentencia mal declarada, falta ';'}");}
+                           ;
+
+sentencia_ejecutable: control ';'
+                        | seleccion ';'
+                        | impresion ';'
+                        | invocacion ';'
+                        | asignacion ';'
+                        | error_ejecucion
+                        ;
 
 error_ejecucion: control error {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Sentencia mal declarada, falta ';'}");}
                 |seleccion error {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Sentencia mal declarada, falta ';'}");}
@@ -158,6 +166,15 @@ error_invocacion: '(' parametro ')' {System.out.println("[ERROR SINTÁCTICO] [Li
 		| IDENTIFICADOR '('parametro {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Invocación de función mal declarada, falta el ')'}");}
 		;
 
+try_catch: TRY sentencia_ejecutable CATCH bloque_ejecutable
+           |error_try_catch
+            ;
+
+error_try_catch:  sentencia_ejecucion CATCH bloque_ejecutable {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Falta la palabra TRY}");}
+                   | TRY  CATCH bloque_ejecutable {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Falta la  sentencia ejecutable después del TRY}");}
+                   | TRY sentencia_ejecucion bloque_ejecutable {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Falta la palabra CATCH}");}
+                   | TRY sentencia_ejecucion CATCH error {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Falta el bloque de sentencias ejecutables despues del CATCH}");}
+                    ;
 
 lista_de_variables : lista_de_variables ',' IDENTIFICADOR {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {se leyo el Identificador -> " + $3.sval);}
 			    |IDENTIFICADOR {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Identificador :" + $1.sval + "}");}
@@ -207,14 +224,13 @@ bloque_type: IDENTIFICADOR lista_de_variables
 
 
 bloque_funcion : bloque_declarativo bloque_ejecucion_funcion
-	       | bloque_declarativo TRY sentencia_ejecucion CATCH bloque_ejecutable
+           | bloque_ejecucion_funcion
  	       | error_bloque_funcion
 	       ;
 
-error_bloque_funcion : bloque_declarativo sentencia_ejecucion CATCH bloque_ejecutable {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Error en una función, falta el TRY}");}
-		     | bloque_declarativo TRY CATCH bloque_ejecutable  {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Error en una función, la sentencia ejecutable después del TRY}");}
-		     |  bloque_declarativo TRY sentencia_ejecucion bloque_ejecutable  {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Error en una función, falta el CATCH}");}
+error_bloque_funcion : bloque_declarativo error {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Funcion mal declarada, falta el bloque de sentencias ejecutables}");}
 		     ;
+
 
 bloque_ejecucion_funcion : BEGIN bloque_sentencias RETURN '('condicion')' ';' END 
 			 | BEGIN PRE ':' '(' condicion ')' ';' bloque_sentencias RETURN '('condicion')' ';' END
@@ -244,6 +260,7 @@ error_bloque_ejecucion_funcion :       bloque_sentencias RETURN '('condicion')' 
 				|BEGIN PRE '('condicion')' ';'bloque_sentencias RETURN '('condicion    ';' END  {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Error en una funcion, falta ')' }");}
 				|BEGIN PRE '('condicion')' ';'bloque_sentencias RETURN '('condicion')'      END  {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Error en una funcion, falta ';' }");}
 				|BEGIN PRE '('condicion')' ';'bloque_sentencias RETURN '('condicion')' ';' error  {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Error en una funcion, falta el END }");}
+                |BEGIN PRE '('condicion')' ';'bloque_sentencias END  {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Error en una funcion, falta indicar un retorno }");}
                 ;
 
 

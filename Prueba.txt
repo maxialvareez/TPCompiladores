@@ -1,46 +1,13 @@
-programita
+pruebaTryCatch
 
-DOUBLE numero;
-ULONG a,b,d;
-ULONG k;
-DOUBLE j;
-
-ULONG FUNC f(ULONG x)
-ULONG y, z;
-BEGIN
-PRE: (x > 3);
-RETURN (x + 1);
-END;
-
-ULONG FUNC f1 (DOUBLE dou)
-ULONG c,d,e
-DOUBLE g;
-BEGIN
-c:= 4;
-d:= 5;
-g:= 1.4;
-IF (a <> 55) THEN
-BEGIN
-s :=s;
-a :=f;
-END;
-ELSE
-BEGIN
-d := -2 ;
-d := -3;
-END;
-ENDIF;
-END;
-TYPEDEF f2 = ULONG FUNC (ULONG);
-f2 x, y, z;
-
+ULONG i;
 BEGIN
 
-j := -0.4;
+TRY
+x := f(ULONG z) * 4;
 
-REPEAT (i = 1; i<10; 1)
-BEGIN
-i:= 1;
+CATCH BEGIN
+x := 10;
 END;
 
 END
