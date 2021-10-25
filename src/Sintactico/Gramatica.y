@@ -9,8 +9,8 @@ import Principal.*;
 
 
 %%
-programa : IDENTIFICADOR bloque_declarativo bloque_ejecutable {System.out.println("[Sintáctico] [Linea " + Lexico.linea + '"] {Programa llamado " +$1.sval + "'}");}
-         |IDENTIFICADOR  bloque_ejecutable {System.out.println("[Sintáctico] [Linea " + Lexico.linea + '"] {Programa llamado " +$1.sval + "'}");}
+programa : IDENTIFICADOR bloque_declarativo bloque_ejecutable {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Programa llamado '" +$1.sval + "'}");}
+         |IDENTIFICADOR  bloque_ejecutable {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Programa llamado '" +$1.sval + "'}");}
          | error_programa
          ;
 
@@ -41,7 +41,7 @@ error_bloque_ejecutable : bloque_sentencias END {System.out.println("[ERROR SINT
 
    			 
 sentencia_ejecucion : sentencia_ejecutable
-                      try_catch ';'
+                      |try_catch ';'
                       |error_sentencia_ejecucion
 		    		;
 
@@ -156,7 +156,7 @@ impresion: PRINT '(' CADENA ')'
 	 ;
 
 
-invocacion : IDENTIFICADOR '(' parametro ')' {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Invocación al procedimiento '" + $1.sval + "'}");}
+invocacion : IDENTIFICADOR '(' factor ')' {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Invocación a la función '" + $1.sval + "'}");}
 	   | error_invocacion
 	   ;
 
@@ -166,15 +166,25 @@ error_invocacion: '(' parametro ')' {System.out.println("[ERROR SINTÁCTICO] [Li
 		| IDENTIFICADOR '('parametro {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Invocación de función mal declarada, falta el ')'}");}
 		;
 
-try_catch: TRY sentencia_ejecutable CATCH bloque_ejecutable
+try_catch: TRY sentencia_ejecutable CATCH bloque_catch
            |error_try_catch
             ;
 
-error_try_catch:  sentencia_ejecucion CATCH bloque_ejecutable {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Falta la palabra TRY}");}
-                   | TRY  CATCH bloque_ejecutable {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Falta la  sentencia ejecutable después del TRY}");}
-                   | TRY sentencia_ejecucion bloque_ejecutable {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Falta la palabra CATCH}");}
-                   | TRY sentencia_ejecucion CATCH error {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Falta el bloque de sentencias ejecutables despues del CATCH}");}
+
+
+error_try_catch:  sentencia_ejecutable CATCH bloque_catch {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Falta la palabra TRY}");}
+                   | TRY  CATCH bloque_catch  {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Falta la  sentencia ejecutable después del TRY}");}
+                   | TRY sentencia_ejecutable bloque_catch  {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Falta la palabra CATCH}");}
+                   | TRY sentencia_ejecutable CATCH error {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Falta el bloque de sentencias ejecutables despues del CATCH}");}
                     ;
+
+bloque_catch: BEGIN bloque_1 END
+              |BEGIN try_catch END {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {No se permiten Try y Catch anidados}");}
+            ;
+
+bloque_1: sentencia_ejecutable
+          |bloque_1 sentencia_ejecutable
+	;
 
 lista_de_variables : lista_de_variables ',' IDENTIFICADOR {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {se leyo el Identificador -> " + $3.sval);}
 			    |IDENTIFICADOR {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Identificador :" + $1.sval + "}");}
@@ -293,6 +303,7 @@ factor 	: '-' factor  {chequearFactorNegado();}
         |CTE_DOUBLE {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Constante DOUBLE: " + $1.sval + "}");}
         | CTE_ULONG {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Constante ULONG: " + $1.sval + "}");}
 	    | IDENTIFICADOR {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Identificador: " + $1.sval +"}");}
+        | invocacion
         ;
 
 
