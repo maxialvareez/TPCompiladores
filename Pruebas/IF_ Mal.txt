@@ -9,7 +9,7 @@ END;
 ELSE
 BEGIN
 d := 2 ;
-END;
+d:= 4;
 
 ENDIF;
 END

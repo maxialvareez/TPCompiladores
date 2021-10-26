@@ -1,0 +1,12 @@
+programita
+DOUBLE numero;
+ULONG a,b,d;
+ULONG FUNC f1 (DOUBLE A)
+ULONG s,f,f;
+BEGIN
+a := f;
+RETURN (A);
+END;
+BEGIN
+d := d;
+END
