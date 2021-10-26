@@ -1,7 +1,6 @@
-if
-repeat
-else
-ulong
-UlOnG
-If
-REPeaT
+PruebaReservada
+ulong i;
+UlOnG j;
+BEGIN
+i:= 1;
+END

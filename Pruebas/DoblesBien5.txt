@@ -1,1 +1,8 @@
-2.E+34
+
+pruebaDouble
+DOUBLE x;
+BEGIN
+x := 2.E+34 ;
+END
+
+3.E-5

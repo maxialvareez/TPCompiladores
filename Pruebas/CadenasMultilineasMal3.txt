@@ -1,2 +1,6 @@
-%Hola+
-mundo%
+
+pruebaCadena
+BEGIN
+PRINT(%Hola+
+      mundo%);
+END

@@ -1,1 +1,5 @@
-1E34
+pruebaDouble
+DOUBLE x;
+BEGIN
+x := 1E34 ;
+END

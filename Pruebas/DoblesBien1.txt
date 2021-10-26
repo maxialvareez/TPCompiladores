@@ -1,1 +1,6 @@
-1.
+pruebaDouble
+DOUBLE x;
+BEGIN
+
+x:= 1. ;
+END

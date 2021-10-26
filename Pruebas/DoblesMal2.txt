@@ -1,1 +1,5 @@
-1.E
+pruebaDouble
+DOUBLE x;
+BEGIN
+x := 1.E ;
+END

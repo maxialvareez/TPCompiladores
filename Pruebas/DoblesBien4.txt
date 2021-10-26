@@ -1,1 +1,5 @@
-3.E-5
+pruebaDouble
+DOUBLE x;
+BEGIN
+x := 3.E-5 ;
+END
