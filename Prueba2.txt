@@ -1,9 +1,0 @@
-pruebaRepeat
-
-BEGIN
-
-PRINT(%Hola+
-+mundo%);
-i:= 1;
-
-END

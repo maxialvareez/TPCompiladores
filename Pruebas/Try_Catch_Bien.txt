@@ -1,0 +1,13 @@
+pruebaTryCatch
+
+BEGIN
+
+TRY
+x := f(z) * 4;
+CATCH
+BEGIN
+x := 10;
+END;
+
+
+END

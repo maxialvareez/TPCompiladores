@@ -1,0 +1,2 @@
+TYPEDEF f2 = ULONG FUNC (ULONG);
+f2 x, y, z;

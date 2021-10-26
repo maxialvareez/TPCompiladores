@@ -1,0 +1,14 @@
+pruebaTryCatch
+
+BEGIN
+
+TRY
+
+
+CATCH
+BEGIN
+x:= 4
+END;
+
+
+END
