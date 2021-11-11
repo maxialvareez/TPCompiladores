@@ -21,8 +21,8 @@ public class AccionSemantica3 extends Accion {
                     buffer = buffer.substring(0, 22);
                     System.out.println("[WARNING] [Linea " + Lexico.linea + "] {Un identificador superó el limite de 22 caracteres, por lo que fue cortado}");
                 }
-                if (!Main.tSimbolos.existeLexema(buffer)) {
-                    Main.tSimbolos.agregarSimbolo(buffer, Lexico.IDENTIFICADOR);
+                if (!Main.tablaSimbolos.existeLexema(buffer)) {
+                    Main.tablaSimbolos.agregarSimbolo(buffer, Lexico.IDENTIFICADOR);
                 }
                 System.out.println("[Lexico] [Linea " + Lexico.linea + "] {Se detectó un token de tipo Identificador} >> " + buffer);
                 return new Token(buffer, Lexico.IDENTIFICADOR);

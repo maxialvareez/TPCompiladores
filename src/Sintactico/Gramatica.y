@@ -1,6 +1,8 @@
 %{
 package Sintactico;
 import Principal.*;
+import CodigoIntermedio.*;
+import java.util.ArrayList;
 %}
 
 %token IDENTIFICADOR CTE_ULONG MAYOR_IGUAL MENOR_IGUAL IGUAL_IGUAL DISTINTO ASIGNACION CTE_DOUBLE CADENA AND OR IF THEN ENDIF PRINT FUNC RETURN BEGIN END BREAK ULONG DOUBLE REPEAT PRE TRY CATCH TYPEDEF ELSE
@@ -65,8 +67,30 @@ error_sentencia_ejecucion: 	try_catch error {System.out.println("[ERROR SINTÁCT
 
 
 
-declaracion : tipo lista_de_variables ';'{System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Declaración de variables}");}
-    	    | tipo funcion ';'
+declaracion : tipo lista_de_variables ';'{System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Declaración de variables}");
+    	        String tipoVariable = $1.sval;
+    	        lista_variables = (ArrayList<String>)$2.obj;
+    	        for(String lexema: lista_variables){
+                    String nuevoLexema = lexema + "@" + ambito;
+                    if (!Main.tablaSimbolos.existeLexema(nuevoLexema)){
+                        Main.tablaSimbolos.reemplazarLexema(lexema, nuevoLexema);
+                        DatosSimbolo ds = Main.tablaSimbolos.getDatos(nuevoLexema);
+                        ds.setUso("Variable");
+                        ds.setTipo(tipoVariable);
+                        Main.tablaSimbolos.setDatosSimbolo(nuevoLexema, ds);
+                    }
+                    else{
+                        System.out.println("[ERROR SEMÁNTICO] [Linea " + Lexico.linea + "] {Ya se declaró la variable " + lexema + " en este ámbito}");
+                        Main.tablaSimbolos.eliminarSimbolo(lexema);
+                    }
+    	        }
+    	        lista_variables.clear();
+    	        }
+    	    |   tipo funcion ';'
+       	        {
+       	        //TODO : asignar tipo de funcion (Main.tablaSimbolos.get
+
+    	        }
     	    | TYPEDEF IDENTIFICADOR '=' tipo funcion_type ';' {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Declaración de función de definición de tipo llamada '" + $2.sval +"'}");}
     	    | error_declaracion
             ;
@@ -80,24 +104,50 @@ error_declaracion : tipo lista_de_variables error {System.out.println("[ERROR SI
 
 
 tipo : ULONG
+       {$$ = new ParserVal("ULONG");}
      | DOUBLE
+     {$$ = new ParserVal("DOUBLE");}
      ;
 
-control : REPEAT'('IDENTIFICADOR '=' CTE_ULONG';'condicion';' CTE_ULONG')' bloque_repeat {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Sentencia REPEAT}");}
+control : REPEAT'(' asignacion_repeat ';'condicion';' CTE_ULONG')' bloque_repeat {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Sentencia REPEAT}");
+                    if(($3.sval != null) && ($5.sval != null)){
+                }
 	| error_control
 	;
 
-error_control : REPEAT IDENTIFICADOR '=' CTE_ULONG ';' condicion ';' CTE_ULONG ')' bloque_repeat{System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {REPEAT mal declarado, falta '('}");}
-	 | REPEAT '('  '=' CTE_ULONG ';' condicion ';' CTE_ULONG ')' bloque_repeat  {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {REPEAT mal declarado, falta el identificador }");}
-	 | REPEAT'('IDENTIFICADOR   CTE_ULONG';'condicion';' CTE_ULONG')'bloque_repeat {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {REPEAT mal declarado, falta '='}");}
-	 | REPEAT'('IDENTIFICADOR '='       ';'condicion';' CTE_ULONG')'bloque_repeat {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {REPEAT mal declarado, falta una constante ULONG}");}
-	 | REPEAT'('IDENTIFICADOR '=' CTE_ULONG   condicion';' CTE_ULONG')'bloque_repeat {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {REPEAT mal declarado, falta ';'}");}
-	 | REPEAT'('IDENTIFICADOR '=' CTE_ULONG';'         ';' CTE_ULONG')'bloque_repeat {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {REPEAT mal declarado, falta la condición}");}
-	 | REPEAT'('IDENTIFICADOR '=' CTE_ULONG';'condicion    CTE_ULONG')'bloque_repeat {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {REPEAT mal declarado, falta ';'}");}
-	 | REPEAT'('IDENTIFICADOR '=' CTE_ULONG';'condicion';'        ')'bloque_repeat {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {REPEAT mal declarado, falta una constante CTE_ULONG}");}
-	 | REPEAT'('IDENTIFICADOR '=' CTE_ULONG';'condicion';'CTE_ULONG   bloque_repeat {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {REPEAT mal declarado, falta ')'}");}
-	 | REPEAT'('IDENTIFICADOR '=' CTE_ULONG';'condicion';'CTE_ULONG')' error {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {REPEAT mal declarado, falta el bloque de sentencias}");}
-	 ;
+error_control : REPEAT asignacion_repeat ';' condicion ';' CTE_ULONG ')' bloque_repeat{System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {REPEAT mal declarado, falta '('}");}
+	          | REPEAT '('               ';' condicion ';' CTE_ULONG ')' bloque_repeat{System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {REPEAT mal declarado, falta la asignación}");}
+	          | REPEAT'('asignacion_repeat    condicion';' CTE_ULONG')'bloque_repeat {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {REPEAT mal declarado, falta ';'}");}
+	          | REPEAT'('asignacion_repeat ';'         ';' CTE_ULONG')'bloque_repeat {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {REPEAT mal declarado, falta la condición}");}
+	          | REPEAT'('asignacion_repeat ';'condicion    CTE_ULONG')'bloque_repeat {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {REPEAT mal declarado, falta ';'}");}
+	          | REPEAT'('asignacion_repeat ';'condicion';'        ')'bloque_repeat {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {REPEAT mal declarado, falta una constante CTE_ULONG}");}
+	          | REPEAT'('asignacion_repeat ';'condicion';'CTE_ULONG   bloque_repeat {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {REPEAT mal declarado, falta ')'}");}
+	          | REPEAT'('asignacion_repeat ';'condicion';'CTE_ULONG')' error {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {REPEAT mal declarado, falta el bloque de sentencias}");}
+	          ;
+
+asignacion_repeat: IDENTIFICADOR ASIGNACION CTE_ULONG {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Asignacion del repeat: "+ $1.sval + " := "+ $3.sval + "}");
+                    String ambitoVariable = Main.tSimbolos.verificarAmbito($1.sval, ambito);
+                    if(ambitoVariable != null) {
+                        String tipoIdentificador = Main.tSimbolos.getDatosTabla(ambitoVariable).getTipo();
+                        if(tipoIdentificador.equals("ULONG")){
+                            Terceto t = new Terceto(":=", ambitoVariable, $3.sval);
+                            t.setTipo("ULONG");
+                            adminTerceto.agregarTerceto(t);
+                            adminTerceto.apilar(t.getNumero());
+                            $$ = new ParserVal(ambitoVariable);
+                        }
+                        else
+                            Main.listaErrores.add("Error semántico: Linea " + Lexico.linea + " los tipos son incompatibles");
+                        }
+                    }
+                   }
+                     | error_asignacion_repeat
+                    ;
+
+error_asignacion_repeat:  ASIGNACION CTE_ULONG {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {REPEAT mal declarado, falta el identificador }");}
+                         | IDENTIFICADOR   CTE_ULONG {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {REPEAT mal declarado, falta '='}");}
+                         | IDENTIFICADOR ASIGNACION error {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {REPEAT mal declarado, falta una constante ULONG}");}
+                        ;
 
 bloque_repeat: BEGIN bloque_control END
             ;
@@ -114,7 +164,15 @@ sentencia_control : sentencia_ejecucion
 error_sentencia_control : BREAK error {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Se detectó una sentencia mal declarada, falta ';' despues del BREAK}");}
                	 	;
 
-asignacion : IDENTIFICADOR ASIGNACION expresion2  {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Asignacion : " + $1.sval + ":= " + $3.sval +"}");}
+asignacion : IDENTIFICADOR ASIGNACION expresion2  {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Asignacion : " + $1.sval + ":= " + $3.sval +"}");
+            String ambitoVariable = Main.tSimbolos.verificarAmbito($1.sval, ambito);
+            if(ambitoVariable != null){
+                String tipoIdentificador = Main.tSimbolos.getDatosTabla(ambitoVariable).getTipo();
+                Operando op = (Operando)$3.obj;
+                if(op != null)
+            }
+
+}
 	   	  |error_asignacion;
 	   ;
 
@@ -122,7 +180,6 @@ asignacion : IDENTIFICADOR ASIGNACION expresion2  {System.out.println("[Sintáct
 error_asignacion : ASIGNACION termino {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Falta el identificador del lado izquierdo de la asignación}");}
 			   |IDENTIFICADOR termino {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Falta ':=' en la asignación}");}
 			   |IDENTIFICADOR ASIGNACION error {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Falta una expresión aritmética del lado derecho de la asignación}");}
-		 	  
 		  ;
 
 
@@ -189,8 +246,15 @@ bloque_1: sentencia_ejecutable
           |bloque_1 sentencia_ejecutable
 	      ;
 
-lista_de_variables : lista_de_variables ',' IDENTIFICADOR {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {se leyo el Identificador -> " + $3.sval);}
-			        |IDENTIFICADOR {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Identificador :" + $1.sval + "}");}
+lista_de_variables : lista_de_variables ',' IDENTIFICADOR {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {se leyo el Identificador -> " + $3.sval);
+			        lista_variables = (ArrayList<String>) $1.obj;
+			        lista_variables.add($3.sval);
+			        $$ = new ParserVal(lista_variables);
+			        }
+			        |IDENTIFICADOR {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Identificador :" + $1.sval + "}");
+			                        lista_variables.add($1.sval);
+                                    $$ = new ParserVal(lista_variables);
+                                    }
       		        | error_lista_de_variables
                     ;
 
@@ -198,23 +262,56 @@ lista_de_variables : lista_de_variables ',' IDENTIFICADOR {System.out.println("[
 error_lista_de_variables: lista_de_variables IDENTIFICADOR {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Sentencia mal declarada, falta ',' entre los identificadores}");}
                         ;
 
-funcion : FUNC IDENTIFICADOR'('parametro')' bloque_funcion  {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Declaración de función llamada '"+ $2.sval +"'" );}
+funcion :  declaracion_funcion bloque_funcion
+         {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Declaración de función llamada '"+ $2.sval +"'" );
+            if($1.sval != null){    //si se declaró bien
+                ambito = ambito.substring(0,ambito.lastIndexOf("@"));
+            }
+         }
         | error_funcion
         ;
 
-
-error_funcion :      IDENTIFICADOR'('parametro')' bloque_funcion {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Función mal declarada, falta el FUNC");}
-	      | FUNC         '('parametro')' bloque_funcion {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Función mal declarada, falta el nombre}");}
-	      | FUNC IDENTIFICADOR parametro')' bloque_funcion {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Función mal declarada, falta '(' }");}
-	      | FUNC IDENTIFICADOR'('       ')' bloque_funcion {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Función mal declarada, falta el parámetro}");}
-	      | FUNC IDENTIFICADOR'('parametro  bloque_funcion {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Función mal declarada, falta ')'}");}
-	      | FUNC IDENTIFICADOR'('parametro')'              {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Función mal declarada, falta bloque de sentencias}");}
+error_funcion : declaracion_funcion   error   {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Función mal declarada, falta bloque de sentencias}");}
 	      ;
 
-parametro : tipo IDENTIFICADOR
+declaracion_funcion: FUNC IDENTIFICADOR'('parametro')'{
+                    parametroCopiaValor = (String) $4.obj;
+                    if (!parametroCopiaValor.equals(""){
+                        String nuevoLexema = $2.sval + "@" + "ambito"
+                        if (!Main.tablaSimbolos.existeLexema(nuevoLexema){
+                            Main.tablaSimbolos.reemplazarLexema($2.sval, nuevoLexema);
+                            DatosSimbolo ds = Main.tablaSimbolos.getDatos(nuevoLexema);
+                            ds.setUso("Funcion");
+                            Main.tablaSimbolos.setDatos(nuevoLexema, ds);
+                            ambito = ambito + "@" + $2.sval;
+                            Main.tSimbolos.reemplazarLexema(parametroCopiaValor, parametroCopiaValor + ambito); // Se agrega el ambito al parametro (nombre de la función)
+                        }
+                        else{
+                            System.out.println("[ERROR SEMÁNTICO] [Linea " + Lexico.linea + "] {La funcion '" + $2.sval + "' ya fue declarada en este ámbito}");
+                            $$ = new ParserVal(null);  // se setea null para luego comprobar si se declaró o no
+                        }
+                    }
+                    }
+                    |error_declaracion_funcion
+                    ;
+
+error_declaracion_funcion:    IDENTIFICADOR'('parametro')'     {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Función mal declarada, falta la palabra FUNC}");}
+                           |FUNC           '('parametro')'     {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Función mal declarada, falta el nombre}");}
+                           | FUNC IDENTIFICADOR parametro')'    {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Función mal declarada, falta '(' }");}
+                           | FUNC IDENTIFICADOR'('       ')'    {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Función mal declarada, falta el parámetro}");}
+                           | FUNC IDENTIFICADOR'('parametro  error {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Función mal declarada, falta ')'}");}
+                           ;
+
+parametro : tipo IDENTIFICADOR{
+                DatosSimbolo ds = Main.tablaSimbolos.getDatos($2.sval);
+                ds.setUso("Parametro");
+                ds.setTipo($1.sval);
+                Main.tablaSimbolos.setDatos($2.sval, ds);
+                $$ = new ParserVal($2.sval);
+
+                }
 	  | error_parametro
 	  ;
-
 
 error_parametro :  tipo error {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Parámetro mal declarado, falta el nombre identificador}");}
 		 ;
@@ -247,7 +344,7 @@ error_bloque_funcion : bloque_declarativo error {System.out.println("[ERROR SINT
 
 
 bloque_ejecucion_funcion : BEGIN bloque_sentencias RETURN '('condicion')' ';' END 
-			 | BEGIN PRE ':' '(' condicion ')' ';' bloque_sentencias RETURN '('condicion')' ';' END
+			 | BEGIN PRE ':' '(' condicion ')' ';' bloque_sentencias RETURN '('condicion')' ';' END {//TODO CHEQUEAR QUE HACER ACA}
 			 | BEGIN PRE ':' '(' condicion ')' ';' RETURN '('condicion')' ';' END
 			 | error_bloque_ejecucion_funcion
    			 ;			
@@ -293,21 +390,114 @@ expresion1: expresion2
 
 
 expresion2: termino
-	  | expresion2 '+' termino {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Se realizó la operación: SUMA }");}
-	  | expresion2 '-' termino {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Se realizó la operación: RESTA}");}
+	  | expresion2 '+' termino
+	  {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Se realizó la operación: SUMA }");
+	    Operando op1 = (Operando)$1.obj;
+                        Operando op2 = (Operando)$3.obj;
+                        if(op1 != null && op2 !=null){
+                            if (op1.getTipo().equals(op2.getTipo())){
+                                Terceto t = new Terceto("*", op1.getValor(), op2.getValor());
+                                t.setTipo(op1.getTipo());
+                                adminTerceto.agregarTerceto(t);
+                                $$ = new ParserVal(new Operando(op1.getTipo(), "["+t.getNumero()+"]"));
+                            }
+                            else{
+                                System.out.println("Error semántico: Linea " + Lexico.linea + " los tipos son incompatibles");
+                                $$ = new ParserVal(null);
+                             }
+                        }
+                        else{
+                               $$ = new ParserVal(null);
+                        }
+      }
+	  | expresion2 '-' termino
+	  {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Se realizó la operación: RESTA}");
+	    Operando op1 = (Operando)$1.obj;
+                        Operando op2 = (Operando)$3.obj;
+                        if(op1 != null && op2 !=null){
+                            if (op1.getTipo().equals(op2.getTipo())){
+                                Terceto t = new Terceto("*", op1.getValor(), op2.getValor());
+                                t.setTipo(op1.getTipo());
+                                adminTerceto.agregarTerceto(t);
+                                $$ = new ParserVal(new Operando(op1.getTipo(), "["+t.getNumero()+"]"));
+                            }
+                            else{
+                                System.out.println("Error semántico: Linea " + Lexico.linea + " los tipos son incompatibles");
+                                $$ = new ParserVal(null);
+                             }
+                        }
+                        else{
+                               $$ = new ParserVal(null);
+                        }
+        }
 	  ;
 
-termino : termino '*' factor {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Se realizó la operación: MULTIPLICACIÓN}");}
-	| termino '/' factor  {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Se realizó la operación: DIVISION}");}
-	| factor
+termino : termino '*' factor
+        {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Se realizó la operación: MULTIPLICACIÓN}");
+                Operando op1 = (Operando)$1.obj;
+                        Operando op2 = (Operando)$3.obj;
+                        if(op1 != null && op2 !=null){
+                            if (op1.getTipo().equals(op2.getTipo())){
+                                Terceto t = new Terceto("*", op1.getValor(), op2.getValor());
+                                t.setTipo(op1.getTipo());
+                                adminTerceto.agregarTerceto(t);
+                                $$ = new ParserVal(new Operando(op1.getTipo(), "["+t.getNumero()+"]"));
+                            }
+                            else{
+                                System.out.println("Error semántico: Linea " + Lexico.linea + " los tipos son incompatibles");
+                                $$ = new ParserVal(null);
+                             }
+                        }
+                        else{
+                               $$ = new ParserVal(null);
+                        }
+                    }
+	| termino '/' factor
+            {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Se realizó la operación: DIVISION}");
+                Operando op1 = (Operando)$1.obj;
+                Operando op2 = (Operando)$3.obj;
+                if(op1 != null && op2 !=null){
+                    if (op1.getTipo().equals(op2.getTipo())){
+                        Terceto t = new Terceto("/", op1.getValor(), op2.getValor());
+                        t.setTipo(op1.getTipo());
+                        adminTerceto.agregarTerceto(t);
+                        $$ = new ParserVal(new Operando(op1.getTipo(), "["+t.getNumero()+"]"));
+                    }
+                    else{
+                        System.out.println("Error semántico: Linea " + Lexico.linea + " los tipos son incompatibles");
+                        $$ = new ParserVal(null);
+                     }
+                }
+                else{
+                       $$ = new ParserVal(null);
+                }
+            }
+
+	| factor  { $$ = new ParserVal((Operando)$1.obj);}
         ;
 
 
-factor 	: '-' factor  {chequearFactorNegado();}
-        |CTE_DOUBLE {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Constante DOUBLE: " + $1.sval + "}");}
-        | CTE_ULONG {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Constante ULONG: " + $1.sval + "}");}
-	    | IDENTIFICADOR {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Identificador: " + $1.sval +"}");}
-	    | invocacion
+factor 	: '-' factor  { if (chequearFactorNegado()){
+                        Operando operando = (Operando) $2.obj;
+                        $$ = new ParserVal(new Operando(operando.getTipo(), "-" + operando.getValor())) ;
+                       }
+                        }
+        |CTE_DOUBLE {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Constante DOUBLE: " + $1.sval + "}");
+            $$ = new ParserVal(new Operando("DOUBLE", $1.sval));
+        }
+        | CTE_ULONG {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Constante ULONG: " + $1.sval + "}");
+         $$ = new ParserVal(new Operando("ULONG", $1.sval));
+         }
+	    | IDENTIFICADOR {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Identificador: " + $1.sval +"}");
+	            String ambitoVariable = Main.tablaSimbolos.verificarAmbito($1.sval, ambito);
+                	if(ambitoVariable != null)
+                        $$ = new ParserVal(new Operando(Main.tablaSimbolos.getDatos(ambitoVariable).getTipo(), ambitoVariable));
+                    else {
+                    System.out.println("[Error semántico: Linea " + Lexico.linea + " la variable " + $1.sval +" no fue declarada");
+                    $$ = new ParserVal(null);
+	                }
+	          }
+	    | invocacion { TODO QUEDA HACER ESTO}
         ;
 
 
@@ -323,9 +513,18 @@ comparador : '<'
 %%
 
 private Lexico lexico;
-public Parser(Lexico lexico)
+private AdministradorTercetos adminTercetos;
+private String ambito;
+private ArrayList<String> lista_variables;  //lista de declaración de variables
+private String parametroCopiaValor;
+
+public Parser(Lexico lexico, AdministradorTercetos adminTercetos)
 {
   this.lexico= lexico;
+  this.adminTercetos = adminTercetos;
+  this.ambito = "main";
+  this.lista_variables = new ArrayList<String>();
+  this.parametroCopiaValor = "";
 }
 
 public int yylex(){
@@ -342,20 +541,22 @@ public void yyerror(String s){
 
 }
 
-public void chequearFactorNegado(){
+public boolean chequearFactorNegado(){
 	String lexema = yylval.sval;
-	int id = Main.tSimbolos.getId(lexema);
+	int id = Main.tablaSimbolos.getId(lexema);
 	if(id == Lexico.CTE_ULONG){
 		System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Se detectó una constante ULONG fuera de rango}");
-		Main.tSimbolos.eliminarSimbolo(lexema);
+		Main.tablaSimbolos.eliminarSimbolo(lexema);
 	}
 	else if (id == Lexico.CTE_DOUBLE) {
 		double valor = -1*Double.parseDouble(lexema);
 		if(( valor > 2.2250738585272014e-308 && valor < 1.7976931348623157e+308) || (valor > -1.7976931348623157e+308 && valor < -2.2250738585072014e-308) || (valor == 0.0))
-                	Main.tSimbolos.modificarSimbolo(lexema, String.valueOf(valor));
+                	Main.tablaSimbolos.modificarSimbolo(lexema, String.valueOf(valor));
+                	return true;
                 else {
                 	System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "]  {Se detectó una constante DOUBLE fuera de rango}");
-	               	Main.tSimbolos.eliminarSimbolo(lexema);
+	               	Main.tablaSimbolos.eliminarSimbolo(lexema);
 	 	}
 	}
+	return false;
 }

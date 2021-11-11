@@ -14,7 +14,7 @@ public class AccionSemantica4 extends Accion {
 
         if ((valor >= 0) && (valor <= Math.pow(2,32) - 1)) {
             System.out.println("[Lexico] [Linea " + Lexico.linea + "] {Se detectó un token de tipo Entero Largo Sin Signo} >> " + buffer);
-            Main.tSimbolos.agregarSimbolo(buffer,Lexico.CTE_ULONG);
+            Main.tablaSimbolos.agregarSimbolo(buffer,Lexico.CTE_ULONG);
             return (new Token(buffer, Lexico.CTE_ULONG));
         }
         else{

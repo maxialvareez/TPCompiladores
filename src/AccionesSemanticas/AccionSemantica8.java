@@ -9,7 +9,7 @@ public class AccionSemantica8 extends Accion {
     @Override
     public Token ejecutar() {
         System.out.println("[Lexico] [Linea " + Lexico.linea + "] {Se detectó un token de tipo Cadena} >>  '" +buffer +"'");
-        Main.tSimbolos.agregarSimbolo(buffer, Lexico.CADENA);
+        Main.tablaSimbolos.agregarSimbolo(buffer, Lexico.CADENA);
         return (new Token(buffer, Lexico.CADENA));
 
     }

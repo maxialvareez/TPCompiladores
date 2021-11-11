@@ -2,7 +2,7 @@ pruebaRepeat
 ULONG i;
 BEGIN
 
-REPEAT (i = 1; i<10; 1)
+REPEAT (i := 1; i<10; 1)
 BEGIN
 i:= i+1;
 END;

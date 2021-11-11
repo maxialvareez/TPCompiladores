@@ -1,11 +1,12 @@
 package Principal;
-
 import java.io.*;
+
+import CodigoIntermedio.AdministradorTercetos;
 import Sintactico.*;
 public class Main {
 
     private static BufferedReader codigo;
-    public static TablaSimbolos tSimbolos = new TablaSimbolos();
+    public static TablaSimbolos tablaSimbolos = new TablaSimbolos();
 
     private static StringBuilder getCodigo(BufferedReader ubicacion){
 
@@ -50,8 +51,11 @@ public class Main {
         //-------------- FIN CARGA DE ARCHIVO --------------
 
         Lexico l1 = new Lexico(codigo);
+        AdministradorTercetos adminTercetos = new AdministradorTercetos();
 
-        Parser p = new Parser(l1);
+
+
+        Parser p = new Parser(l1, adminTercetos);
         p.run();
 
 /*
@@ -60,8 +64,12 @@ public class Main {
             l1.getToken();
         }
  */
+
+        System.out.println("\n------ CÓDIGO INTERMEDIO ------");
+        adminTercetos.imprimirTercetos();
+
         System.out.println("\n -----TABLA DE SIMBOLOS------");
-        tSimbolos.printTablaSimbolos();
+        tablaSimbolos.imprimirTablaSimbolos();
 
     }
 }
