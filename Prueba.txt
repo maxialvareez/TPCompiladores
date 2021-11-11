@@ -1,12 +1,10 @@
 programita
 DOUBLE numero;
-ULONG a,b,d;
-ULONG FUNC f1 (DOUBLE A)
-ULONG s,f,f;
+ULONG a,b,d,c;
+
 BEGIN
-a := f;
-RETURN (A);
-END;
-BEGIN
-d := d;
+a := 1;
+b:= 2;
+d:= a +b;
+c:= d +2;
 END

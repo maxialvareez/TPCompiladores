@@ -109,9 +109,8 @@ tipo : ULONG
      {$$ = new ParserVal("DOUBLE");}
      ;
 
-control : REPEAT'(' asignacion_repeat ';'condicion';' CTE_ULONG')' bloque_repeat {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Sentencia REPEAT}");
-                    if(($3.sval != null) && ($5.sval != null)){
-                }
+control : REPEAT'(' asignacion_repeat ';'condicion';' CTE_ULONG')' bloque_repeat {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Sentencia REPEAT}");}
+
 	| error_control
 	;
 
@@ -126,21 +125,20 @@ error_control : REPEAT asignacion_repeat ';' condicion ';' CTE_ULONG ')' bloque_
 	          ;
 
 asignacion_repeat: IDENTIFICADOR ASIGNACION CTE_ULONG {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Asignacion del repeat: "+ $1.sval + " := "+ $3.sval + "}");
-                    String ambitoVariable = Main.tSimbolos.verificarAmbito($1.sval, ambito);
+                    String ambitoVariable = Main.tablaSimbolos.verificarAmbito($1.sval, ambito);
                     if(ambitoVariable != null) {
-                        String tipoIdentificador = Main.tSimbolos.getDatosTabla(ambitoVariable).getTipo();
+                        String tipoIdentificador = Main.tablaSimbolos.getDatos(ambitoVariable).getTipo();
                         if(tipoIdentificador.equals("ULONG")){
                             Terceto t = new Terceto(":=", ambitoVariable, $3.sval);
                             t.setTipo("ULONG");
-                            adminTerceto.agregarTerceto(t);
-                            adminTerceto.apilar(t.getNumero());
+                            adminTercetos.agregarTerceto(t);
+                            adminTercetos.apilar(t.getNumero());
                             $$ = new ParserVal(ambitoVariable);
                         }
                         else
-                            Main.listaErrores.add("Error semántico: Linea " + Lexico.linea + " los tipos son incompatibles");
+                            System.out.println("Error semántico: Linea " + Lexico.linea + " los tipos son incompatibles");
                         }
                     }
-                   }
                      | error_asignacion_repeat
                     ;
 
@@ -165,14 +163,26 @@ error_sentencia_control : BREAK error {System.out.println("[ERROR SINTÁCTICO] [
                	 	;
 
 asignacion : IDENTIFICADOR ASIGNACION expresion2  {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Asignacion : " + $1.sval + ":= " + $3.sval +"}");
-            String ambitoVariable = Main.tSimbolos.verificarAmbito($1.sval, ambito);
+            String ambitoVariable = Main.tablaSimbolos.verificarAmbito($1.sval, ambito);
             if(ambitoVariable != null){
-                String tipoIdentificador = Main.tSimbolos.getDatosTabla(ambitoVariable).getTipo();
+                String tipoIdentificador = Main.tablaSimbolos.getDatos(ambitoVariable).getTipo();
                 Operando op = (Operando)$3.obj;
                 if(op != null)
+                    if (tipoIdentificador.equals(op.getTipo())){
+                    Terceto t = new Terceto(":=", ambitoVariable, op.getValor());
+                    t.setTipo(op.getTipo());
+                    adminTercetos.agregarTerceto(t);
+                    $$ = new ParserVal(new Operando(tipoIdentificador, "[" + t.getNumero()+ "]"));
+                    }
+                    else{
+                        System.out.println("Error semántico: Linea " + Lexico.linea + " los tipos son incompatibles");
+                    }
+           }
+            else{
+                System.out.println("Error semántico: Linea " + Lexico.linea + " la variable " + $1.sval +" no fue declarada");
             }
 
-}
+        }
 	   	  |error_asignacion;
 	   ;
 
@@ -276,15 +286,15 @@ error_funcion : declaracion_funcion   error   {System.out.println("[ERROR SINTÁ
 
 declaracion_funcion: FUNC IDENTIFICADOR'('parametro')'{
                     parametroCopiaValor = (String) $4.obj;
-                    if (!parametroCopiaValor.equals(""){
-                        String nuevoLexema = $2.sval + "@" + "ambito"
-                        if (!Main.tablaSimbolos.existeLexema(nuevoLexema){
+                    if (!parametroCopiaValor.equals("")){
+                        String nuevoLexema = $2.sval + "@" + "ambito";
+                        if (!Main.tablaSimbolos.existeLexema(nuevoLexema)){
                             Main.tablaSimbolos.reemplazarLexema($2.sval, nuevoLexema);
                             DatosSimbolo ds = Main.tablaSimbolos.getDatos(nuevoLexema);
                             ds.setUso("Funcion");
-                            Main.tablaSimbolos.setDatos(nuevoLexema, ds);
+                            Main.tablaSimbolos.setDatosSimbolo(nuevoLexema, ds);
                             ambito = ambito + "@" + $2.sval;
-                            Main.tSimbolos.reemplazarLexema(parametroCopiaValor, parametroCopiaValor + ambito); // Se agrega el ambito al parametro (nombre de la función)
+                            Main.tablaSimbolos.reemplazarLexema(parametroCopiaValor, parametroCopiaValor + ambito); // Se agrega el ambito al parametro (nombre de la función)
                         }
                         else{
                             System.out.println("[ERROR SEMÁNTICO] [Linea " + Lexico.linea + "] {La funcion '" + $2.sval + "' ya fue declarada en este ámbito}");
@@ -306,7 +316,7 @@ parametro : tipo IDENTIFICADOR{
                 DatosSimbolo ds = Main.tablaSimbolos.getDatos($2.sval);
                 ds.setUso("Parametro");
                 ds.setTipo($1.sval);
-                Main.tablaSimbolos.setDatos($2.sval, ds);
+                Main.tablaSimbolos.setDatosSimbolo($2.sval, ds);
                 $$ = new ParserVal($2.sval);
 
                 }
@@ -344,7 +354,7 @@ error_bloque_funcion : bloque_declarativo error {System.out.println("[ERROR SINT
 
 
 bloque_ejecucion_funcion : BEGIN bloque_sentencias RETURN '('condicion')' ';' END 
-			 | BEGIN PRE ':' '(' condicion ')' ';' bloque_sentencias RETURN '('condicion')' ';' END {//TODO CHEQUEAR QUE HACER ACA}
+			 | BEGIN PRE ':' '(' condicion ')' ';' bloque_sentencias RETURN '('condicion')' ';' END
 			 | BEGIN PRE ':' '(' condicion ')' ';' RETURN '('condicion')' ';' END
 			 | error_bloque_ejecucion_funcion
    			 ;			
@@ -377,28 +387,86 @@ error_bloque_ejecucion_funcion :       bloque_sentencias RETURN '('condicion')' 
 
 
 
-condicion : expresion
-	  | condicion OR expresion {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Se realizó la operación OR }");}
+condicion : expresion { $$ = new ParserVal((Operando)$1.obj);}
+	  | condicion OR expresion {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Se realizó la operación OR }");
+
+	                    Operando op1 = (Operando)$1.obj;
+                        Operando op2 = (Operando)$3.obj;
+                        if(op1 != null && op2 !=null){
+                            if (op1.getTipo().equals(op2.getTipo())){
+                                Terceto t = new Terceto("OR", op1.getValor(), op2.getValor());
+                                t.setTipo(op1.getTipo());
+                                adminTercetos.agregarTerceto(t);
+                                $$ = new ParserVal(new Operando(op1.getTipo(), "["+t.getNumero()+"]"));
+                            }
+                            else{
+                                System.out.println("Error semántico: Linea " + Lexico.linea + " los tipos son incompatibles");
+                                $$ = new ParserVal(null);
+                             }
+                        }
+                        else{
+                               $$ = new ParserVal(null);
+                        }
+        }
 	  ;
 
-expresion: expresion1
-	    | expresion AND expresion1 {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Se realizó la operación: AND}");}
+expresion: expresion1 { $$ = new ParserVal((Operando)$1.obj);}
+	    | expresion AND expresion1 {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Se realizó la operación: AND}");
+	                    Operando op1 = (Operando)$1.obj;
+                        Operando op2 = (Operando)$3.obj;
+                        if(op1 != null && op2 !=null){
+                            if (op1.getTipo().equals(op2.getTipo())){
+                                Terceto t = new Terceto("AND", op1.getValor(), op2.getValor());
+                                t.setTipo(op1.getTipo());
+                                adminTercetos.agregarTerceto(t);
+                                $$ = new ParserVal(new Operando(op1.getTipo(), "["+t.getNumero()+"]"));
+                            }
+                            else{
+                                System.out.println("Error semántico: Linea " + Lexico.linea + " los tipos son incompatibles");
+                                $$ = new ParserVal(null);
+                             }
+                        }
+                        else{
+                               $$ = new ParserVal(null);
+                        }
+        }
 	    ;
 
-expresion1: expresion2
-		| expresion1 comparador expresion2 {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Se realizó la operación: " +  $2.sval + "}");}
+expresion1: expresion2 { $$ = new ParserVal((Operando)$1.obj);}
+		| expresion1 comparador expresion2 {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Se realizó la operación: " +  $2.sval + "}");
 
+		    Operando op1 = (Operando)$1.obj;
+                                    Operando op2 = (Operando)$3.obj;
+                                    if(op1 != null && op2 !=null){
+                                        if (op1.getTipo().equals(op2.getTipo())){
+                                            Terceto t = new Terceto((String)$2.obj, op1.getValor(), op2.getValor());
+                                            t.setTipo(op1.getTipo());
+                                            adminTercetos.agregarTerceto(t);
+                                            $$ = new ParserVal(new Operando(op1.getTipo(), "["+t.getNumero()+"]"));
+                                        }
+                                        else{
+                                            System.out.println("Error semántico: Linea " + Lexico.linea + " los tipos son incompatibles");
+                                            $$ = new ParserVal(null);
+                                         }
+                                    }
+                                    else{
+                                           $$ = new ParserVal(null);
+                                    }
+                    }
 
-expresion2: termino
+        ;
+
+expresion2: termino { $$ = new ParserVal((Operando)$1.obj);}
+
 	  | expresion2 '+' termino
 	  {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Se realizó la operación: SUMA }");
 	    Operando op1 = (Operando)$1.obj;
                         Operando op2 = (Operando)$3.obj;
                         if(op1 != null && op2 !=null){
                             if (op1.getTipo().equals(op2.getTipo())){
-                                Terceto t = new Terceto("*", op1.getValor(), op2.getValor());
+                                Terceto t = new Terceto("+", op1.getValor(), op2.getValor());
                                 t.setTipo(op1.getTipo());
-                                adminTerceto.agregarTerceto(t);
+                                adminTercetos.agregarTerceto(t);
                                 $$ = new ParserVal(new Operando(op1.getTipo(), "["+t.getNumero()+"]"));
                             }
                             else{
@@ -416,9 +484,9 @@ expresion2: termino
                         Operando op2 = (Operando)$3.obj;
                         if(op1 != null && op2 !=null){
                             if (op1.getTipo().equals(op2.getTipo())){
-                                Terceto t = new Terceto("*", op1.getValor(), op2.getValor());
+                                Terceto t = new Terceto("-", op1.getValor(), op2.getValor());
                                 t.setTipo(op1.getTipo());
-                                adminTerceto.agregarTerceto(t);
+                                adminTercetos.agregarTerceto(t);
                                 $$ = new ParserVal(new Operando(op1.getTipo(), "["+t.getNumero()+"]"));
                             }
                             else{
@@ -440,7 +508,7 @@ termino : termino '*' factor
                             if (op1.getTipo().equals(op2.getTipo())){
                                 Terceto t = new Terceto("*", op1.getValor(), op2.getValor());
                                 t.setTipo(op1.getTipo());
-                                adminTerceto.agregarTerceto(t);
+                                adminTercetos.agregarTerceto(t);
                                 $$ = new ParserVal(new Operando(op1.getTipo(), "["+t.getNumero()+"]"));
                             }
                             else{
@@ -460,7 +528,7 @@ termino : termino '*' factor
                     if (op1.getTipo().equals(op2.getTipo())){
                         Terceto t = new Terceto("/", op1.getValor(), op2.getValor());
                         t.setTipo(op1.getTipo());
-                        adminTerceto.agregarTerceto(t);
+                        adminTercetos.agregarTerceto(t);
                         $$ = new ParserVal(new Operando(op1.getTipo(), "["+t.getNumero()+"]"));
                     }
                     else{
@@ -497,16 +565,16 @@ factor 	: '-' factor  { if (chequearFactorNegado()){
                     $$ = new ParserVal(null);
 	                }
 	          }
-	    | invocacion { TODO QUEDA HACER ESTO}
+	    | invocacion
         ;
 
 
-comparador : '<'
-	   | '>'
-	   | IGUAL_IGUAL
-        | MAYOR_IGUAL
-	   | MENOR_IGUAL
-	   | DISTINTO
+comparador : '<'        { $$ = new ParserVal($1.sval);}
+	   | '>'            { $$ = new ParserVal($1.sval);}
+	   | IGUAL_IGUAL    { $$ = new ParserVal($1.sval);}
+        | MAYOR_IGUAL   { $$ = new ParserVal($1.sval);}
+	   | MENOR_IGUAL    { $$ = new ParserVal($1.sval);}
+	   | DISTINTO       { $$ = new ParserVal((String) $1.obj);}
 	   ;
 
 
@@ -550,12 +618,13 @@ public boolean chequearFactorNegado(){
 	}
 	else if (id == Lexico.CTE_DOUBLE) {
 		double valor = -1*Double.parseDouble(lexema);
-		if(( valor > 2.2250738585272014e-308 && valor < 1.7976931348623157e+308) || (valor > -1.7976931348623157e+308 && valor < -2.2250738585072014e-308) || (valor == 0.0))
+		if(( valor > 2.2250738585272014e-308 && valor < 1.7976931348623157e+308) || (valor > -1.7976931348623157e+308 && valor < -2.2250738585072014e-308) || (valor == 0.0)){
                 	Main.tablaSimbolos.modificarSimbolo(lexema, String.valueOf(valor));
                 	return true;
-                else {
-                	System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "]  {Se detectó una constante DOUBLE fuera de rango}");
-	               	Main.tablaSimbolos.eliminarSimbolo(lexema);
+        }
+        else {
+            System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "]  {Se detectó una constante DOUBLE fuera de rango}");
+            Main.tablaSimbolos.eliminarSimbolo(lexema);
 	 	}
 	}
 	return false;
