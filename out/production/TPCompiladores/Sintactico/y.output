@@ -1,0 +1,5319 @@
+   0  $accept : programa $end
+
+   1  programa : IDENTIFICADOR bloque_declarativo bloque_ejecutable
+   2           | IDENTIFICADOR bloque_ejecutable
+   3           | error_programa
+
+   4  error_programa : bloque_declarativo bloque_ejecutable
+   5                 | IDENTIFICADOR bloque_ejecutable bloque_declarativo
+
+   6  bloque_declarativo : declaracion
+   7                     | bloque_declarativo declaracion
+
+   8  bloque_ejecutable : BEGIN bloque_sentencias END
+   9                    | error_bloque_ejecutable
+
+  10  bloque_sentencias : sentencia_ejecucion
+  11                    | bloque_sentencias sentencia_ejecucion
+
+  12  error_bloque_ejecutable : bloque_sentencias END
+  13                          | BEGIN bloque_sentencias error
+
+  14  sentencia_ejecutable : control ';'
+  15                       | seleccion ';'
+  16                       | impresion ';'
+  17                       | invocacion ';'
+  18                       | asignacion ';'
+  19                       | error_ejecucion
+
+  20  error_ejecucion : control error
+  21                  | seleccion error
+  22                  | impresion error
+  23                  | asignacion error
+  24                  | invocacion error
+
+  25  sentencia_ejecucion : sentencia_ejecutable
+  26                      | try_catch ';'
+  27                      | error_sentencia_ejecucion
+
+  28  error_sentencia_ejecucion : try_catch error
+
+  29  declaracion : tipo lista_de_variables ';'
+  30              | tipo funcion ';'
+  31              | TYPEDEF IDENTIFICADOR '=' tipo funcion_type ';'
+  32              | error_declaracion
+
+  33  error_declaracion : tipo lista_de_variables error
+  34                    | tipo funcion error
+  35                    | funcion ';'
+
+  36  tipo : ULONG
+  37       | DOUBLE
+
+  38  control : REPEAT '(' asignacion_repeat ';' condicion ';' CTE_ULONG ')' bloque_repeat
+  39          | error_control
+
+  40  error_control : REPEAT asignacion_repeat ';' condicion ';' CTE_ULONG ')' bloque_repeat
+  41                | REPEAT '(' ';' condicion ';' CTE_ULONG ')' bloque_repeat
+  42                | REPEAT '(' asignacion_repeat condicion ';' CTE_ULONG ')' bloque_repeat
+  43                | REPEAT '(' asignacion_repeat ';' ';' CTE_ULONG ')' bloque_repeat
+  44                | REPEAT '(' asignacion_repeat ';' condicion CTE_ULONG ')' bloque_repeat
+  45                | REPEAT '(' asignacion_repeat ';' condicion ';' ')' bloque_repeat
+  46                | REPEAT '(' asignacion_repeat ';' condicion ';' CTE_ULONG bloque_repeat
+  47                | REPEAT '(' asignacion_repeat ';' condicion ';' CTE_ULONG ')' error
+
+  48  asignacion_repeat : IDENTIFICADOR ASIGNACION CTE_ULONG
+  49                    | error_asignacion_repeat
+
+  50  error_asignacion_repeat : ASIGNACION CTE_ULONG
+  51                          | IDENTIFICADOR CTE_ULONG
+  52                          | IDENTIFICADOR ASIGNACION error
+
+  53  bloque_repeat : BEGIN bloque_control END
+
+  54  bloque_control : sentencia_control
+  55                 | bloque_control sentencia_control
+
+  56  sentencia_control : sentencia_ejecucion
+  57                    | BREAK ';'
+  58                    | error_sentencia_control
+
+  59  error_sentencia_control : BREAK error
+
+  60  asignacion : IDENTIFICADOR ASIGNACION expresion2
+  61             | error_asignacion
+
+  62  error_asignacion : ASIGNACION termino
+  63                   | IDENTIFICADOR termino
+  64                   | IDENTIFICADOR ASIGNACION error
+
+  65  seleccion : IF '(' condicion ')' THEN bloque_if ENDIF
+  66            | IF '(' condicion ')' THEN bloque_if ELSE bloque_if ENDIF
+  67            | error_seleccion
+
+  68  bloque_if : sentencia_ejecucion
+  69            | BEGIN sentencia_ejecucion bloque_sentencias END ';'
+  70            | error_bloque_if
+
+  71  error_bloque_if : BEGIN sentencia_ejecucion END ';'
+  72                  | BEGIN sentencia_ejecucion bloque_sentencias END error
+  73                  | BEGIN sentencia_ejecucion END error
+
+  74  error_seleccion : '(' condicion ')' THEN bloque_if ENDIF
+  75                  | IF condicion ')' THEN bloque_if ENDIF
+  76                  | IF '(' ')' THEN bloque_if ENDIF
+  77                  | IF '(' condicion THEN bloque_if ENDIF
+  78                  | IF '(' condicion ')' bloque_if ENDIF
+  79                  | IF '(' condicion ')' THEN ENDIF
+  80                  | IF '(' condicion ')' THEN bloque_if
+  81                  | IF '(' condicion ')' THEN bloque_if ELSE ENDIF
+  82                  | IF '(' condicion ')' THEN bloque_if ELSE bloque_if
+
+  83  impresion : PRINT '(' CADENA ')'
+  84            | PRINT '(' ')'
+
+  85  invocacion : IDENTIFICADOR '(' CTE_ULONG ')'
+  86             | IDENTIFICADOR '(' CTE_DOUBLE ')'
+  87             | IDENTIFICADOR '(' IDENTIFICADOR ')'
+  88             | error_invocacion
+
+  89  error_invocacion : IDENTIFICADOR '(' ')'
+  90                   | IDENTIFICADOR '(' CTE_ULONG error
+  91                   | IDENTIFICADOR '(' CTE_DOUBLE error
+  92                   | IDENTIFICADOR '(' IDENTIFICADOR error
+
+  93  try_catch : TRY sentencia_ejecutable CATCH bloque_catch
+  94            | error_try_catch
+
+  95  error_try_catch : TRY CATCH bloque_catch
+  96                  | TRY sentencia_ejecutable bloque_catch
+  97                  | TRY sentencia_ejecutable CATCH error
+  98                  | TRY try_catch CATCH bloque_catch
+
+  99  bloque_catch : BEGIN bloque_1 END
+
+ 100  bloque_1 : sentencia_ejecutable
+ 101           | bloque_1 sentencia_ejecutable
+
+ 102  lista_de_variables : lista_de_variables ',' IDENTIFICADOR
+ 103                     | IDENTIFICADOR
+ 104                     | error_lista_de_variables
+
+ 105  error_lista_de_variables : lista_de_variables IDENTIFICADOR
+
+ 106  funcion : declaracion_funcion bloque_funcion
+ 107          | error_funcion
+
+ 108  error_funcion : declaracion_funcion error
+
+ 109  declaracion_funcion : FUNC IDENTIFICADOR '(' parametro ')'
+ 110                      | error_declaracion_funcion
+
+ 111  error_declaracion_funcion : IDENTIFICADOR '(' parametro ')'
+ 112                            | FUNC '(' parametro ')'
+ 113                            | FUNC IDENTIFICADOR parametro ')'
+ 114                            | FUNC IDENTIFICADOR '(' ')'
+ 115                            | FUNC IDENTIFICADOR '(' parametro error
+
+ 116  parametro : tipo IDENTIFICADOR
+ 117            | error_parametro
+
+ 118  error_parametro : tipo error
+
+ 119  funcion_type : FUNC '(' tipo ')' ';' bloque_type
+ 120               | error_funcion_type
+
+ 121  error_funcion_type : '(' tipo ')' ';' bloque_type
+ 122                     | FUNC tipo ')' ';' bloque_type
+ 123                     | FUNC '(' ')' ';' bloque_type
+ 124                     | FUNC '(' tipo ';' bloque_type
+ 125                     | FUNC '(' tipo ')' bloque_type
+ 126                     | FUNC '(' tipo ')' ';' error
+
+ 127  bloque_type : IDENTIFICADOR lista_de_variables
+
+ 128  bloque_funcion : bloque_declarativo bloque_ejecucion_funcion
+ 129                 | bloque_ejecucion_funcion
+ 130                 | error_bloque_funcion
+
+ 131  error_bloque_funcion : bloque_declarativo error
+
+ 132  bloque_ejecucion_funcion : BEGIN bloque_sentencias RETURN '(' condicion ')' ';' END
+ 133                           | BEGIN PRE ':' '(' condicion ')' ';' bloque_sentencias RETURN '(' condicion ')' ';' END
+ 134                           | BEGIN PRE ':' '(' condicion ')' ';' RETURN '(' condicion ')' ';' END
+ 135                           | error_bloque_ejecucion_funcion
+
+ 136  error_bloque_ejecucion_funcion : bloque_sentencias RETURN '(' condicion ')' ';' END
+ 137                                 | BEGIN RETURN '(' condicion ')' ';' END
+ 138                                 | BEGIN bloque_sentencias '(' condicion ')' ';' END
+ 139                                 | BEGIN bloque_sentencias RETURN condicion ')' ';' END
+ 140                                 | BEGIN bloque_sentencias RETURN '(' ')' ';' END
+ 141                                 | BEGIN bloque_sentencias RETURN '(' condicion ';' END
+ 142                                 | BEGIN bloque_sentencias RETURN '(' condicion ')' END
+ 143                                 | BEGIN bloque_sentencias END
+ 144                                 | BEGIN bloque_sentencias RETURN '(' condicion ')' ';' error
+ 145                                 | PRE '(' condicion ')' ';' bloque_sentencias RETURN '(' condicion ')' ';' END
+ 146                                 | BEGIN PRE condicion ')' ';' bloque_sentencias RETURN '(' condicion ')' ';' END
+ 147                                 | BEGIN PRE '(' ')' ';' bloque_sentencias RETURN '(' condicion ')' ';' END
+ 148                                 | BEGIN PRE '(' condicion ';' bloque_sentencias RETURN '(' condicion ')' ';' END
+ 149                                 | BEGIN PRE '(' condicion ')' bloque_sentencias RETURN '(' condicion ')' ';' END
+ 150                                 | BEGIN PRE '(' condicion ')' ';' RETURN '(' condicion ')' ';' END
+ 151                                 | BEGIN PRE '(' condicion ')' ';' bloque_sentencias '(' condicion ')' ';' END
+ 152                                 | BEGIN PRE '(' condicion ')' ';' bloque_sentencias RETURN condicion ')' ';' END
+ 153                                 | BEGIN PRE '(' condicion ')' ';' bloque_sentencias RETURN '(' ')' ';' END
+ 154                                 | BEGIN PRE '(' condicion ')' ';' bloque_sentencias RETURN '(' condicion ';' END
+ 155                                 | BEGIN PRE '(' condicion ')' ';' bloque_sentencias RETURN '(' condicion ')' END
+ 156                                 | BEGIN PRE '(' condicion ')' ';' bloque_sentencias RETURN '(' condicion ')' ';' error
+ 157                                 | BEGIN PRE '(' condicion ')' ';' bloque_sentencias END
+
+ 158  condicion : expresion
+ 159            | condicion OR expresion
+
+ 160  expresion : expresion1
+ 161            | expresion AND expresion1
+
+ 162  expresion1 : expresion2
+ 163             | expresion1 comparador expresion2
+
+ 164  expresion2 : termino
+ 165             | expresion2 '+' termino
+ 166             | expresion2 '-' termino
+
+ 167  termino : termino '*' factor
+ 168          | termino '/' factor
+ 169          | factor
+
+ 170  factor : '-' factor
+ 171         | CTE_DOUBLE
+ 172         | CTE_ULONG
+ 173         | IDENTIFICADOR
+ 174         | invocacion
+
+ 175  comparador : '<'
+ 176             | '>'
+ 177             | IGUAL_IGUAL
+ 178             | MAYOR_IGUAL
+ 179             | MENOR_IGUAL
+ 180             | DISTINTO
+
+state 0
+	$accept : . programa $end  (0)
+
+	IDENTIFICADOR  shift 1
+	FUNC  shift 2
+	ULONG  shift 3
+	DOUBLE  shift 4
+	TYPEDEF  shift 5
+	.  error
+
+	programa  goto 6
+	bloque_declarativo  goto 7
+	error_programa  goto 8
+	declaracion  goto 9
+	tipo  goto 10
+	funcion  goto 11
+	error_declaracion  goto 12
+	declaracion_funcion  goto 13
+	error_funcion  goto 14
+	error_declaracion_funcion  goto 15
+
+
+state 1
+	programa : IDENTIFICADOR . bloque_declarativo bloque_ejecutable  (1)
+	programa : IDENTIFICADOR . bloque_ejecutable  (2)
+	error_programa : IDENTIFICADOR . bloque_ejecutable bloque_declarativo  (5)
+	error_declaracion_funcion : IDENTIFICADOR . '(' parametro ')'  (111)
+
+	IDENTIFICADOR  shift 16
+	ASIGNACION  shift 17
+	IF  shift 18
+	PRINT  shift 19
+	FUNC  shift 2
+	BEGIN  shift 20
+	ULONG  shift 3
+	DOUBLE  shift 4
+	REPEAT  shift 21
+	TRY  shift 22
+	TYPEDEF  shift 5
+	'('  shift 23
+	.  error
+
+	bloque_declarativo  goto 24
+	bloque_ejecutable  goto 25
+	declaracion  goto 9
+	bloque_sentencias  goto 26
+	error_bloque_ejecutable  goto 27
+	sentencia_ejecucion  goto 28
+	sentencia_ejecutable  goto 29
+	control  goto 30
+	seleccion  goto 31
+	impresion  goto 32
+	invocacion  goto 33
+	asignacion  goto 34
+	error_ejecucion  goto 35
+	try_catch  goto 36
+	error_sentencia_ejecucion  goto 37
+	tipo  goto 10
+	funcion  goto 11
+	error_declaracion  goto 12
+	error_control  goto 38
+	error_asignacion  goto 39
+	error_seleccion  goto 40
+	error_invocacion  goto 41
+	error_try_catch  goto 42
+	declaracion_funcion  goto 13
+	error_funcion  goto 14
+	error_declaracion_funcion  goto 15
+
+
+state 2
+	declaracion_funcion : FUNC . IDENTIFICADOR '(' parametro ')'  (109)
+	error_declaracion_funcion : FUNC . '(' parametro ')'  (112)
+	error_declaracion_funcion : FUNC . IDENTIFICADOR parametro ')'  (113)
+	error_declaracion_funcion : FUNC . IDENTIFICADOR '(' ')'  (114)
+	error_declaracion_funcion : FUNC . IDENTIFICADOR '(' parametro error  (115)
+
+	IDENTIFICADOR  shift 43
+	'('  shift 44
+	.  error
+
+
+state 3
+	tipo : ULONG .  (36)
+
+	.  reduce 36
+
+
+state 4
+	tipo : DOUBLE .  (37)
+
+	.  reduce 37
+
+
+state 5
+	declaracion : TYPEDEF . IDENTIFICADOR '=' tipo funcion_type ';'  (31)
+
+	IDENTIFICADOR  shift 45
+	.  error
+
+
+state 6
+	$accept : programa . $end  (0)
+
+	$end  accept
+
+
+state 7
+	error_programa : bloque_declarativo . bloque_ejecutable  (4)
+	bloque_declarativo : bloque_declarativo . declaracion  (7)
+
+	IDENTIFICADOR  shift 16
+	ASIGNACION  shift 17
+	IF  shift 18
+	PRINT  shift 19
+	FUNC  shift 2
+	BEGIN  shift 20
+	ULONG  shift 3
+	DOUBLE  shift 4
+	REPEAT  shift 21
+	TRY  shift 22
+	TYPEDEF  shift 5
+	'('  shift 46
+	.  error
+
+	bloque_ejecutable  goto 47
+	declaracion  goto 48
+	bloque_sentencias  goto 26
+	error_bloque_ejecutable  goto 27
+	sentencia_ejecucion  goto 28
+	sentencia_ejecutable  goto 29
+	control  goto 30
+	seleccion  goto 31
+	impresion  goto 32
+	invocacion  goto 33
+	asignacion  goto 34
+	error_ejecucion  goto 35
+	try_catch  goto 36
+	error_sentencia_ejecucion  goto 37
+	tipo  goto 10
+	funcion  goto 11
+	error_declaracion  goto 12
+	error_control  goto 38
+	error_asignacion  goto 39
+	error_seleccion  goto 40
+	error_invocacion  goto 41
+	error_try_catch  goto 42
+	declaracion_funcion  goto 13
+	error_funcion  goto 14
+	error_declaracion_funcion  goto 15
+
+
+state 8
+	programa : error_programa .  (3)
+
+	.  reduce 3
+
+
+state 9
+	bloque_declarativo : declaracion .  (6)
+
+	.  reduce 6
+
+
+state 10
+	declaracion : tipo . lista_de_variables ';'  (29)
+	declaracion : tipo . funcion ';'  (30)
+	error_declaracion : tipo . lista_de_variables error  (33)
+	error_declaracion : tipo . funcion error  (34)
+
+	IDENTIFICADOR  shift 49
+	FUNC  shift 2
+	.  error
+
+	lista_de_variables  goto 50
+	funcion  goto 51
+	error_lista_de_variables  goto 52
+	declaracion_funcion  goto 13
+	error_funcion  goto 14
+	error_declaracion_funcion  goto 15
+
+
+state 11
+	error_declaracion : funcion . ';'  (35)
+
+	';'  shift 53
+	.  error
+
+
+state 12
+	declaracion : error_declaracion .  (32)
+
+	.  reduce 32
+
+
+state 13
+	funcion : declaracion_funcion . bloque_funcion  (106)
+	error_funcion : declaracion_funcion . error  (108)
+
+	error  shift 54
+	IDENTIFICADOR  shift 16
+	ASIGNACION  shift 17
+	IF  shift 18
+	PRINT  shift 19
+	FUNC  shift 2
+	BEGIN  shift 55
+	ULONG  shift 3
+	DOUBLE  shift 4
+	REPEAT  shift 21
+	PRE  shift 56
+	TRY  shift 22
+	TYPEDEF  shift 5
+	'('  shift 46
+	.  error
+
+	bloque_declarativo  goto 57
+	declaracion  goto 9
+	bloque_sentencias  goto 58
+	sentencia_ejecucion  goto 28
+	sentencia_ejecutable  goto 29
+	control  goto 30
+	seleccion  goto 31
+	impresion  goto 32
+	invocacion  goto 33
+	asignacion  goto 34
+	error_ejecucion  goto 35
+	try_catch  goto 36
+	error_sentencia_ejecucion  goto 37
+	tipo  goto 10
+	funcion  goto 11
+	error_declaracion  goto 12
+	error_control  goto 38
+	error_asignacion  goto 39
+	error_seleccion  goto 40
+	error_invocacion  goto 41
+	error_try_catch  goto 42
+	declaracion_funcion  goto 13
+	bloque_funcion  goto 59
+	error_funcion  goto 14
+	error_declaracion_funcion  goto 15
+	bloque_ejecucion_funcion  goto 60
+	error_bloque_funcion  goto 61
+	error_bloque_ejecucion_funcion  goto 62
+
+
+state 14
+	funcion : error_funcion .  (107)
+
+	.  reduce 107
+
+
+state 15
+	declaracion_funcion : error_declaracion_funcion .  (110)
+
+	.  reduce 110
+
+
+state 16
+	asignacion : IDENTIFICADOR . ASIGNACION expresion2  (60)
+	error_asignacion : IDENTIFICADOR . termino  (63)
+	error_asignacion : IDENTIFICADOR . ASIGNACION error  (64)
+	invocacion : IDENTIFICADOR . '(' CTE_ULONG ')'  (85)
+	invocacion : IDENTIFICADOR . '(' CTE_DOUBLE ')'  (86)
+	invocacion : IDENTIFICADOR . '(' IDENTIFICADOR ')'  (87)
+	error_invocacion : IDENTIFICADOR . '(' ')'  (89)
+	error_invocacion : IDENTIFICADOR . '(' CTE_ULONG error  (90)
+	error_invocacion : IDENTIFICADOR . '(' CTE_DOUBLE error  (91)
+	error_invocacion : IDENTIFICADOR . '(' IDENTIFICADOR error  (92)
+	error_declaracion_funcion : IDENTIFICADOR . '(' parametro ')'  (111)
+
+	IDENTIFICADOR  shift 63
+	CTE_ULONG  shift 64
+	ASIGNACION  shift 65
+	CTE_DOUBLE  shift 66
+	'('  shift 67
+	'-'  shift 68
+	.  error
+
+	invocacion  goto 69
+	termino  goto 70
+	error_invocacion  goto 41
+	factor  goto 71
+
+
+state 17
+	error_asignacion : ASIGNACION . termino  (62)
+
+	IDENTIFICADOR  shift 63
+	CTE_ULONG  shift 64
+	CTE_DOUBLE  shift 66
+	'-'  shift 68
+	.  error
+
+	invocacion  goto 69
+	termino  goto 72
+	error_invocacion  goto 41
+	factor  goto 71
+
+
+state 18
+	seleccion : IF . '(' condicion ')' THEN bloque_if ENDIF  (65)
+	seleccion : IF . '(' condicion ')' THEN bloque_if ELSE bloque_if ENDIF  (66)
+	error_seleccion : IF . condicion ')' THEN bloque_if ENDIF  (75)
+	error_seleccion : IF . '(' ')' THEN bloque_if ENDIF  (76)
+	error_seleccion : IF . '(' condicion THEN bloque_if ENDIF  (77)
+	error_seleccion : IF . '(' condicion ')' bloque_if ENDIF  (78)
+	error_seleccion : IF . '(' condicion ')' THEN ENDIF  (79)
+	error_seleccion : IF . '(' condicion ')' THEN bloque_if  (80)
+	error_seleccion : IF . '(' condicion ')' THEN bloque_if ELSE ENDIF  (81)
+	error_seleccion : IF . '(' condicion ')' THEN bloque_if ELSE bloque_if  (82)
+
+	IDENTIFICADOR  shift 63
+	CTE_ULONG  shift 64
+	CTE_DOUBLE  shift 66
+	'('  shift 73
+	'-'  shift 68
+	.  error
+
+	invocacion  goto 69
+	condicion  goto 74
+	expresion2  goto 75
+	termino  goto 76
+	error_invocacion  goto 41
+	expresion  goto 77
+	expresion1  goto 78
+	factor  goto 71
+
+
+state 19
+	impresion : PRINT . '(' CADENA ')'  (83)
+	impresion : PRINT . '(' ')'  (84)
+
+	'('  shift 79
+	.  error
+
+
+state 20
+	bloque_ejecutable : BEGIN . bloque_sentencias END  (8)
+	error_bloque_ejecutable : BEGIN . bloque_sentencias error  (13)
+
+	IDENTIFICADOR  shift 80
+	ASIGNACION  shift 17
+	IF  shift 18
+	PRINT  shift 19
+	REPEAT  shift 21
+	TRY  shift 22
+	'('  shift 46
+	.  error
+
+	bloque_sentencias  goto 81
+	sentencia_ejecucion  goto 28
+	sentencia_ejecutable  goto 29
+	control  goto 30
+	seleccion  goto 31
+	impresion  goto 32
+	invocacion  goto 33
+	asignacion  goto 34
+	error_ejecucion  goto 35
+	try_catch  goto 36
+	error_sentencia_ejecucion  goto 37
+	error_control  goto 38
+	error_asignacion  goto 39
+	error_seleccion  goto 40
+	error_invocacion  goto 41
+	error_try_catch  goto 42
+
+
+state 21
+	control : REPEAT . '(' asignacion_repeat ';' condicion ';' CTE_ULONG ')' bloque_repeat  (38)
+	error_control : REPEAT . asignacion_repeat ';' condicion ';' CTE_ULONG ')' bloque_repeat  (40)
+	error_control : REPEAT . '(' ';' condicion ';' CTE_ULONG ')' bloque_repeat  (41)
+	error_control : REPEAT . '(' asignacion_repeat condicion ';' CTE_ULONG ')' bloque_repeat  (42)
+	error_control : REPEAT . '(' asignacion_repeat ';' ';' CTE_ULONG ')' bloque_repeat  (43)
+	error_control : REPEAT . '(' asignacion_repeat ';' condicion CTE_ULONG ')' bloque_repeat  (44)
+	error_control : REPEAT . '(' asignacion_repeat ';' condicion ';' ')' bloque_repeat  (45)
+	error_control : REPEAT . '(' asignacion_repeat ';' condicion ';' CTE_ULONG bloque_repeat  (46)
+	error_control : REPEAT . '(' asignacion_repeat ';' condicion ';' CTE_ULONG ')' error  (47)
+
+	IDENTIFICADOR  shift 82
+	ASIGNACION  shift 83
+	'('  shift 84
+	.  error
+
+	asignacion_repeat  goto 85
+	error_asignacion_repeat  goto 86
+
+
+state 22
+	try_catch : TRY . sentencia_ejecutable CATCH bloque_catch  (93)
+	error_try_catch : TRY . CATCH bloque_catch  (95)
+	error_try_catch : TRY . sentencia_ejecutable bloque_catch  (96)
+	error_try_catch : TRY . sentencia_ejecutable CATCH error  (97)
+	error_try_catch : TRY . try_catch CATCH bloque_catch  (98)
+
+	IDENTIFICADOR  shift 80
+	ASIGNACION  shift 17
+	IF  shift 18
+	PRINT  shift 19
+	REPEAT  shift 21
+	TRY  shift 22
+	CATCH  shift 87
+	'('  shift 46
+	.  error
+
+	sentencia_ejecutable  goto 88
+	control  goto 30
+	seleccion  goto 31
+	impresion  goto 32
+	invocacion  goto 33
+	asignacion  goto 34
+	error_ejecucion  goto 35
+	try_catch  goto 89
+	error_control  goto 38
+	error_asignacion  goto 39
+	error_seleccion  goto 40
+	error_invocacion  goto 41
+	error_try_catch  goto 42
+
+
+state 23
+	error_seleccion : '(' . condicion ')' THEN bloque_if ENDIF  (74)
+	error_declaracion_funcion : IDENTIFICADOR '(' . parametro ')'  (111)
+
+	IDENTIFICADOR  shift 63
+	CTE_ULONG  shift 64
+	CTE_DOUBLE  shift 66
+	ULONG  shift 3
+	DOUBLE  shift 4
+	'-'  shift 68
+	.  error
+
+	invocacion  goto 69
+	tipo  goto 90
+	condicion  goto 91
+	expresion2  goto 75
+	termino  goto 76
+	error_invocacion  goto 41
+	parametro  goto 92
+	error_parametro  goto 93
+	expresion  goto 77
+	expresion1  goto 78
+	factor  goto 71
+
+
+state 24
+	programa : IDENTIFICADOR bloque_declarativo . bloque_ejecutable  (1)
+	bloque_declarativo : bloque_declarativo . declaracion  (7)
+
+	IDENTIFICADOR  shift 16
+	ASIGNACION  shift 17
+	IF  shift 18
+	PRINT  shift 19
+	FUNC  shift 2
+	BEGIN  shift 20
+	ULONG  shift 3
+	DOUBLE  shift 4
+	REPEAT  shift 21
+	TRY  shift 22
+	TYPEDEF  shift 5
+	'('  shift 46
+	.  error
+
+	bloque_ejecutable  goto 94
+	declaracion  goto 48
+	bloque_sentencias  goto 26
+	error_bloque_ejecutable  goto 27
+	sentencia_ejecucion  goto 28
+	sentencia_ejecutable  goto 29
+	control  goto 30
+	seleccion  goto 31
+	impresion  goto 32
+	invocacion  goto 33
+	asignacion  goto 34
+	error_ejecucion  goto 35
+	try_catch  goto 36
+	error_sentencia_ejecucion  goto 37
+	tipo  goto 10
+	funcion  goto 11
+	error_declaracion  goto 12
+	error_control  goto 38
+	error_asignacion  goto 39
+	error_seleccion  goto 40
+	error_invocacion  goto 41
+	error_try_catch  goto 42
+	declaracion_funcion  goto 13
+	error_funcion  goto 14
+	error_declaracion_funcion  goto 15
+
+
+state 25
+	programa : IDENTIFICADOR bloque_ejecutable .  (2)
+	error_programa : IDENTIFICADOR bloque_ejecutable . bloque_declarativo  (5)
+
+	IDENTIFICADOR  shift 95
+	FUNC  shift 2
+	ULONG  shift 3
+	DOUBLE  shift 4
+	TYPEDEF  shift 5
+	$end  reduce 2
+
+	bloque_declarativo  goto 96
+	declaracion  goto 9
+	tipo  goto 10
+	funcion  goto 11
+	error_declaracion  goto 12
+	declaracion_funcion  goto 13
+	error_funcion  goto 14
+	error_declaracion_funcion  goto 15
+
+
+state 26
+	bloque_sentencias : bloque_sentencias . sentencia_ejecucion  (11)
+	error_bloque_ejecutable : bloque_sentencias . END  (12)
+
+	IDENTIFICADOR  shift 80
+	ASIGNACION  shift 17
+	IF  shift 18
+	PRINT  shift 19
+	END  shift 97
+	REPEAT  shift 21
+	TRY  shift 22
+	'('  shift 46
+	.  error
+
+	sentencia_ejecucion  goto 98
+	sentencia_ejecutable  goto 29
+	control  goto 30
+	seleccion  goto 31
+	impresion  goto 32
+	invocacion  goto 33
+	asignacion  goto 34
+	error_ejecucion  goto 35
+	try_catch  goto 36
+	error_sentencia_ejecucion  goto 37
+	error_control  goto 38
+	error_asignacion  goto 39
+	error_seleccion  goto 40
+	error_invocacion  goto 41
+	error_try_catch  goto 42
+
+
+state 27
+	bloque_ejecutable : error_bloque_ejecutable .  (9)
+
+	.  reduce 9
+
+
+state 28
+	bloque_sentencias : sentencia_ejecucion .  (10)
+
+	.  reduce 10
+
+
+state 29
+	sentencia_ejecucion : sentencia_ejecutable .  (25)
+
+	.  reduce 25
+
+
+state 30
+	sentencia_ejecutable : control . ';'  (14)
+	error_ejecucion : control . error  (20)
+
+	error  shift 99
+	';'  shift 100
+	.  error
+
+
+state 31
+	sentencia_ejecutable : seleccion . ';'  (15)
+	error_ejecucion : seleccion . error  (21)
+
+	error  shift 101
+	';'  shift 102
+	.  error
+
+
+state 32
+	sentencia_ejecutable : impresion . ';'  (16)
+	error_ejecucion : impresion . error  (22)
+
+	error  shift 103
+	';'  shift 104
+	.  error
+
+
+state 33
+	sentencia_ejecutable : invocacion . ';'  (17)
+	error_ejecucion : invocacion . error  (24)
+
+	error  shift 105
+	';'  shift 106
+	.  error
+
+
+state 34
+	sentencia_ejecutable : asignacion . ';'  (18)
+	error_ejecucion : asignacion . error  (23)
+
+	error  shift 107
+	';'  shift 108
+	.  error
+
+
+state 35
+	sentencia_ejecutable : error_ejecucion .  (19)
+
+	.  reduce 19
+
+
+state 36
+	sentencia_ejecucion : try_catch . ';'  (26)
+	error_sentencia_ejecucion : try_catch . error  (28)
+
+	error  shift 109
+	';'  shift 110
+	.  error
+
+
+state 37
+	sentencia_ejecucion : error_sentencia_ejecucion .  (27)
+
+	.  reduce 27
+
+
+state 38
+	control : error_control .  (39)
+
+	.  reduce 39
+
+
+state 39
+	asignacion : error_asignacion .  (61)
+
+	.  reduce 61
+
+
+state 40
+	seleccion : error_seleccion .  (67)
+
+	.  reduce 67
+
+
+state 41
+	invocacion : error_invocacion .  (88)
+
+	.  reduce 88
+
+
+state 42
+	try_catch : error_try_catch .  (94)
+
+	.  reduce 94
+
+
+state 43
+	declaracion_funcion : FUNC IDENTIFICADOR . '(' parametro ')'  (109)
+	error_declaracion_funcion : FUNC IDENTIFICADOR . parametro ')'  (113)
+	error_declaracion_funcion : FUNC IDENTIFICADOR . '(' ')'  (114)
+	error_declaracion_funcion : FUNC IDENTIFICADOR . '(' parametro error  (115)
+
+	ULONG  shift 3
+	DOUBLE  shift 4
+	'('  shift 111
+	.  error
+
+	tipo  goto 90
+	parametro  goto 112
+	error_parametro  goto 93
+
+
+state 44
+	error_declaracion_funcion : FUNC '(' . parametro ')'  (112)
+
+	ULONG  shift 3
+	DOUBLE  shift 4
+	.  error
+
+	tipo  goto 90
+	parametro  goto 113
+	error_parametro  goto 93
+
+
+state 45
+	declaracion : TYPEDEF IDENTIFICADOR . '=' tipo funcion_type ';'  (31)
+
+	'='  shift 114
+	.  error
+
+
+state 46
+	error_seleccion : '(' . condicion ')' THEN bloque_if ENDIF  (74)
+
+	IDENTIFICADOR  shift 63
+	CTE_ULONG  shift 64
+	CTE_DOUBLE  shift 66
+	'-'  shift 68
+	.  error
+
+	invocacion  goto 69
+	condicion  goto 91
+	expresion2  goto 75
+	termino  goto 76
+	error_invocacion  goto 41
+	expresion  goto 77
+	expresion1  goto 78
+	factor  goto 71
+
+
+state 47
+	error_programa : bloque_declarativo bloque_ejecutable .  (4)
+
+	.  reduce 4
+
+
+state 48
+	bloque_declarativo : bloque_declarativo declaracion .  (7)
+
+	.  reduce 7
+
+
+state 49
+	lista_de_variables : IDENTIFICADOR .  (103)
+	error_declaracion_funcion : IDENTIFICADOR . '(' parametro ')'  (111)
+
+	'('  shift 115
+	error  reduce 103
+	IDENTIFICADOR  reduce 103
+	';'  reduce 103
+	','  reduce 103
+
+
+state 50
+	declaracion : tipo lista_de_variables . ';'  (29)
+	error_declaracion : tipo lista_de_variables . error  (33)
+	lista_de_variables : lista_de_variables . ',' IDENTIFICADOR  (102)
+	error_lista_de_variables : lista_de_variables . IDENTIFICADOR  (105)
+
+	error  shift 116
+	IDENTIFICADOR  shift 117
+	';'  shift 118
+	','  shift 119
+	.  error
+
+
+state 51
+	declaracion : tipo funcion . ';'  (30)
+	error_declaracion : tipo funcion . error  (34)
+
+	error  shift 120
+	';'  shift 121
+	.  error
+
+
+state 52
+	lista_de_variables : error_lista_de_variables .  (104)
+
+	.  reduce 104
+
+
+state 53
+	error_declaracion : funcion ';' .  (35)
+
+	.  reduce 35
+
+
+state 54
+	error_funcion : declaracion_funcion error .  (108)
+
+	.  reduce 108
+
+
+state 55
+	bloque_ejecucion_funcion : BEGIN . bloque_sentencias RETURN '(' condicion ')' ';' END  (132)
+	bloque_ejecucion_funcion : BEGIN . PRE ':' '(' condicion ')' ';' bloque_sentencias RETURN '(' condicion ')' ';' END  (133)
+	bloque_ejecucion_funcion : BEGIN . PRE ':' '(' condicion ')' ';' RETURN '(' condicion ')' ';' END  (134)
+	error_bloque_ejecucion_funcion : BEGIN . RETURN '(' condicion ')' ';' END  (137)
+	error_bloque_ejecucion_funcion : BEGIN . bloque_sentencias '(' condicion ')' ';' END  (138)
+	error_bloque_ejecucion_funcion : BEGIN . bloque_sentencias RETURN condicion ')' ';' END  (139)
+	error_bloque_ejecucion_funcion : BEGIN . bloque_sentencias RETURN '(' ')' ';' END  (140)
+	error_bloque_ejecucion_funcion : BEGIN . bloque_sentencias RETURN '(' condicion ';' END  (141)
+	error_bloque_ejecucion_funcion : BEGIN . bloque_sentencias RETURN '(' condicion ')' END  (142)
+	error_bloque_ejecucion_funcion : BEGIN . bloque_sentencias END  (143)
+	error_bloque_ejecucion_funcion : BEGIN . bloque_sentencias RETURN '(' condicion ')' ';' error  (144)
+	error_bloque_ejecucion_funcion : BEGIN . PRE condicion ')' ';' bloque_sentencias RETURN '(' condicion ')' ';' END  (146)
+	error_bloque_ejecucion_funcion : BEGIN . PRE '(' ')' ';' bloque_sentencias RETURN '(' condicion ')' ';' END  (147)
+	error_bloque_ejecucion_funcion : BEGIN . PRE '(' condicion ';' bloque_sentencias RETURN '(' condicion ')' ';' END  (148)
+	error_bloque_ejecucion_funcion : BEGIN . PRE '(' condicion ')' bloque_sentencias RETURN '(' condicion ')' ';' END  (149)
+	error_bloque_ejecucion_funcion : BEGIN . PRE '(' condicion ')' ';' RETURN '(' condicion ')' ';' END  (150)
+	error_bloque_ejecucion_funcion : BEGIN . PRE '(' condicion ')' ';' bloque_sentencias '(' condicion ')' ';' END  (151)
+	error_bloque_ejecucion_funcion : BEGIN . PRE '(' condicion ')' ';' bloque_sentencias RETURN condicion ')' ';' END  (152)
+	error_bloque_ejecucion_funcion : BEGIN . PRE '(' condicion ')' ';' bloque_sentencias RETURN '(' ')' ';' END  (153)
+	error_bloque_ejecucion_funcion : BEGIN . PRE '(' condicion ')' ';' bloque_sentencias RETURN '(' condicion ';' END  (154)
+	error_bloque_ejecucion_funcion : BEGIN . PRE '(' condicion ')' ';' bloque_sentencias RETURN '(' condicion ')' END  (155)
+	error_bloque_ejecucion_funcion : BEGIN . PRE '(' condicion ')' ';' bloque_sentencias RETURN '(' condicion ')' ';' error  (156)
+	error_bloque_ejecucion_funcion : BEGIN . PRE '(' condicion ')' ';' bloque_sentencias END  (157)
+
+	IDENTIFICADOR  shift 80
+	ASIGNACION  shift 17
+	IF  shift 18
+	PRINT  shift 19
+	RETURN  shift 122
+	REPEAT  shift 21
+	PRE  shift 123
+	TRY  shift 22
+	'('  shift 46
+	.  error
+
+	bloque_sentencias  goto 124
+	sentencia_ejecucion  goto 28
+	sentencia_ejecutable  goto 29
+	control  goto 30
+	seleccion  goto 31
+	impresion  goto 32
+	invocacion  goto 33
+	asignacion  goto 34
+	error_ejecucion  goto 35
+	try_catch  goto 36
+	error_sentencia_ejecucion  goto 37
+	error_control  goto 38
+	error_asignacion  goto 39
+	error_seleccion  goto 40
+	error_invocacion  goto 41
+	error_try_catch  goto 42
+
+
+state 56
+	error_bloque_ejecucion_funcion : PRE . '(' condicion ')' ';' bloque_sentencias RETURN '(' condicion ')' ';' END  (145)
+
+	'('  shift 125
+	.  error
+
+
+state 57
+	bloque_declarativo : bloque_declarativo . declaracion  (7)
+	bloque_funcion : bloque_declarativo . bloque_ejecucion_funcion  (128)
+	error_bloque_funcion : bloque_declarativo . error  (131)
+
+	error  shift 126
+	IDENTIFICADOR  shift 16
+	ASIGNACION  shift 17
+	IF  shift 18
+	PRINT  shift 19
+	FUNC  shift 2
+	BEGIN  shift 55
+	ULONG  shift 3
+	DOUBLE  shift 4
+	REPEAT  shift 21
+	PRE  shift 56
+	TRY  shift 22
+	TYPEDEF  shift 5
+	'('  shift 46
+	.  error
+
+	declaracion  goto 48
+	bloque_sentencias  goto 58
+	sentencia_ejecucion  goto 28
+	sentencia_ejecutable  goto 29
+	control  goto 30
+	seleccion  goto 31
+	impresion  goto 32
+	invocacion  goto 33
+	asignacion  goto 34
+	error_ejecucion  goto 35
+	try_catch  goto 36
+	error_sentencia_ejecucion  goto 37
+	tipo  goto 10
+	funcion  goto 11
+	error_declaracion  goto 12
+	error_control  goto 38
+	error_asignacion  goto 39
+	error_seleccion  goto 40
+	error_invocacion  goto 41
+	error_try_catch  goto 42
+	declaracion_funcion  goto 13
+	error_funcion  goto 14
+	error_declaracion_funcion  goto 15
+	bloque_ejecucion_funcion  goto 127
+	error_bloque_ejecucion_funcion  goto 62
+
+
+state 58
+	bloque_sentencias : bloque_sentencias . sentencia_ejecucion  (11)
+	error_bloque_ejecucion_funcion : bloque_sentencias . RETURN '(' condicion ')' ';' END  (136)
+
+	IDENTIFICADOR  shift 80
+	ASIGNACION  shift 17
+	IF  shift 18
+	PRINT  shift 19
+	RETURN  shift 128
+	REPEAT  shift 21
+	TRY  shift 22
+	'('  shift 46
+	.  error
+
+	sentencia_ejecucion  goto 98
+	sentencia_ejecutable  goto 29
+	control  goto 30
+	seleccion  goto 31
+	impresion  goto 32
+	invocacion  goto 33
+	asignacion  goto 34
+	error_ejecucion  goto 35
+	try_catch  goto 36
+	error_sentencia_ejecucion  goto 37
+	error_control  goto 38
+	error_asignacion  goto 39
+	error_seleccion  goto 40
+	error_invocacion  goto 41
+	error_try_catch  goto 42
+
+
+state 59
+	funcion : declaracion_funcion bloque_funcion .  (106)
+
+	.  reduce 106
+
+
+state 60
+	bloque_funcion : bloque_ejecucion_funcion .  (129)
+
+	.  reduce 129
+
+
+state 61
+	bloque_funcion : error_bloque_funcion .  (130)
+
+	.  reduce 130
+
+
+state 62
+	bloque_ejecucion_funcion : error_bloque_ejecucion_funcion .  (135)
+
+	.  reduce 135
+
+
+state 63
+	invocacion : IDENTIFICADOR . '(' CTE_ULONG ')'  (85)
+	invocacion : IDENTIFICADOR . '(' CTE_DOUBLE ')'  (86)
+	invocacion : IDENTIFICADOR . '(' IDENTIFICADOR ')'  (87)
+	error_invocacion : IDENTIFICADOR . '(' ')'  (89)
+	error_invocacion : IDENTIFICADOR . '(' CTE_ULONG error  (90)
+	error_invocacion : IDENTIFICADOR . '(' CTE_DOUBLE error  (91)
+	error_invocacion : IDENTIFICADOR . '(' IDENTIFICADOR error  (92)
+	factor : IDENTIFICADOR .  (173)
+
+	'('  shift 129
+	error  reduce 173
+	CTE_ULONG  reduce 173
+	MAYOR_IGUAL  reduce 173
+	MENOR_IGUAL  reduce 173
+	IGUAL_IGUAL  reduce 173
+	DISTINTO  reduce 173
+	AND  reduce 173
+	OR  reduce 173
+	THEN  reduce 173
+	';'  reduce 173
+	')'  reduce 173
+	'+'  reduce 173
+	'-'  reduce 173
+	'*'  reduce 173
+	'/'  reduce 173
+	'<'  reduce 173
+	'>'  reduce 173
+
+
+state 64
+	factor : CTE_ULONG .  (172)
+
+	.  reduce 172
+
+
+state 65
+	asignacion : IDENTIFICADOR ASIGNACION . expresion2  (60)
+	error_asignacion : IDENTIFICADOR ASIGNACION . error  (64)
+
+	error  shift 130
+	IDENTIFICADOR  shift 63
+	CTE_ULONG  shift 64
+	CTE_DOUBLE  shift 66
+	'-'  shift 68
+	.  error
+
+	invocacion  goto 69
+	expresion2  goto 131
+	termino  goto 76
+	error_invocacion  goto 41
+	factor  goto 71
+
+
+state 66
+	factor : CTE_DOUBLE .  (171)
+
+	.  reduce 171
+
+
+state 67
+	invocacion : IDENTIFICADOR '(' . CTE_ULONG ')'  (85)
+	invocacion : IDENTIFICADOR '(' . CTE_DOUBLE ')'  (86)
+	invocacion : IDENTIFICADOR '(' . IDENTIFICADOR ')'  (87)
+	error_invocacion : IDENTIFICADOR '(' . ')'  (89)
+	error_invocacion : IDENTIFICADOR '(' . CTE_ULONG error  (90)
+	error_invocacion : IDENTIFICADOR '(' . CTE_DOUBLE error  (91)
+	error_invocacion : IDENTIFICADOR '(' . IDENTIFICADOR error  (92)
+	error_declaracion_funcion : IDENTIFICADOR '(' . parametro ')'  (111)
+
+	IDENTIFICADOR  shift 132
+	CTE_ULONG  shift 133
+	CTE_DOUBLE  shift 134
+	ULONG  shift 3
+	DOUBLE  shift 4
+	')'  shift 135
+	.  error
+
+	tipo  goto 90
+	parametro  goto 92
+	error_parametro  goto 93
+
+
+state 68
+	factor : '-' . factor  (170)
+
+	IDENTIFICADOR  shift 63
+	CTE_ULONG  shift 64
+	CTE_DOUBLE  shift 66
+	'-'  shift 68
+	.  error
+
+	invocacion  goto 69
+	error_invocacion  goto 41
+	factor  goto 136
+
+
+state 69
+	factor : invocacion .  (174)
+
+	.  reduce 174
+
+
+state 70
+	error_asignacion : IDENTIFICADOR termino .  (63)
+	termino : termino . '*' factor  (167)
+	termino : termino . '/' factor  (168)
+
+	'*'  shift 137
+	'/'  shift 138
+	error  reduce 63
+	';'  reduce 63
+
+
+state 71
+	termino : factor .  (169)
+
+	.  reduce 169
+
+
+state 72
+	error_asignacion : ASIGNACION termino .  (62)
+	termino : termino . '*' factor  (167)
+	termino : termino . '/' factor  (168)
+
+	'*'  shift 137
+	'/'  shift 138
+	error  reduce 62
+	';'  reduce 62
+
+
+state 73
+	seleccion : IF '(' . condicion ')' THEN bloque_if ENDIF  (65)
+	seleccion : IF '(' . condicion ')' THEN bloque_if ELSE bloque_if ENDIF  (66)
+	error_seleccion : IF '(' . ')' THEN bloque_if ENDIF  (76)
+	error_seleccion : IF '(' . condicion THEN bloque_if ENDIF  (77)
+	error_seleccion : IF '(' . condicion ')' bloque_if ENDIF  (78)
+	error_seleccion : IF '(' . condicion ')' THEN ENDIF  (79)
+	error_seleccion : IF '(' . condicion ')' THEN bloque_if  (80)
+	error_seleccion : IF '(' . condicion ')' THEN bloque_if ELSE ENDIF  (81)
+	error_seleccion : IF '(' . condicion ')' THEN bloque_if ELSE bloque_if  (82)
+
+	IDENTIFICADOR  shift 63
+	CTE_ULONG  shift 64
+	CTE_DOUBLE  shift 66
+	')'  shift 139
+	'-'  shift 68
+	.  error
+
+	invocacion  goto 69
+	condicion  goto 140
+	expresion2  goto 75
+	termino  goto 76
+	error_invocacion  goto 41
+	expresion  goto 77
+	expresion1  goto 78
+	factor  goto 71
+
+
+state 74
+	error_seleccion : IF condicion . ')' THEN bloque_if ENDIF  (75)
+	condicion : condicion . OR expresion  (159)
+
+	OR  shift 141
+	')'  shift 142
+	.  error
+
+
+state 75
+	expresion1 : expresion2 .  (162)
+	expresion2 : expresion2 . '+' termino  (165)
+	expresion2 : expresion2 . '-' termino  (166)
+
+	'+'  shift 143
+	'-'  shift 144
+	CTE_ULONG  reduce 162
+	MAYOR_IGUAL  reduce 162
+	MENOR_IGUAL  reduce 162
+	IGUAL_IGUAL  reduce 162
+	DISTINTO  reduce 162
+	AND  reduce 162
+	OR  reduce 162
+	THEN  reduce 162
+	';'  reduce 162
+	')'  reduce 162
+	'<'  reduce 162
+	'>'  reduce 162
+
+
+state 76
+	expresion2 : termino .  (164)
+	termino : termino . '*' factor  (167)
+	termino : termino . '/' factor  (168)
+
+	'*'  shift 137
+	'/'  shift 138
+	error  reduce 164
+	CTE_ULONG  reduce 164
+	MAYOR_IGUAL  reduce 164
+	MENOR_IGUAL  reduce 164
+	IGUAL_IGUAL  reduce 164
+	DISTINTO  reduce 164
+	AND  reduce 164
+	OR  reduce 164
+	THEN  reduce 164
+	';'  reduce 164
+	')'  reduce 164
+	'+'  reduce 164
+	'-'  reduce 164
+	'<'  reduce 164
+	'>'  reduce 164
+
+
+state 77
+	condicion : expresion .  (158)
+	expresion : expresion . AND expresion1  (161)
+
+	AND  shift 145
+	CTE_ULONG  reduce 158
+	OR  reduce 158
+	THEN  reduce 158
+	';'  reduce 158
+	')'  reduce 158
+
+
+state 78
+	expresion : expresion1 .  (160)
+	expresion1 : expresion1 . comparador expresion2  (163)
+
+	MAYOR_IGUAL  shift 146
+	MENOR_IGUAL  shift 147
+	IGUAL_IGUAL  shift 148
+	DISTINTO  shift 149
+	'<'  shift 150
+	'>'  shift 151
+	CTE_ULONG  reduce 160
+	AND  reduce 160
+	OR  reduce 160
+	THEN  reduce 160
+	';'  reduce 160
+	')'  reduce 160
+
+	comparador  goto 152
+
+
+state 79
+	impresion : PRINT '(' . CADENA ')'  (83)
+	impresion : PRINT '(' . ')'  (84)
+
+	CADENA  shift 153
+	')'  shift 154
+	.  error
+
+
+state 80
+	asignacion : IDENTIFICADOR . ASIGNACION expresion2  (60)
+	error_asignacion : IDENTIFICADOR . termino  (63)
+	error_asignacion : IDENTIFICADOR . ASIGNACION error  (64)
+	invocacion : IDENTIFICADOR . '(' CTE_ULONG ')'  (85)
+	invocacion : IDENTIFICADOR . '(' CTE_DOUBLE ')'  (86)
+	invocacion : IDENTIFICADOR . '(' IDENTIFICADOR ')'  (87)
+	error_invocacion : IDENTIFICADOR . '(' ')'  (89)
+	error_invocacion : IDENTIFICADOR . '(' CTE_ULONG error  (90)
+	error_invocacion : IDENTIFICADOR . '(' CTE_DOUBLE error  (91)
+	error_invocacion : IDENTIFICADOR . '(' IDENTIFICADOR error  (92)
+
+	IDENTIFICADOR  shift 63
+	CTE_ULONG  shift 64
+	ASIGNACION  shift 65
+	CTE_DOUBLE  shift 66
+	'('  shift 129
+	'-'  shift 68
+	.  error
+
+	invocacion  goto 69
+	termino  goto 70
+	error_invocacion  goto 41
+	factor  goto 71
+
+
+state 81
+	bloque_ejecutable : BEGIN bloque_sentencias . END  (8)
+	bloque_sentencias : bloque_sentencias . sentencia_ejecucion  (11)
+	error_bloque_ejecutable : BEGIN bloque_sentencias . error  (13)
+
+	error  shift 155
+	IDENTIFICADOR  shift 80
+	ASIGNACION  shift 17
+	IF  shift 18
+	PRINT  shift 19
+	END  shift 156
+	REPEAT  shift 21
+	TRY  shift 22
+	'('  shift 46
+	.  error
+
+	sentencia_ejecucion  goto 98
+	sentencia_ejecutable  goto 29
+	control  goto 30
+	seleccion  goto 31
+	impresion  goto 32
+	invocacion  goto 33
+	asignacion  goto 34
+	error_ejecucion  goto 35
+	try_catch  goto 36
+	error_sentencia_ejecucion  goto 37
+	error_control  goto 38
+	error_asignacion  goto 39
+	error_seleccion  goto 40
+	error_invocacion  goto 41
+	error_try_catch  goto 42
+
+
+state 82
+	asignacion_repeat : IDENTIFICADOR . ASIGNACION CTE_ULONG  (48)
+	error_asignacion_repeat : IDENTIFICADOR . CTE_ULONG  (51)
+	error_asignacion_repeat : IDENTIFICADOR . ASIGNACION error  (52)
+
+	CTE_ULONG  shift 157
+	ASIGNACION  shift 158
+	.  error
+
+
+state 83
+	error_asignacion_repeat : ASIGNACION . CTE_ULONG  (50)
+
+	CTE_ULONG  shift 159
+	.  error
+
+
+state 84
+	control : REPEAT '(' . asignacion_repeat ';' condicion ';' CTE_ULONG ')' bloque_repeat  (38)
+	error_control : REPEAT '(' . ';' condicion ';' CTE_ULONG ')' bloque_repeat  (41)
+	error_control : REPEAT '(' . asignacion_repeat condicion ';' CTE_ULONG ')' bloque_repeat  (42)
+	error_control : REPEAT '(' . asignacion_repeat ';' ';' CTE_ULONG ')' bloque_repeat  (43)
+	error_control : REPEAT '(' . asignacion_repeat ';' condicion CTE_ULONG ')' bloque_repeat  (44)
+	error_control : REPEAT '(' . asignacion_repeat ';' condicion ';' ')' bloque_repeat  (45)
+	error_control : REPEAT '(' . asignacion_repeat ';' condicion ';' CTE_ULONG bloque_repeat  (46)
+	error_control : REPEAT '(' . asignacion_repeat ';' condicion ';' CTE_ULONG ')' error  (47)
+
+	IDENTIFICADOR  shift 82
+	ASIGNACION  shift 83
+	';'  shift 160
+	.  error
+
+	asignacion_repeat  goto 161
+	error_asignacion_repeat  goto 86
+
+
+state 85
+	error_control : REPEAT asignacion_repeat . ';' condicion ';' CTE_ULONG ')' bloque_repeat  (40)
+
+	';'  shift 162
+	.  error
+
+
+state 86
+	asignacion_repeat : error_asignacion_repeat .  (49)
+
+	.  reduce 49
+
+
+state 87
+	error_try_catch : TRY CATCH . bloque_catch  (95)
+
+	BEGIN  shift 163
+	.  error
+
+	bloque_catch  goto 164
+
+
+state 88
+	try_catch : TRY sentencia_ejecutable . CATCH bloque_catch  (93)
+	error_try_catch : TRY sentencia_ejecutable . bloque_catch  (96)
+	error_try_catch : TRY sentencia_ejecutable . CATCH error  (97)
+
+	BEGIN  shift 163
+	CATCH  shift 165
+	.  error
+
+	bloque_catch  goto 166
+
+
+state 89
+	error_try_catch : TRY try_catch . CATCH bloque_catch  (98)
+
+	CATCH  shift 167
+	.  error
+
+
+state 90
+	parametro : tipo . IDENTIFICADOR  (116)
+	error_parametro : tipo . error  (118)
+
+	error  shift 168
+	IDENTIFICADOR  shift 169
+	.  error
+
+
+state 91
+	error_seleccion : '(' condicion . ')' THEN bloque_if ENDIF  (74)
+	condicion : condicion . OR expresion  (159)
+
+	OR  shift 141
+	')'  shift 170
+	.  error
+
+
+state 92
+	error_declaracion_funcion : IDENTIFICADOR '(' parametro . ')'  (111)
+
+	')'  shift 171
+	.  error
+
+
+state 93
+	parametro : error_parametro .  (117)
+
+	.  reduce 117
+
+
+state 94
+	programa : IDENTIFICADOR bloque_declarativo bloque_ejecutable .  (1)
+
+	.  reduce 1
+
+
+state 95
+	error_declaracion_funcion : IDENTIFICADOR . '(' parametro ')'  (111)
+
+	'('  shift 115
+	.  error
+
+
+state 96
+	error_programa : IDENTIFICADOR bloque_ejecutable bloque_declarativo .  (5)
+	bloque_declarativo : bloque_declarativo . declaracion  (7)
+
+	IDENTIFICADOR  shift 95
+	FUNC  shift 2
+	ULONG  shift 3
+	DOUBLE  shift 4
+	TYPEDEF  shift 5
+	$end  reduce 5
+
+	declaracion  goto 48
+	tipo  goto 10
+	funcion  goto 11
+	error_declaracion  goto 12
+	declaracion_funcion  goto 13
+	error_funcion  goto 14
+	error_declaracion_funcion  goto 15
+
+
+state 97
+	error_bloque_ejecutable : bloque_sentencias END .  (12)
+
+	.  reduce 12
+
+
+state 98
+	bloque_sentencias : bloque_sentencias sentencia_ejecucion .  (11)
+
+	.  reduce 11
+
+
+state 99
+	error_ejecucion : control error .  (20)
+
+	.  reduce 20
+
+
+state 100
+	sentencia_ejecutable : control ';' .  (14)
+
+	.  reduce 14
+
+
+state 101
+	error_ejecucion : seleccion error .  (21)
+
+	.  reduce 21
+
+
+state 102
+	sentencia_ejecutable : seleccion ';' .  (15)
+
+	.  reduce 15
+
+
+state 103
+	error_ejecucion : impresion error .  (22)
+
+	.  reduce 22
+
+
+state 104
+	sentencia_ejecutable : impresion ';' .  (16)
+
+	.  reduce 16
+
+
+state 105
+	error_ejecucion : invocacion error .  (24)
+
+	.  reduce 24
+
+
+state 106
+	sentencia_ejecutable : invocacion ';' .  (17)
+
+	.  reduce 17
+
+
+state 107
+	error_ejecucion : asignacion error .  (23)
+
+	.  reduce 23
+
+
+state 108
+	sentencia_ejecutable : asignacion ';' .  (18)
+
+	.  reduce 18
+
+
+state 109
+	error_sentencia_ejecucion : try_catch error .  (28)
+
+	.  reduce 28
+
+
+state 110
+	sentencia_ejecucion : try_catch ';' .  (26)
+
+	.  reduce 26
+
+
+state 111
+	declaracion_funcion : FUNC IDENTIFICADOR '(' . parametro ')'  (109)
+	error_declaracion_funcion : FUNC IDENTIFICADOR '(' . ')'  (114)
+	error_declaracion_funcion : FUNC IDENTIFICADOR '(' . parametro error  (115)
+
+	ULONG  shift 3
+	DOUBLE  shift 4
+	')'  shift 172
+	.  error
+
+	tipo  goto 90
+	parametro  goto 173
+	error_parametro  goto 93
+
+
+state 112
+	error_declaracion_funcion : FUNC IDENTIFICADOR parametro . ')'  (113)
+
+	')'  shift 174
+	.  error
+
+
+state 113
+	error_declaracion_funcion : FUNC '(' parametro . ')'  (112)
+
+	')'  shift 175
+	.  error
+
+
+state 114
+	declaracion : TYPEDEF IDENTIFICADOR '=' . tipo funcion_type ';'  (31)
+
+	ULONG  shift 3
+	DOUBLE  shift 4
+	.  error
+
+	tipo  goto 176
+
+
+state 115
+	error_declaracion_funcion : IDENTIFICADOR '(' . parametro ')'  (111)
+
+	ULONG  shift 3
+	DOUBLE  shift 4
+	.  error
+
+	tipo  goto 90
+	parametro  goto 92
+	error_parametro  goto 93
+
+
+state 116
+	error_declaracion : tipo lista_de_variables error .  (33)
+
+	.  reduce 33
+
+
+state 117
+	error_lista_de_variables : lista_de_variables IDENTIFICADOR .  (105)
+
+	.  reduce 105
+
+
+state 118
+	declaracion : tipo lista_de_variables ';' .  (29)
+
+	.  reduce 29
+
+
+state 119
+	lista_de_variables : lista_de_variables ',' . IDENTIFICADOR  (102)
+
+	IDENTIFICADOR  shift 177
+	.  error
+
+
+state 120
+	error_declaracion : tipo funcion error .  (34)
+
+	.  reduce 34
+
+
+state 121
+	declaracion : tipo funcion ';' .  (30)
+
+	.  reduce 30
+
+
+state 122
+	error_bloque_ejecucion_funcion : BEGIN RETURN . '(' condicion ')' ';' END  (137)
+
+	'('  shift 178
+	.  error
+
+
+state 123
+	bloque_ejecucion_funcion : BEGIN PRE . ':' '(' condicion ')' ';' bloque_sentencias RETURN '(' condicion ')' ';' END  (133)
+	bloque_ejecucion_funcion : BEGIN PRE . ':' '(' condicion ')' ';' RETURN '(' condicion ')' ';' END  (134)
+	error_bloque_ejecucion_funcion : BEGIN PRE . condicion ')' ';' bloque_sentencias RETURN '(' condicion ')' ';' END  (146)
+	error_bloque_ejecucion_funcion : BEGIN PRE . '(' ')' ';' bloque_sentencias RETURN '(' condicion ')' ';' END  (147)
+	error_bloque_ejecucion_funcion : BEGIN PRE . '(' condicion ';' bloque_sentencias RETURN '(' condicion ')' ';' END  (148)
+	error_bloque_ejecucion_funcion : BEGIN PRE . '(' condicion ')' bloque_sentencias RETURN '(' condicion ')' ';' END  (149)
+	error_bloque_ejecucion_funcion : BEGIN PRE . '(' condicion ')' ';' RETURN '(' condicion ')' ';' END  (150)
+	error_bloque_ejecucion_funcion : BEGIN PRE . '(' condicion ')' ';' bloque_sentencias '(' condicion ')' ';' END  (151)
+	error_bloque_ejecucion_funcion : BEGIN PRE . '(' condicion ')' ';' bloque_sentencias RETURN condicion ')' ';' END  (152)
+	error_bloque_ejecucion_funcion : BEGIN PRE . '(' condicion ')' ';' bloque_sentencias RETURN '(' ')' ';' END  (153)
+	error_bloque_ejecucion_funcion : BEGIN PRE . '(' condicion ')' ';' bloque_sentencias RETURN '(' condicion ';' END  (154)
+	error_bloque_ejecucion_funcion : BEGIN PRE . '(' condicion ')' ';' bloque_sentencias RETURN '(' condicion ')' END  (155)
+	error_bloque_ejecucion_funcion : BEGIN PRE . '(' condicion ')' ';' bloque_sentencias RETURN '(' condicion ')' ';' error  (156)
+	error_bloque_ejecucion_funcion : BEGIN PRE . '(' condicion ')' ';' bloque_sentencias END  (157)
+
+	IDENTIFICADOR  shift 63
+	CTE_ULONG  shift 64
+	CTE_DOUBLE  shift 66
+	'('  shift 179
+	':'  shift 180
+	'-'  shift 68
+	.  error
+
+	invocacion  goto 69
+	condicion  goto 181
+	expresion2  goto 75
+	termino  goto 76
+	error_invocacion  goto 41
+	expresion  goto 77
+	expresion1  goto 78
+	factor  goto 71
+
+
+state 124
+	bloque_sentencias : bloque_sentencias . sentencia_ejecucion  (11)
+	bloque_ejecucion_funcion : BEGIN bloque_sentencias . RETURN '(' condicion ')' ';' END  (132)
+	error_bloque_ejecucion_funcion : BEGIN bloque_sentencias . '(' condicion ')' ';' END  (138)
+	error_bloque_ejecucion_funcion : BEGIN bloque_sentencias . RETURN condicion ')' ';' END  (139)
+	error_bloque_ejecucion_funcion : BEGIN bloque_sentencias . RETURN '(' ')' ';' END  (140)
+	error_bloque_ejecucion_funcion : BEGIN bloque_sentencias . RETURN '(' condicion ';' END  (141)
+	error_bloque_ejecucion_funcion : BEGIN bloque_sentencias . RETURN '(' condicion ')' END  (142)
+	error_bloque_ejecucion_funcion : BEGIN bloque_sentencias . END  (143)
+	error_bloque_ejecucion_funcion : BEGIN bloque_sentencias . RETURN '(' condicion ')' ';' error  (144)
+
+	IDENTIFICADOR  shift 80
+	ASIGNACION  shift 17
+	IF  shift 18
+	PRINT  shift 19
+	RETURN  shift 182
+	END  shift 183
+	REPEAT  shift 21
+	TRY  shift 22
+	'('  shift 184
+	.  error
+
+	sentencia_ejecucion  goto 98
+	sentencia_ejecutable  goto 29
+	control  goto 30
+	seleccion  goto 31
+	impresion  goto 32
+	invocacion  goto 33
+	asignacion  goto 34
+	error_ejecucion  goto 35
+	try_catch  goto 36
+	error_sentencia_ejecucion  goto 37
+	error_control  goto 38
+	error_asignacion  goto 39
+	error_seleccion  goto 40
+	error_invocacion  goto 41
+	error_try_catch  goto 42
+
+
+state 125
+	error_bloque_ejecucion_funcion : PRE '(' . condicion ')' ';' bloque_sentencias RETURN '(' condicion ')' ';' END  (145)
+
+	IDENTIFICADOR  shift 63
+	CTE_ULONG  shift 64
+	CTE_DOUBLE  shift 66
+	'-'  shift 68
+	.  error
+
+	invocacion  goto 69
+	condicion  goto 185
+	expresion2  goto 75
+	termino  goto 76
+	error_invocacion  goto 41
+	expresion  goto 77
+	expresion1  goto 78
+	factor  goto 71
+
+
+state 126
+	error_bloque_funcion : bloque_declarativo error .  (131)
+
+	.  reduce 131
+
+
+state 127
+	bloque_funcion : bloque_declarativo bloque_ejecucion_funcion .  (128)
+
+	.  reduce 128
+
+
+state 128
+	error_bloque_ejecucion_funcion : bloque_sentencias RETURN . '(' condicion ')' ';' END  (136)
+
+	'('  shift 186
+	.  error
+
+
+state 129
+	invocacion : IDENTIFICADOR '(' . CTE_ULONG ')'  (85)
+	invocacion : IDENTIFICADOR '(' . CTE_DOUBLE ')'  (86)
+	invocacion : IDENTIFICADOR '(' . IDENTIFICADOR ')'  (87)
+	error_invocacion : IDENTIFICADOR '(' . ')'  (89)
+	error_invocacion : IDENTIFICADOR '(' . CTE_ULONG error  (90)
+	error_invocacion : IDENTIFICADOR '(' . CTE_DOUBLE error  (91)
+	error_invocacion : IDENTIFICADOR '(' . IDENTIFICADOR error  (92)
+
+	IDENTIFICADOR  shift 132
+	CTE_ULONG  shift 133
+	CTE_DOUBLE  shift 134
+	')'  shift 135
+	.  error
+
+
+state 130
+	error_asignacion : IDENTIFICADOR ASIGNACION error .  (64)
+
+	.  reduce 64
+
+
+state 131
+	asignacion : IDENTIFICADOR ASIGNACION expresion2 .  (60)
+	expresion2 : expresion2 . '+' termino  (165)
+	expresion2 : expresion2 . '-' termino  (166)
+
+	'+'  shift 143
+	'-'  shift 144
+	error  reduce 60
+	';'  reduce 60
+
+
+state 132
+	invocacion : IDENTIFICADOR '(' IDENTIFICADOR . ')'  (87)
+	error_invocacion : IDENTIFICADOR '(' IDENTIFICADOR . error  (92)
+
+	error  shift 187
+	')'  shift 188
+	.  error
+
+
+state 133
+	invocacion : IDENTIFICADOR '(' CTE_ULONG . ')'  (85)
+	error_invocacion : IDENTIFICADOR '(' CTE_ULONG . error  (90)
+
+	error  shift 189
+	')'  shift 190
+	.  error
+
+
+state 134
+	invocacion : IDENTIFICADOR '(' CTE_DOUBLE . ')'  (86)
+	error_invocacion : IDENTIFICADOR '(' CTE_DOUBLE . error  (91)
+
+	error  shift 191
+	')'  shift 192
+	.  error
+
+
+state 135
+	error_invocacion : IDENTIFICADOR '(' ')' .  (89)
+
+	.  reduce 89
+
+
+state 136
+	factor : '-' factor .  (170)
+
+	.  reduce 170
+
+
+state 137
+	termino : termino '*' . factor  (167)
+
+	IDENTIFICADOR  shift 63
+	CTE_ULONG  shift 64
+	CTE_DOUBLE  shift 66
+	'-'  shift 68
+	.  error
+
+	invocacion  goto 69
+	error_invocacion  goto 41
+	factor  goto 193
+
+
+state 138
+	termino : termino '/' . factor  (168)
+
+	IDENTIFICADOR  shift 63
+	CTE_ULONG  shift 64
+	CTE_DOUBLE  shift 66
+	'-'  shift 68
+	.  error
+
+	invocacion  goto 69
+	error_invocacion  goto 41
+	factor  goto 194
+
+
+state 139
+	error_seleccion : IF '(' ')' . THEN bloque_if ENDIF  (76)
+
+	THEN  shift 195
+	.  error
+
+
+state 140
+	seleccion : IF '(' condicion . ')' THEN bloque_if ENDIF  (65)
+	seleccion : IF '(' condicion . ')' THEN bloque_if ELSE bloque_if ENDIF  (66)
+	error_seleccion : IF '(' condicion . THEN bloque_if ENDIF  (77)
+	error_seleccion : IF '(' condicion . ')' bloque_if ENDIF  (78)
+	error_seleccion : IF '(' condicion . ')' THEN ENDIF  (79)
+	error_seleccion : IF '(' condicion . ')' THEN bloque_if  (80)
+	error_seleccion : IF '(' condicion . ')' THEN bloque_if ELSE ENDIF  (81)
+	error_seleccion : IF '(' condicion . ')' THEN bloque_if ELSE bloque_if  (82)
+	condicion : condicion . OR expresion  (159)
+
+	OR  shift 141
+	THEN  shift 196
+	')'  shift 197
+	.  error
+
+
+state 141
+	condicion : condicion OR . expresion  (159)
+
+	IDENTIFICADOR  shift 63
+	CTE_ULONG  shift 64
+	CTE_DOUBLE  shift 66
+	'-'  shift 68
+	.  error
+
+	invocacion  goto 69
+	expresion2  goto 75
+	termino  goto 76
+	error_invocacion  goto 41
+	expresion  goto 198
+	expresion1  goto 78
+	factor  goto 71
+
+
+state 142
+	error_seleccion : IF condicion ')' . THEN bloque_if ENDIF  (75)
+
+	THEN  shift 199
+	.  error
+
+
+state 143
+	expresion2 : expresion2 '+' . termino  (165)
+
+	IDENTIFICADOR  shift 63
+	CTE_ULONG  shift 64
+	CTE_DOUBLE  shift 66
+	'-'  shift 68
+	.  error
+
+	invocacion  goto 69
+	termino  goto 200
+	error_invocacion  goto 41
+	factor  goto 71
+
+
+state 144
+	expresion2 : expresion2 '-' . termino  (166)
+
+	IDENTIFICADOR  shift 63
+	CTE_ULONG  shift 64
+	CTE_DOUBLE  shift 66
+	'-'  shift 68
+	.  error
+
+	invocacion  goto 69
+	termino  goto 201
+	error_invocacion  goto 41
+	factor  goto 71
+
+
+state 145
+	expresion : expresion AND . expresion1  (161)
+
+	IDENTIFICADOR  shift 63
+	CTE_ULONG  shift 64
+	CTE_DOUBLE  shift 66
+	'-'  shift 68
+	.  error
+
+	invocacion  goto 69
+	expresion2  goto 75
+	termino  goto 76
+	error_invocacion  goto 41
+	expresion1  goto 202
+	factor  goto 71
+
+
+state 146
+	comparador : MAYOR_IGUAL .  (178)
+
+	.  reduce 178
+
+
+state 147
+	comparador : MENOR_IGUAL .  (179)
+
+	.  reduce 179
+
+
+state 148
+	comparador : IGUAL_IGUAL .  (177)
+
+	.  reduce 177
+
+
+state 149
+	comparador : DISTINTO .  (180)
+
+	.  reduce 180
+
+
+state 150
+	comparador : '<' .  (175)
+
+	.  reduce 175
+
+
+state 151
+	comparador : '>' .  (176)
+
+	.  reduce 176
+
+
+state 152
+	expresion1 : expresion1 comparador . expresion2  (163)
+
+	IDENTIFICADOR  shift 63
+	CTE_ULONG  shift 64
+	CTE_DOUBLE  shift 66
+	'-'  shift 68
+	.  error
+
+	invocacion  goto 69
+	expresion2  goto 203
+	termino  goto 76
+	error_invocacion  goto 41
+	factor  goto 71
+
+
+state 153
+	impresion : PRINT '(' CADENA . ')'  (83)
+
+	')'  shift 204
+	.  error
+
+
+state 154
+	impresion : PRINT '(' ')' .  (84)
+
+	.  reduce 84
+
+
+state 155
+	error_bloque_ejecutable : BEGIN bloque_sentencias error .  (13)
+
+	.  reduce 13
+
+
+state 156
+	bloque_ejecutable : BEGIN bloque_sentencias END .  (8)
+
+	.  reduce 8
+
+
+state 157
+	error_asignacion_repeat : IDENTIFICADOR CTE_ULONG .  (51)
+
+	.  reduce 51
+
+
+state 158
+	asignacion_repeat : IDENTIFICADOR ASIGNACION . CTE_ULONG  (48)
+	error_asignacion_repeat : IDENTIFICADOR ASIGNACION . error  (52)
+
+	error  shift 205
+	CTE_ULONG  shift 206
+	.  error
+
+
+state 159
+	error_asignacion_repeat : ASIGNACION CTE_ULONG .  (50)
+
+	.  reduce 50
+
+
+state 160
+	error_control : REPEAT '(' ';' . condicion ';' CTE_ULONG ')' bloque_repeat  (41)
+
+	IDENTIFICADOR  shift 63
+	CTE_ULONG  shift 64
+	CTE_DOUBLE  shift 66
+	'-'  shift 68
+	.  error
+
+	invocacion  goto 69
+	condicion  goto 207
+	expresion2  goto 75
+	termino  goto 76
+	error_invocacion  goto 41
+	expresion  goto 77
+	expresion1  goto 78
+	factor  goto 71
+
+
+state 161
+	control : REPEAT '(' asignacion_repeat . ';' condicion ';' CTE_ULONG ')' bloque_repeat  (38)
+	error_control : REPEAT '(' asignacion_repeat . condicion ';' CTE_ULONG ')' bloque_repeat  (42)
+	error_control : REPEAT '(' asignacion_repeat . ';' ';' CTE_ULONG ')' bloque_repeat  (43)
+	error_control : REPEAT '(' asignacion_repeat . ';' condicion CTE_ULONG ')' bloque_repeat  (44)
+	error_control : REPEAT '(' asignacion_repeat . ';' condicion ';' ')' bloque_repeat  (45)
+	error_control : REPEAT '(' asignacion_repeat . ';' condicion ';' CTE_ULONG bloque_repeat  (46)
+	error_control : REPEAT '(' asignacion_repeat . ';' condicion ';' CTE_ULONG ')' error  (47)
+
+	IDENTIFICADOR  shift 63
+	CTE_ULONG  shift 64
+	CTE_DOUBLE  shift 66
+	';'  shift 208
+	'-'  shift 68
+	.  error
+
+	invocacion  goto 69
+	condicion  goto 209
+	expresion2  goto 75
+	termino  goto 76
+	error_invocacion  goto 41
+	expresion  goto 77
+	expresion1  goto 78
+	factor  goto 71
+
+
+state 162
+	error_control : REPEAT asignacion_repeat ';' . condicion ';' CTE_ULONG ')' bloque_repeat  (40)
+
+	IDENTIFICADOR  shift 63
+	CTE_ULONG  shift 64
+	CTE_DOUBLE  shift 66
+	'-'  shift 68
+	.  error
+
+	invocacion  goto 69
+	condicion  goto 210
+	expresion2  goto 75
+	termino  goto 76
+	error_invocacion  goto 41
+	expresion  goto 77
+	expresion1  goto 78
+	factor  goto 71
+
+
+state 163
+	bloque_catch : BEGIN . bloque_1 END  (99)
+
+	IDENTIFICADOR  shift 80
+	ASIGNACION  shift 17
+	IF  shift 18
+	PRINT  shift 19
+	REPEAT  shift 21
+	'('  shift 46
+	.  error
+
+	sentencia_ejecutable  goto 211
+	control  goto 30
+	seleccion  goto 31
+	impresion  goto 32
+	invocacion  goto 33
+	asignacion  goto 34
+	error_ejecucion  goto 35
+	error_control  goto 38
+	error_asignacion  goto 39
+	error_seleccion  goto 40
+	error_invocacion  goto 41
+	bloque_1  goto 212
+
+
+state 164
+	error_try_catch : TRY CATCH bloque_catch .  (95)
+
+	.  reduce 95
+
+
+state 165
+	try_catch : TRY sentencia_ejecutable CATCH . bloque_catch  (93)
+	error_try_catch : TRY sentencia_ejecutable CATCH . error  (97)
+
+	error  shift 213
+	BEGIN  shift 163
+	.  error
+
+	bloque_catch  goto 214
+
+
+state 166
+	error_try_catch : TRY sentencia_ejecutable bloque_catch .  (96)
+
+	.  reduce 96
+
+
+state 167
+	error_try_catch : TRY try_catch CATCH . bloque_catch  (98)
+
+	BEGIN  shift 163
+	.  error
+
+	bloque_catch  goto 215
+
+
+state 168
+	error_parametro : tipo error .  (118)
+
+	.  reduce 118
+
+
+state 169
+	parametro : tipo IDENTIFICADOR .  (116)
+
+	.  reduce 116
+
+
+state 170
+	error_seleccion : '(' condicion ')' . THEN bloque_if ENDIF  (74)
+
+	THEN  shift 216
+	.  error
+
+
+state 171
+	error_declaracion_funcion : IDENTIFICADOR '(' parametro ')' .  (111)
+
+	.  reduce 111
+
+
+state 172
+	error_declaracion_funcion : FUNC IDENTIFICADOR '(' ')' .  (114)
+
+	.  reduce 114
+
+
+state 173
+	declaracion_funcion : FUNC IDENTIFICADOR '(' parametro . ')'  (109)
+	error_declaracion_funcion : FUNC IDENTIFICADOR '(' parametro . error  (115)
+
+	error  shift 217
+	')'  shift 218
+	.  error
+
+
+state 174
+	error_declaracion_funcion : FUNC IDENTIFICADOR parametro ')' .  (113)
+
+	.  reduce 113
+
+
+state 175
+	error_declaracion_funcion : FUNC '(' parametro ')' .  (112)
+
+	.  reduce 112
+
+
+state 176
+	declaracion : TYPEDEF IDENTIFICADOR '=' tipo . funcion_type ';'  (31)
+
+	FUNC  shift 219
+	'('  shift 220
+	.  error
+
+	funcion_type  goto 221
+	error_funcion_type  goto 222
+
+
+state 177
+	lista_de_variables : lista_de_variables ',' IDENTIFICADOR .  (102)
+
+	.  reduce 102
+
+
+state 178
+	error_bloque_ejecucion_funcion : BEGIN RETURN '(' . condicion ')' ';' END  (137)
+
+	IDENTIFICADOR  shift 63
+	CTE_ULONG  shift 64
+	CTE_DOUBLE  shift 66
+	'-'  shift 68
+	.  error
+
+	invocacion  goto 69
+	condicion  goto 223
+	expresion2  goto 75
+	termino  goto 76
+	error_invocacion  goto 41
+	expresion  goto 77
+	expresion1  goto 78
+	factor  goto 71
+
+
+state 179
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' . ')' ';' bloque_sentencias RETURN '(' condicion ')' ';' END  (147)
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' . condicion ';' bloque_sentencias RETURN '(' condicion ')' ';' END  (148)
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' . condicion ')' bloque_sentencias RETURN '(' condicion ')' ';' END  (149)
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' . condicion ')' ';' RETURN '(' condicion ')' ';' END  (150)
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' . condicion ')' ';' bloque_sentencias '(' condicion ')' ';' END  (151)
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' . condicion ')' ';' bloque_sentencias RETURN condicion ')' ';' END  (152)
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' . condicion ')' ';' bloque_sentencias RETURN '(' ')' ';' END  (153)
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' . condicion ')' ';' bloque_sentencias RETURN '(' condicion ';' END  (154)
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' . condicion ')' ';' bloque_sentencias RETURN '(' condicion ')' END  (155)
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' . condicion ')' ';' bloque_sentencias RETURN '(' condicion ')' ';' error  (156)
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' . condicion ')' ';' bloque_sentencias END  (157)
+
+	IDENTIFICADOR  shift 63
+	CTE_ULONG  shift 64
+	CTE_DOUBLE  shift 66
+	')'  shift 224
+	'-'  shift 68
+	.  error
+
+	invocacion  goto 69
+	condicion  goto 225
+	expresion2  goto 75
+	termino  goto 76
+	error_invocacion  goto 41
+	expresion  goto 77
+	expresion1  goto 78
+	factor  goto 71
+
+
+state 180
+	bloque_ejecucion_funcion : BEGIN PRE ':' . '(' condicion ')' ';' bloque_sentencias RETURN '(' condicion ')' ';' END  (133)
+	bloque_ejecucion_funcion : BEGIN PRE ':' . '(' condicion ')' ';' RETURN '(' condicion ')' ';' END  (134)
+
+	'('  shift 226
+	.  error
+
+
+state 181
+	error_bloque_ejecucion_funcion : BEGIN PRE condicion . ')' ';' bloque_sentencias RETURN '(' condicion ')' ';' END  (146)
+	condicion : condicion . OR expresion  (159)
+
+	OR  shift 141
+	')'  shift 227
+	.  error
+
+
+state 182
+	bloque_ejecucion_funcion : BEGIN bloque_sentencias RETURN . '(' condicion ')' ';' END  (132)
+	error_bloque_ejecucion_funcion : BEGIN bloque_sentencias RETURN . condicion ')' ';' END  (139)
+	error_bloque_ejecucion_funcion : BEGIN bloque_sentencias RETURN . '(' ')' ';' END  (140)
+	error_bloque_ejecucion_funcion : BEGIN bloque_sentencias RETURN . '(' condicion ';' END  (141)
+	error_bloque_ejecucion_funcion : BEGIN bloque_sentencias RETURN . '(' condicion ')' END  (142)
+	error_bloque_ejecucion_funcion : BEGIN bloque_sentencias RETURN . '(' condicion ')' ';' error  (144)
+
+	IDENTIFICADOR  shift 63
+	CTE_ULONG  shift 64
+	CTE_DOUBLE  shift 66
+	'('  shift 228
+	'-'  shift 68
+	.  error
+
+	invocacion  goto 69
+	condicion  goto 229
+	expresion2  goto 75
+	termino  goto 76
+	error_invocacion  goto 41
+	expresion  goto 77
+	expresion1  goto 78
+	factor  goto 71
+
+
+state 183
+	error_bloque_ejecucion_funcion : BEGIN bloque_sentencias END .  (143)
+
+	.  reduce 143
+
+
+state 184
+	error_seleccion : '(' . condicion ')' THEN bloque_if ENDIF  (74)
+	error_bloque_ejecucion_funcion : BEGIN bloque_sentencias '(' . condicion ')' ';' END  (138)
+
+	IDENTIFICADOR  shift 63
+	CTE_ULONG  shift 64
+	CTE_DOUBLE  shift 66
+	'-'  shift 68
+	.  error
+
+	invocacion  goto 69
+	condicion  goto 230
+	expresion2  goto 75
+	termino  goto 76
+	error_invocacion  goto 41
+	expresion  goto 77
+	expresion1  goto 78
+	factor  goto 71
+
+
+state 185
+	error_bloque_ejecucion_funcion : PRE '(' condicion . ')' ';' bloque_sentencias RETURN '(' condicion ')' ';' END  (145)
+	condicion : condicion . OR expresion  (159)
+
+	OR  shift 141
+	')'  shift 231
+	.  error
+
+
+state 186
+	error_bloque_ejecucion_funcion : bloque_sentencias RETURN '(' . condicion ')' ';' END  (136)
+
+	IDENTIFICADOR  shift 63
+	CTE_ULONG  shift 64
+	CTE_DOUBLE  shift 66
+	'-'  shift 68
+	.  error
+
+	invocacion  goto 69
+	condicion  goto 232
+	expresion2  goto 75
+	termino  goto 76
+	error_invocacion  goto 41
+	expresion  goto 77
+	expresion1  goto 78
+	factor  goto 71
+
+
+state 187
+	error_invocacion : IDENTIFICADOR '(' IDENTIFICADOR error .  (92)
+
+	.  reduce 92
+
+
+state 188
+	invocacion : IDENTIFICADOR '(' IDENTIFICADOR ')' .  (87)
+
+	.  reduce 87
+
+
+state 189
+	error_invocacion : IDENTIFICADOR '(' CTE_ULONG error .  (90)
+
+	.  reduce 90
+
+
+state 190
+	invocacion : IDENTIFICADOR '(' CTE_ULONG ')' .  (85)
+
+	.  reduce 85
+
+
+state 191
+	error_invocacion : IDENTIFICADOR '(' CTE_DOUBLE error .  (91)
+
+	.  reduce 91
+
+
+state 192
+	invocacion : IDENTIFICADOR '(' CTE_DOUBLE ')' .  (86)
+
+	.  reduce 86
+
+
+state 193
+	termino : termino '*' factor .  (167)
+
+	.  reduce 167
+
+
+state 194
+	termino : termino '/' factor .  (168)
+
+	.  reduce 168
+
+
+state 195
+	error_seleccion : IF '(' ')' THEN . bloque_if ENDIF  (76)
+
+	IDENTIFICADOR  shift 80
+	ASIGNACION  shift 17
+	IF  shift 18
+	PRINT  shift 19
+	BEGIN  shift 233
+	REPEAT  shift 21
+	TRY  shift 22
+	'('  shift 46
+	.  error
+
+	sentencia_ejecucion  goto 234
+	sentencia_ejecutable  goto 29
+	control  goto 30
+	seleccion  goto 31
+	impresion  goto 32
+	invocacion  goto 33
+	asignacion  goto 34
+	error_ejecucion  goto 35
+	try_catch  goto 36
+	error_sentencia_ejecucion  goto 37
+	error_control  goto 38
+	error_asignacion  goto 39
+	bloque_if  goto 235
+	error_seleccion  goto 40
+	error_bloque_if  goto 236
+	error_invocacion  goto 41
+	error_try_catch  goto 42
+
+
+state 196
+	error_seleccion : IF '(' condicion THEN . bloque_if ENDIF  (77)
+
+	IDENTIFICADOR  shift 80
+	ASIGNACION  shift 17
+	IF  shift 18
+	PRINT  shift 19
+	BEGIN  shift 233
+	REPEAT  shift 21
+	TRY  shift 22
+	'('  shift 46
+	.  error
+
+	sentencia_ejecucion  goto 234
+	sentencia_ejecutable  goto 29
+	control  goto 30
+	seleccion  goto 31
+	impresion  goto 32
+	invocacion  goto 33
+	asignacion  goto 34
+	error_ejecucion  goto 35
+	try_catch  goto 36
+	error_sentencia_ejecucion  goto 37
+	error_control  goto 38
+	error_asignacion  goto 39
+	bloque_if  goto 237
+	error_seleccion  goto 40
+	error_bloque_if  goto 236
+	error_invocacion  goto 41
+	error_try_catch  goto 42
+
+
+state 197
+	seleccion : IF '(' condicion ')' . THEN bloque_if ENDIF  (65)
+	seleccion : IF '(' condicion ')' . THEN bloque_if ELSE bloque_if ENDIF  (66)
+	error_seleccion : IF '(' condicion ')' . bloque_if ENDIF  (78)
+	error_seleccion : IF '(' condicion ')' . THEN ENDIF  (79)
+	error_seleccion : IF '(' condicion ')' . THEN bloque_if  (80)
+	error_seleccion : IF '(' condicion ')' . THEN bloque_if ELSE ENDIF  (81)
+	error_seleccion : IF '(' condicion ')' . THEN bloque_if ELSE bloque_if  (82)
+
+	IDENTIFICADOR  shift 80
+	ASIGNACION  shift 17
+	IF  shift 18
+	THEN  shift 238
+	PRINT  shift 19
+	BEGIN  shift 233
+	REPEAT  shift 21
+	TRY  shift 22
+	'('  shift 46
+	.  error
+
+	sentencia_ejecucion  goto 234
+	sentencia_ejecutable  goto 29
+	control  goto 30
+	seleccion  goto 31
+	impresion  goto 32
+	invocacion  goto 33
+	asignacion  goto 34
+	error_ejecucion  goto 35
+	try_catch  goto 36
+	error_sentencia_ejecucion  goto 37
+	error_control  goto 38
+	error_asignacion  goto 39
+	bloque_if  goto 239
+	error_seleccion  goto 40
+	error_bloque_if  goto 236
+	error_invocacion  goto 41
+	error_try_catch  goto 42
+
+
+state 198
+	condicion : condicion OR expresion .  (159)
+	expresion : expresion . AND expresion1  (161)
+
+	AND  shift 145
+	CTE_ULONG  reduce 159
+	OR  reduce 159
+	THEN  reduce 159
+	';'  reduce 159
+	')'  reduce 159
+
+
+state 199
+	error_seleccion : IF condicion ')' THEN . bloque_if ENDIF  (75)
+
+	IDENTIFICADOR  shift 80
+	ASIGNACION  shift 17
+	IF  shift 18
+	PRINT  shift 19
+	BEGIN  shift 233
+	REPEAT  shift 21
+	TRY  shift 22
+	'('  shift 46
+	.  error
+
+	sentencia_ejecucion  goto 234
+	sentencia_ejecutable  goto 29
+	control  goto 30
+	seleccion  goto 31
+	impresion  goto 32
+	invocacion  goto 33
+	asignacion  goto 34
+	error_ejecucion  goto 35
+	try_catch  goto 36
+	error_sentencia_ejecucion  goto 37
+	error_control  goto 38
+	error_asignacion  goto 39
+	bloque_if  goto 240
+	error_seleccion  goto 40
+	error_bloque_if  goto 236
+	error_invocacion  goto 41
+	error_try_catch  goto 42
+
+
+state 200
+	expresion2 : expresion2 '+' termino .  (165)
+	termino : termino . '*' factor  (167)
+	termino : termino . '/' factor  (168)
+
+	'*'  shift 137
+	'/'  shift 138
+	error  reduce 165
+	CTE_ULONG  reduce 165
+	MAYOR_IGUAL  reduce 165
+	MENOR_IGUAL  reduce 165
+	IGUAL_IGUAL  reduce 165
+	DISTINTO  reduce 165
+	AND  reduce 165
+	OR  reduce 165
+	THEN  reduce 165
+	';'  reduce 165
+	')'  reduce 165
+	'+'  reduce 165
+	'-'  reduce 165
+	'<'  reduce 165
+	'>'  reduce 165
+
+
+state 201
+	expresion2 : expresion2 '-' termino .  (166)
+	termino : termino . '*' factor  (167)
+	termino : termino . '/' factor  (168)
+
+	'*'  shift 137
+	'/'  shift 138
+	error  reduce 166
+	CTE_ULONG  reduce 166
+	MAYOR_IGUAL  reduce 166
+	MENOR_IGUAL  reduce 166
+	IGUAL_IGUAL  reduce 166
+	DISTINTO  reduce 166
+	AND  reduce 166
+	OR  reduce 166
+	THEN  reduce 166
+	';'  reduce 166
+	')'  reduce 166
+	'+'  reduce 166
+	'-'  reduce 166
+	'<'  reduce 166
+	'>'  reduce 166
+
+
+state 202
+	expresion : expresion AND expresion1 .  (161)
+	expresion1 : expresion1 . comparador expresion2  (163)
+
+	MAYOR_IGUAL  shift 146
+	MENOR_IGUAL  shift 147
+	IGUAL_IGUAL  shift 148
+	DISTINTO  shift 149
+	'<'  shift 150
+	'>'  shift 151
+	CTE_ULONG  reduce 161
+	AND  reduce 161
+	OR  reduce 161
+	THEN  reduce 161
+	';'  reduce 161
+	')'  reduce 161
+
+	comparador  goto 152
+
+
+state 203
+	expresion1 : expresion1 comparador expresion2 .  (163)
+	expresion2 : expresion2 . '+' termino  (165)
+	expresion2 : expresion2 . '-' termino  (166)
+
+	'+'  shift 143
+	'-'  shift 144
+	CTE_ULONG  reduce 163
+	MAYOR_IGUAL  reduce 163
+	MENOR_IGUAL  reduce 163
+	IGUAL_IGUAL  reduce 163
+	DISTINTO  reduce 163
+	AND  reduce 163
+	OR  reduce 163
+	THEN  reduce 163
+	';'  reduce 163
+	')'  reduce 163
+	'<'  reduce 163
+	'>'  reduce 163
+
+
+state 204
+	impresion : PRINT '(' CADENA ')' .  (83)
+
+	.  reduce 83
+
+
+state 205
+	error_asignacion_repeat : IDENTIFICADOR ASIGNACION error .  (52)
+
+	.  reduce 52
+
+
+state 206
+	asignacion_repeat : IDENTIFICADOR ASIGNACION CTE_ULONG .  (48)
+
+	.  reduce 48
+
+
+state 207
+	error_control : REPEAT '(' ';' condicion . ';' CTE_ULONG ')' bloque_repeat  (41)
+	condicion : condicion . OR expresion  (159)
+
+	OR  shift 141
+	';'  shift 241
+	.  error
+
+
+state 208
+	control : REPEAT '(' asignacion_repeat ';' . condicion ';' CTE_ULONG ')' bloque_repeat  (38)
+	error_control : REPEAT '(' asignacion_repeat ';' . ';' CTE_ULONG ')' bloque_repeat  (43)
+	error_control : REPEAT '(' asignacion_repeat ';' . condicion CTE_ULONG ')' bloque_repeat  (44)
+	error_control : REPEAT '(' asignacion_repeat ';' . condicion ';' ')' bloque_repeat  (45)
+	error_control : REPEAT '(' asignacion_repeat ';' . condicion ';' CTE_ULONG bloque_repeat  (46)
+	error_control : REPEAT '(' asignacion_repeat ';' . condicion ';' CTE_ULONG ')' error  (47)
+
+	IDENTIFICADOR  shift 63
+	CTE_ULONG  shift 64
+	CTE_DOUBLE  shift 66
+	';'  shift 242
+	'-'  shift 68
+	.  error
+
+	invocacion  goto 69
+	condicion  goto 243
+	expresion2  goto 75
+	termino  goto 76
+	error_invocacion  goto 41
+	expresion  goto 77
+	expresion1  goto 78
+	factor  goto 71
+
+
+state 209
+	error_control : REPEAT '(' asignacion_repeat condicion . ';' CTE_ULONG ')' bloque_repeat  (42)
+	condicion : condicion . OR expresion  (159)
+
+	OR  shift 141
+	';'  shift 244
+	.  error
+
+
+state 210
+	error_control : REPEAT asignacion_repeat ';' condicion . ';' CTE_ULONG ')' bloque_repeat  (40)
+	condicion : condicion . OR expresion  (159)
+
+	OR  shift 141
+	';'  shift 245
+	.  error
+
+
+state 211
+	bloque_1 : sentencia_ejecutable .  (100)
+
+	.  reduce 100
+
+
+state 212
+	bloque_catch : BEGIN bloque_1 . END  (99)
+	bloque_1 : bloque_1 . sentencia_ejecutable  (101)
+
+	IDENTIFICADOR  shift 80
+	ASIGNACION  shift 17
+	IF  shift 18
+	PRINT  shift 19
+	END  shift 246
+	REPEAT  shift 21
+	'('  shift 46
+	.  error
+
+	sentencia_ejecutable  goto 247
+	control  goto 30
+	seleccion  goto 31
+	impresion  goto 32
+	invocacion  goto 33
+	asignacion  goto 34
+	error_ejecucion  goto 35
+	error_control  goto 38
+	error_asignacion  goto 39
+	error_seleccion  goto 40
+	error_invocacion  goto 41
+
+
+state 213
+	error_try_catch : TRY sentencia_ejecutable CATCH error .  (97)
+
+	.  reduce 97
+
+
+state 214
+	try_catch : TRY sentencia_ejecutable CATCH bloque_catch .  (93)
+
+	.  reduce 93
+
+
+state 215
+	error_try_catch : TRY try_catch CATCH bloque_catch .  (98)
+
+	.  reduce 98
+
+
+state 216
+	error_seleccion : '(' condicion ')' THEN . bloque_if ENDIF  (74)
+
+	IDENTIFICADOR  shift 80
+	ASIGNACION  shift 17
+	IF  shift 18
+	PRINT  shift 19
+	BEGIN  shift 233
+	REPEAT  shift 21
+	TRY  shift 22
+	'('  shift 46
+	.  error
+
+	sentencia_ejecucion  goto 234
+	sentencia_ejecutable  goto 29
+	control  goto 30
+	seleccion  goto 31
+	impresion  goto 32
+	invocacion  goto 33
+	asignacion  goto 34
+	error_ejecucion  goto 35
+	try_catch  goto 36
+	error_sentencia_ejecucion  goto 37
+	error_control  goto 38
+	error_asignacion  goto 39
+	bloque_if  goto 248
+	error_seleccion  goto 40
+	error_bloque_if  goto 236
+	error_invocacion  goto 41
+	error_try_catch  goto 42
+
+
+state 217
+	error_declaracion_funcion : FUNC IDENTIFICADOR '(' parametro error .  (115)
+
+	.  reduce 115
+
+
+state 218
+	declaracion_funcion : FUNC IDENTIFICADOR '(' parametro ')' .  (109)
+
+	.  reduce 109
+
+
+state 219
+	funcion_type : FUNC . '(' tipo ')' ';' bloque_type  (119)
+	error_funcion_type : FUNC . tipo ')' ';' bloque_type  (122)
+	error_funcion_type : FUNC . '(' ')' ';' bloque_type  (123)
+	error_funcion_type : FUNC . '(' tipo ';' bloque_type  (124)
+	error_funcion_type : FUNC . '(' tipo ')' bloque_type  (125)
+	error_funcion_type : FUNC . '(' tipo ')' ';' error  (126)
+
+	ULONG  shift 3
+	DOUBLE  shift 4
+	'('  shift 249
+	.  error
+
+	tipo  goto 250
+
+
+state 220
+	error_funcion_type : '(' . tipo ')' ';' bloque_type  (121)
+
+	ULONG  shift 3
+	DOUBLE  shift 4
+	.  error
+
+	tipo  goto 251
+
+
+state 221
+	declaracion : TYPEDEF IDENTIFICADOR '=' tipo funcion_type . ';'  (31)
+
+	';'  shift 252
+	.  error
+
+
+state 222
+	funcion_type : error_funcion_type .  (120)
+
+	.  reduce 120
+
+
+state 223
+	error_bloque_ejecucion_funcion : BEGIN RETURN '(' condicion . ')' ';' END  (137)
+	condicion : condicion . OR expresion  (159)
+
+	OR  shift 141
+	')'  shift 253
+	.  error
+
+
+state 224
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' ')' . ';' bloque_sentencias RETURN '(' condicion ')' ';' END  (147)
+
+	';'  shift 254
+	.  error
+
+
+state 225
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion . ';' bloque_sentencias RETURN '(' condicion ')' ';' END  (148)
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion . ')' bloque_sentencias RETURN '(' condicion ')' ';' END  (149)
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion . ')' ';' RETURN '(' condicion ')' ';' END  (150)
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion . ')' ';' bloque_sentencias '(' condicion ')' ';' END  (151)
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion . ')' ';' bloque_sentencias RETURN condicion ')' ';' END  (152)
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion . ')' ';' bloque_sentencias RETURN '(' ')' ';' END  (153)
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion . ')' ';' bloque_sentencias RETURN '(' condicion ';' END  (154)
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion . ')' ';' bloque_sentencias RETURN '(' condicion ')' END  (155)
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion . ')' ';' bloque_sentencias RETURN '(' condicion ')' ';' error  (156)
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion . ')' ';' bloque_sentencias END  (157)
+	condicion : condicion . OR expresion  (159)
+
+	OR  shift 141
+	';'  shift 255
+	')'  shift 256
+	.  error
+
+
+state 226
+	bloque_ejecucion_funcion : BEGIN PRE ':' '(' . condicion ')' ';' bloque_sentencias RETURN '(' condicion ')' ';' END  (133)
+	bloque_ejecucion_funcion : BEGIN PRE ':' '(' . condicion ')' ';' RETURN '(' condicion ')' ';' END  (134)
+
+	IDENTIFICADOR  shift 63
+	CTE_ULONG  shift 64
+	CTE_DOUBLE  shift 66
+	'-'  shift 68
+	.  error
+
+	invocacion  goto 69
+	condicion  goto 257
+	expresion2  goto 75
+	termino  goto 76
+	error_invocacion  goto 41
+	expresion  goto 77
+	expresion1  goto 78
+	factor  goto 71
+
+
+state 227
+	error_bloque_ejecucion_funcion : BEGIN PRE condicion ')' . ';' bloque_sentencias RETURN '(' condicion ')' ';' END  (146)
+
+	';'  shift 258
+	.  error
+
+
+state 228
+	bloque_ejecucion_funcion : BEGIN bloque_sentencias RETURN '(' . condicion ')' ';' END  (132)
+	error_bloque_ejecucion_funcion : BEGIN bloque_sentencias RETURN '(' . ')' ';' END  (140)
+	error_bloque_ejecucion_funcion : BEGIN bloque_sentencias RETURN '(' . condicion ';' END  (141)
+	error_bloque_ejecucion_funcion : BEGIN bloque_sentencias RETURN '(' . condicion ')' END  (142)
+	error_bloque_ejecucion_funcion : BEGIN bloque_sentencias RETURN '(' . condicion ')' ';' error  (144)
+
+	IDENTIFICADOR  shift 63
+	CTE_ULONG  shift 64
+	CTE_DOUBLE  shift 66
+	')'  shift 259
+	'-'  shift 68
+	.  error
+
+	invocacion  goto 69
+	condicion  goto 260
+	expresion2  goto 75
+	termino  goto 76
+	error_invocacion  goto 41
+	expresion  goto 77
+	expresion1  goto 78
+	factor  goto 71
+
+
+state 229
+	error_bloque_ejecucion_funcion : BEGIN bloque_sentencias RETURN condicion . ')' ';' END  (139)
+	condicion : condicion . OR expresion  (159)
+
+	OR  shift 141
+	')'  shift 261
+	.  error
+
+
+state 230
+	error_seleccion : '(' condicion . ')' THEN bloque_if ENDIF  (74)
+	error_bloque_ejecucion_funcion : BEGIN bloque_sentencias '(' condicion . ')' ';' END  (138)
+	condicion : condicion . OR expresion  (159)
+
+	OR  shift 141
+	')'  shift 262
+	.  error
+
+
+state 231
+	error_bloque_ejecucion_funcion : PRE '(' condicion ')' . ';' bloque_sentencias RETURN '(' condicion ')' ';' END  (145)
+
+	';'  shift 263
+	.  error
+
+
+state 232
+	error_bloque_ejecucion_funcion : bloque_sentencias RETURN '(' condicion . ')' ';' END  (136)
+	condicion : condicion . OR expresion  (159)
+
+	OR  shift 141
+	')'  shift 264
+	.  error
+
+
+state 233
+	bloque_if : BEGIN . sentencia_ejecucion bloque_sentencias END ';'  (69)
+	error_bloque_if : BEGIN . sentencia_ejecucion END ';'  (71)
+	error_bloque_if : BEGIN . sentencia_ejecucion bloque_sentencias END error  (72)
+	error_bloque_if : BEGIN . sentencia_ejecucion END error  (73)
+
+	IDENTIFICADOR  shift 80
+	ASIGNACION  shift 17
+	IF  shift 18
+	PRINT  shift 19
+	REPEAT  shift 21
+	TRY  shift 22
+	'('  shift 46
+	.  error
+
+	sentencia_ejecucion  goto 265
+	sentencia_ejecutable  goto 29
+	control  goto 30
+	seleccion  goto 31
+	impresion  goto 32
+	invocacion  goto 33
+	asignacion  goto 34
+	error_ejecucion  goto 35
+	try_catch  goto 36
+	error_sentencia_ejecucion  goto 37
+	error_control  goto 38
+	error_asignacion  goto 39
+	error_seleccion  goto 40
+	error_invocacion  goto 41
+	error_try_catch  goto 42
+
+
+state 234
+	bloque_if : sentencia_ejecucion .  (68)
+
+	.  reduce 68
+
+
+state 235
+	error_seleccion : IF '(' ')' THEN bloque_if . ENDIF  (76)
+
+	ENDIF  shift 266
+	.  error
+
+
+state 236
+	bloque_if : error_bloque_if .  (70)
+
+	.  reduce 70
+
+
+state 237
+	error_seleccion : IF '(' condicion THEN bloque_if . ENDIF  (77)
+
+	ENDIF  shift 267
+	.  error
+
+
+state 238
+	seleccion : IF '(' condicion ')' THEN . bloque_if ENDIF  (65)
+	seleccion : IF '(' condicion ')' THEN . bloque_if ELSE bloque_if ENDIF  (66)
+	error_seleccion : IF '(' condicion ')' THEN . ENDIF  (79)
+	error_seleccion : IF '(' condicion ')' THEN . bloque_if  (80)
+	error_seleccion : IF '(' condicion ')' THEN . bloque_if ELSE ENDIF  (81)
+	error_seleccion : IF '(' condicion ')' THEN . bloque_if ELSE bloque_if  (82)
+
+	IDENTIFICADOR  shift 80
+	ASIGNACION  shift 17
+	IF  shift 18
+	ENDIF  shift 268
+	PRINT  shift 19
+	BEGIN  shift 233
+	REPEAT  shift 21
+	TRY  shift 22
+	'('  shift 46
+	.  error
+
+	sentencia_ejecucion  goto 234
+	sentencia_ejecutable  goto 29
+	control  goto 30
+	seleccion  goto 31
+	impresion  goto 32
+	invocacion  goto 33
+	asignacion  goto 34
+	error_ejecucion  goto 35
+	try_catch  goto 36
+	error_sentencia_ejecucion  goto 37
+	error_control  goto 38
+	error_asignacion  goto 39
+	bloque_if  goto 269
+	error_seleccion  goto 40
+	error_bloque_if  goto 236
+	error_invocacion  goto 41
+	error_try_catch  goto 42
+
+
+state 239
+	error_seleccion : IF '(' condicion ')' bloque_if . ENDIF  (78)
+
+	ENDIF  shift 270
+	.  error
+
+
+state 240
+	error_seleccion : IF condicion ')' THEN bloque_if . ENDIF  (75)
+
+	ENDIF  shift 271
+	.  error
+
+
+state 241
+	error_control : REPEAT '(' ';' condicion ';' . CTE_ULONG ')' bloque_repeat  (41)
+
+	CTE_ULONG  shift 272
+	.  error
+
+
+state 242
+	error_control : REPEAT '(' asignacion_repeat ';' ';' . CTE_ULONG ')' bloque_repeat  (43)
+
+	CTE_ULONG  shift 273
+	.  error
+
+
+state 243
+	control : REPEAT '(' asignacion_repeat ';' condicion . ';' CTE_ULONG ')' bloque_repeat  (38)
+	error_control : REPEAT '(' asignacion_repeat ';' condicion . CTE_ULONG ')' bloque_repeat  (44)
+	error_control : REPEAT '(' asignacion_repeat ';' condicion . ';' ')' bloque_repeat  (45)
+	error_control : REPEAT '(' asignacion_repeat ';' condicion . ';' CTE_ULONG bloque_repeat  (46)
+	error_control : REPEAT '(' asignacion_repeat ';' condicion . ';' CTE_ULONG ')' error  (47)
+	condicion : condicion . OR expresion  (159)
+
+	CTE_ULONG  shift 274
+	OR  shift 141
+	';'  shift 275
+	.  error
+
+
+state 244
+	error_control : REPEAT '(' asignacion_repeat condicion ';' . CTE_ULONG ')' bloque_repeat  (42)
+
+	CTE_ULONG  shift 276
+	.  error
+
+
+state 245
+	error_control : REPEAT asignacion_repeat ';' condicion ';' . CTE_ULONG ')' bloque_repeat  (40)
+
+	CTE_ULONG  shift 277
+	.  error
+
+
+state 246
+	bloque_catch : BEGIN bloque_1 END .  (99)
+
+	.  reduce 99
+
+
+state 247
+	bloque_1 : bloque_1 sentencia_ejecutable .  (101)
+
+	.  reduce 101
+
+
+state 248
+	error_seleccion : '(' condicion ')' THEN bloque_if . ENDIF  (74)
+
+	ENDIF  shift 278
+	.  error
+
+
+state 249
+	funcion_type : FUNC '(' . tipo ')' ';' bloque_type  (119)
+	error_funcion_type : FUNC '(' . ')' ';' bloque_type  (123)
+	error_funcion_type : FUNC '(' . tipo ';' bloque_type  (124)
+	error_funcion_type : FUNC '(' . tipo ')' bloque_type  (125)
+	error_funcion_type : FUNC '(' . tipo ')' ';' error  (126)
+
+	ULONG  shift 3
+	DOUBLE  shift 4
+	')'  shift 279
+	.  error
+
+	tipo  goto 280
+
+
+state 250
+	error_funcion_type : FUNC tipo . ')' ';' bloque_type  (122)
+
+	')'  shift 281
+	.  error
+
+
+state 251
+	error_funcion_type : '(' tipo . ')' ';' bloque_type  (121)
+
+	')'  shift 282
+	.  error
+
+
+state 252
+	declaracion : TYPEDEF IDENTIFICADOR '=' tipo funcion_type ';' .  (31)
+
+	.  reduce 31
+
+
+state 253
+	error_bloque_ejecucion_funcion : BEGIN RETURN '(' condicion ')' . ';' END  (137)
+
+	';'  shift 283
+	.  error
+
+
+state 254
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' ')' ';' . bloque_sentencias RETURN '(' condicion ')' ';' END  (147)
+
+	IDENTIFICADOR  shift 80
+	ASIGNACION  shift 17
+	IF  shift 18
+	PRINT  shift 19
+	REPEAT  shift 21
+	TRY  shift 22
+	'('  shift 46
+	.  error
+
+	bloque_sentencias  goto 284
+	sentencia_ejecucion  goto 28
+	sentencia_ejecutable  goto 29
+	control  goto 30
+	seleccion  goto 31
+	impresion  goto 32
+	invocacion  goto 33
+	asignacion  goto 34
+	error_ejecucion  goto 35
+	try_catch  goto 36
+	error_sentencia_ejecucion  goto 37
+	error_control  goto 38
+	error_asignacion  goto 39
+	error_seleccion  goto 40
+	error_invocacion  goto 41
+	error_try_catch  goto 42
+
+
+state 255
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion ';' . bloque_sentencias RETURN '(' condicion ')' ';' END  (148)
+
+	IDENTIFICADOR  shift 80
+	ASIGNACION  shift 17
+	IF  shift 18
+	PRINT  shift 19
+	REPEAT  shift 21
+	TRY  shift 22
+	'('  shift 46
+	.  error
+
+	bloque_sentencias  goto 285
+	sentencia_ejecucion  goto 28
+	sentencia_ejecutable  goto 29
+	control  goto 30
+	seleccion  goto 31
+	impresion  goto 32
+	invocacion  goto 33
+	asignacion  goto 34
+	error_ejecucion  goto 35
+	try_catch  goto 36
+	error_sentencia_ejecucion  goto 37
+	error_control  goto 38
+	error_asignacion  goto 39
+	error_seleccion  goto 40
+	error_invocacion  goto 41
+	error_try_catch  goto 42
+
+
+state 256
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion ')' . bloque_sentencias RETURN '(' condicion ')' ';' END  (149)
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion ')' . ';' RETURN '(' condicion ')' ';' END  (150)
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion ')' . ';' bloque_sentencias '(' condicion ')' ';' END  (151)
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion ')' . ';' bloque_sentencias RETURN condicion ')' ';' END  (152)
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion ')' . ';' bloque_sentencias RETURN '(' ')' ';' END  (153)
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion ')' . ';' bloque_sentencias RETURN '(' condicion ';' END  (154)
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion ')' . ';' bloque_sentencias RETURN '(' condicion ')' END  (155)
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion ')' . ';' bloque_sentencias RETURN '(' condicion ')' ';' error  (156)
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion ')' . ';' bloque_sentencias END  (157)
+
+	IDENTIFICADOR  shift 80
+	ASIGNACION  shift 17
+	IF  shift 18
+	PRINT  shift 19
+	REPEAT  shift 21
+	TRY  shift 22
+	';'  shift 286
+	'('  shift 46
+	.  error
+
+	bloque_sentencias  goto 287
+	sentencia_ejecucion  goto 28
+	sentencia_ejecutable  goto 29
+	control  goto 30
+	seleccion  goto 31
+	impresion  goto 32
+	invocacion  goto 33
+	asignacion  goto 34
+	error_ejecucion  goto 35
+	try_catch  goto 36
+	error_sentencia_ejecucion  goto 37
+	error_control  goto 38
+	error_asignacion  goto 39
+	error_seleccion  goto 40
+	error_invocacion  goto 41
+	error_try_catch  goto 42
+
+
+state 257
+	bloque_ejecucion_funcion : BEGIN PRE ':' '(' condicion . ')' ';' bloque_sentencias RETURN '(' condicion ')' ';' END  (133)
+	bloque_ejecucion_funcion : BEGIN PRE ':' '(' condicion . ')' ';' RETURN '(' condicion ')' ';' END  (134)
+	condicion : condicion . OR expresion  (159)
+
+	OR  shift 141
+	')'  shift 288
+	.  error
+
+
+state 258
+	error_bloque_ejecucion_funcion : BEGIN PRE condicion ')' ';' . bloque_sentencias RETURN '(' condicion ')' ';' END  (146)
+
+	IDENTIFICADOR  shift 80
+	ASIGNACION  shift 17
+	IF  shift 18
+	PRINT  shift 19
+	REPEAT  shift 21
+	TRY  shift 22
+	'('  shift 46
+	.  error
+
+	bloque_sentencias  goto 289
+	sentencia_ejecucion  goto 28
+	sentencia_ejecutable  goto 29
+	control  goto 30
+	seleccion  goto 31
+	impresion  goto 32
+	invocacion  goto 33
+	asignacion  goto 34
+	error_ejecucion  goto 35
+	try_catch  goto 36
+	error_sentencia_ejecucion  goto 37
+	error_control  goto 38
+	error_asignacion  goto 39
+	error_seleccion  goto 40
+	error_invocacion  goto 41
+	error_try_catch  goto 42
+
+
+state 259
+	error_bloque_ejecucion_funcion : BEGIN bloque_sentencias RETURN '(' ')' . ';' END  (140)
+
+	';'  shift 290
+	.  error
+
+
+state 260
+	bloque_ejecucion_funcion : BEGIN bloque_sentencias RETURN '(' condicion . ')' ';' END  (132)
+	error_bloque_ejecucion_funcion : BEGIN bloque_sentencias RETURN '(' condicion . ';' END  (141)
+	error_bloque_ejecucion_funcion : BEGIN bloque_sentencias RETURN '(' condicion . ')' END  (142)
+	error_bloque_ejecucion_funcion : BEGIN bloque_sentencias RETURN '(' condicion . ')' ';' error  (144)
+	condicion : condicion . OR expresion  (159)
+
+	OR  shift 141
+	';'  shift 291
+	')'  shift 292
+	.  error
+
+
+state 261
+	error_bloque_ejecucion_funcion : BEGIN bloque_sentencias RETURN condicion ')' . ';' END  (139)
+
+	';'  shift 293
+	.  error
+
+
+state 262
+	error_seleccion : '(' condicion ')' . THEN bloque_if ENDIF  (74)
+	error_bloque_ejecucion_funcion : BEGIN bloque_sentencias '(' condicion ')' . ';' END  (138)
+
+	THEN  shift 216
+	';'  shift 294
+	.  error
+
+
+state 263
+	error_bloque_ejecucion_funcion : PRE '(' condicion ')' ';' . bloque_sentencias RETURN '(' condicion ')' ';' END  (145)
+
+	IDENTIFICADOR  shift 80
+	ASIGNACION  shift 17
+	IF  shift 18
+	PRINT  shift 19
+	REPEAT  shift 21
+	TRY  shift 22
+	'('  shift 46
+	.  error
+
+	bloque_sentencias  goto 295
+	sentencia_ejecucion  goto 28
+	sentencia_ejecutable  goto 29
+	control  goto 30
+	seleccion  goto 31
+	impresion  goto 32
+	invocacion  goto 33
+	asignacion  goto 34
+	error_ejecucion  goto 35
+	try_catch  goto 36
+	error_sentencia_ejecucion  goto 37
+	error_control  goto 38
+	error_asignacion  goto 39
+	error_seleccion  goto 40
+	error_invocacion  goto 41
+	error_try_catch  goto 42
+
+
+state 264
+	error_bloque_ejecucion_funcion : bloque_sentencias RETURN '(' condicion ')' . ';' END  (136)
+
+	';'  shift 296
+	.  error
+
+
+state 265
+	bloque_if : BEGIN sentencia_ejecucion . bloque_sentencias END ';'  (69)
+	error_bloque_if : BEGIN sentencia_ejecucion . END ';'  (71)
+	error_bloque_if : BEGIN sentencia_ejecucion . bloque_sentencias END error  (72)
+	error_bloque_if : BEGIN sentencia_ejecucion . END error  (73)
+
+	IDENTIFICADOR  shift 80
+	ASIGNACION  shift 17
+	IF  shift 18
+	PRINT  shift 19
+	END  shift 297
+	REPEAT  shift 21
+	TRY  shift 22
+	'('  shift 46
+	.  error
+
+	bloque_sentencias  goto 298
+	sentencia_ejecucion  goto 28
+	sentencia_ejecutable  goto 29
+	control  goto 30
+	seleccion  goto 31
+	impresion  goto 32
+	invocacion  goto 33
+	asignacion  goto 34
+	error_ejecucion  goto 35
+	try_catch  goto 36
+	error_sentencia_ejecucion  goto 37
+	error_control  goto 38
+	error_asignacion  goto 39
+	error_seleccion  goto 40
+	error_invocacion  goto 41
+	error_try_catch  goto 42
+
+
+state 266
+	error_seleccion : IF '(' ')' THEN bloque_if ENDIF .  (76)
+
+	.  reduce 76
+
+
+state 267
+	error_seleccion : IF '(' condicion THEN bloque_if ENDIF .  (77)
+
+	.  reduce 77
+
+
+state 268
+	error_seleccion : IF '(' condicion ')' THEN ENDIF .  (79)
+
+	.  reduce 79
+
+
+state 269
+	seleccion : IF '(' condicion ')' THEN bloque_if . ENDIF  (65)
+	seleccion : IF '(' condicion ')' THEN bloque_if . ELSE bloque_if ENDIF  (66)
+	error_seleccion : IF '(' condicion ')' THEN bloque_if .  (80)
+	error_seleccion : IF '(' condicion ')' THEN bloque_if . ELSE ENDIF  (81)
+	error_seleccion : IF '(' condicion ')' THEN bloque_if . ELSE bloque_if  (82)
+
+	ENDIF  shift 299
+	ELSE  shift 300
+	error  reduce 80
+	';'  reduce 80
+
+
+state 270
+	error_seleccion : IF '(' condicion ')' bloque_if ENDIF .  (78)
+
+	.  reduce 78
+
+
+state 271
+	error_seleccion : IF condicion ')' THEN bloque_if ENDIF .  (75)
+
+	.  reduce 75
+
+
+state 272
+	error_control : REPEAT '(' ';' condicion ';' CTE_ULONG . ')' bloque_repeat  (41)
+
+	')'  shift 301
+	.  error
+
+
+state 273
+	error_control : REPEAT '(' asignacion_repeat ';' ';' CTE_ULONG . ')' bloque_repeat  (43)
+
+	')'  shift 302
+	.  error
+
+
+state 274
+	error_control : REPEAT '(' asignacion_repeat ';' condicion CTE_ULONG . ')' bloque_repeat  (44)
+
+	')'  shift 303
+	.  error
+
+
+state 275
+	control : REPEAT '(' asignacion_repeat ';' condicion ';' . CTE_ULONG ')' bloque_repeat  (38)
+	error_control : REPEAT '(' asignacion_repeat ';' condicion ';' . ')' bloque_repeat  (45)
+	error_control : REPEAT '(' asignacion_repeat ';' condicion ';' . CTE_ULONG bloque_repeat  (46)
+	error_control : REPEAT '(' asignacion_repeat ';' condicion ';' . CTE_ULONG ')' error  (47)
+
+	CTE_ULONG  shift 304
+	')'  shift 305
+	.  error
+
+
+state 276
+	error_control : REPEAT '(' asignacion_repeat condicion ';' CTE_ULONG . ')' bloque_repeat  (42)
+
+	')'  shift 306
+	.  error
+
+
+state 277
+	error_control : REPEAT asignacion_repeat ';' condicion ';' CTE_ULONG . ')' bloque_repeat  (40)
+
+	')'  shift 307
+	.  error
+
+
+state 278
+	error_seleccion : '(' condicion ')' THEN bloque_if ENDIF .  (74)
+
+	.  reduce 74
+
+
+state 279
+	error_funcion_type : FUNC '(' ')' . ';' bloque_type  (123)
+
+	';'  shift 308
+	.  error
+
+
+state 280
+	funcion_type : FUNC '(' tipo . ')' ';' bloque_type  (119)
+	error_funcion_type : FUNC '(' tipo . ';' bloque_type  (124)
+	error_funcion_type : FUNC '(' tipo . ')' bloque_type  (125)
+	error_funcion_type : FUNC '(' tipo . ')' ';' error  (126)
+
+	';'  shift 309
+	')'  shift 310
+	.  error
+
+
+state 281
+	error_funcion_type : FUNC tipo ')' . ';' bloque_type  (122)
+
+	';'  shift 311
+	.  error
+
+
+state 282
+	error_funcion_type : '(' tipo ')' . ';' bloque_type  (121)
+
+	';'  shift 312
+	.  error
+
+
+state 283
+	error_bloque_ejecucion_funcion : BEGIN RETURN '(' condicion ')' ';' . END  (137)
+
+	END  shift 313
+	.  error
+
+
+state 284
+	bloque_sentencias : bloque_sentencias . sentencia_ejecucion  (11)
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' ')' ';' bloque_sentencias . RETURN '(' condicion ')' ';' END  (147)
+
+	IDENTIFICADOR  shift 80
+	ASIGNACION  shift 17
+	IF  shift 18
+	PRINT  shift 19
+	RETURN  shift 314
+	REPEAT  shift 21
+	TRY  shift 22
+	'('  shift 46
+	.  error
+
+	sentencia_ejecucion  goto 98
+	sentencia_ejecutable  goto 29
+	control  goto 30
+	seleccion  goto 31
+	impresion  goto 32
+	invocacion  goto 33
+	asignacion  goto 34
+	error_ejecucion  goto 35
+	try_catch  goto 36
+	error_sentencia_ejecucion  goto 37
+	error_control  goto 38
+	error_asignacion  goto 39
+	error_seleccion  goto 40
+	error_invocacion  goto 41
+	error_try_catch  goto 42
+
+
+state 285
+	bloque_sentencias : bloque_sentencias . sentencia_ejecucion  (11)
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion ';' bloque_sentencias . RETURN '(' condicion ')' ';' END  (148)
+
+	IDENTIFICADOR  shift 80
+	ASIGNACION  shift 17
+	IF  shift 18
+	PRINT  shift 19
+	RETURN  shift 315
+	REPEAT  shift 21
+	TRY  shift 22
+	'('  shift 46
+	.  error
+
+	sentencia_ejecucion  goto 98
+	sentencia_ejecutable  goto 29
+	control  goto 30
+	seleccion  goto 31
+	impresion  goto 32
+	invocacion  goto 33
+	asignacion  goto 34
+	error_ejecucion  goto 35
+	try_catch  goto 36
+	error_sentencia_ejecucion  goto 37
+	error_control  goto 38
+	error_asignacion  goto 39
+	error_seleccion  goto 40
+	error_invocacion  goto 41
+	error_try_catch  goto 42
+
+
+state 286
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion ')' ';' . RETURN '(' condicion ')' ';' END  (150)
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion ')' ';' . bloque_sentencias '(' condicion ')' ';' END  (151)
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion ')' ';' . bloque_sentencias RETURN condicion ')' ';' END  (152)
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion ')' ';' . bloque_sentencias RETURN '(' ')' ';' END  (153)
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion ')' ';' . bloque_sentencias RETURN '(' condicion ';' END  (154)
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion ')' ';' . bloque_sentencias RETURN '(' condicion ')' END  (155)
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion ')' ';' . bloque_sentencias RETURN '(' condicion ')' ';' error  (156)
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion ')' ';' . bloque_sentencias END  (157)
+
+	IDENTIFICADOR  shift 80
+	ASIGNACION  shift 17
+	IF  shift 18
+	PRINT  shift 19
+	RETURN  shift 316
+	REPEAT  shift 21
+	TRY  shift 22
+	'('  shift 46
+	.  error
+
+	bloque_sentencias  goto 317
+	sentencia_ejecucion  goto 28
+	sentencia_ejecutable  goto 29
+	control  goto 30
+	seleccion  goto 31
+	impresion  goto 32
+	invocacion  goto 33
+	asignacion  goto 34
+	error_ejecucion  goto 35
+	try_catch  goto 36
+	error_sentencia_ejecucion  goto 37
+	error_control  goto 38
+	error_asignacion  goto 39
+	error_seleccion  goto 40
+	error_invocacion  goto 41
+	error_try_catch  goto 42
+
+
+state 287
+	bloque_sentencias : bloque_sentencias . sentencia_ejecucion  (11)
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion ')' bloque_sentencias . RETURN '(' condicion ')' ';' END  (149)
+
+	IDENTIFICADOR  shift 80
+	ASIGNACION  shift 17
+	IF  shift 18
+	PRINT  shift 19
+	RETURN  shift 318
+	REPEAT  shift 21
+	TRY  shift 22
+	'('  shift 46
+	.  error
+
+	sentencia_ejecucion  goto 98
+	sentencia_ejecutable  goto 29
+	control  goto 30
+	seleccion  goto 31
+	impresion  goto 32
+	invocacion  goto 33
+	asignacion  goto 34
+	error_ejecucion  goto 35
+	try_catch  goto 36
+	error_sentencia_ejecucion  goto 37
+	error_control  goto 38
+	error_asignacion  goto 39
+	error_seleccion  goto 40
+	error_invocacion  goto 41
+	error_try_catch  goto 42
+
+
+state 288
+	bloque_ejecucion_funcion : BEGIN PRE ':' '(' condicion ')' . ';' bloque_sentencias RETURN '(' condicion ')' ';' END  (133)
+	bloque_ejecucion_funcion : BEGIN PRE ':' '(' condicion ')' . ';' RETURN '(' condicion ')' ';' END  (134)
+
+	';'  shift 319
+	.  error
+
+
+state 289
+	bloque_sentencias : bloque_sentencias . sentencia_ejecucion  (11)
+	error_bloque_ejecucion_funcion : BEGIN PRE condicion ')' ';' bloque_sentencias . RETURN '(' condicion ')' ';' END  (146)
+
+	IDENTIFICADOR  shift 80
+	ASIGNACION  shift 17
+	IF  shift 18
+	PRINT  shift 19
+	RETURN  shift 320
+	REPEAT  shift 21
+	TRY  shift 22
+	'('  shift 46
+	.  error
+
+	sentencia_ejecucion  goto 98
+	sentencia_ejecutable  goto 29
+	control  goto 30
+	seleccion  goto 31
+	impresion  goto 32
+	invocacion  goto 33
+	asignacion  goto 34
+	error_ejecucion  goto 35
+	try_catch  goto 36
+	error_sentencia_ejecucion  goto 37
+	error_control  goto 38
+	error_asignacion  goto 39
+	error_seleccion  goto 40
+	error_invocacion  goto 41
+	error_try_catch  goto 42
+
+
+state 290
+	error_bloque_ejecucion_funcion : BEGIN bloque_sentencias RETURN '(' ')' ';' . END  (140)
+
+	END  shift 321
+	.  error
+
+
+state 291
+	error_bloque_ejecucion_funcion : BEGIN bloque_sentencias RETURN '(' condicion ';' . END  (141)
+
+	END  shift 322
+	.  error
+
+
+state 292
+	bloque_ejecucion_funcion : BEGIN bloque_sentencias RETURN '(' condicion ')' . ';' END  (132)
+	error_bloque_ejecucion_funcion : BEGIN bloque_sentencias RETURN '(' condicion ')' . END  (142)
+	error_bloque_ejecucion_funcion : BEGIN bloque_sentencias RETURN '(' condicion ')' . ';' error  (144)
+
+	END  shift 323
+	';'  shift 324
+	.  error
+
+
+state 293
+	error_bloque_ejecucion_funcion : BEGIN bloque_sentencias RETURN condicion ')' ';' . END  (139)
+
+	END  shift 325
+	.  error
+
+
+state 294
+	error_bloque_ejecucion_funcion : BEGIN bloque_sentencias '(' condicion ')' ';' . END  (138)
+
+	END  shift 326
+	.  error
+
+
+state 295
+	bloque_sentencias : bloque_sentencias . sentencia_ejecucion  (11)
+	error_bloque_ejecucion_funcion : PRE '(' condicion ')' ';' bloque_sentencias . RETURN '(' condicion ')' ';' END  (145)
+
+	IDENTIFICADOR  shift 80
+	ASIGNACION  shift 17
+	IF  shift 18
+	PRINT  shift 19
+	RETURN  shift 327
+	REPEAT  shift 21
+	TRY  shift 22
+	'('  shift 46
+	.  error
+
+	sentencia_ejecucion  goto 98
+	sentencia_ejecutable  goto 29
+	control  goto 30
+	seleccion  goto 31
+	impresion  goto 32
+	invocacion  goto 33
+	asignacion  goto 34
+	error_ejecucion  goto 35
+	try_catch  goto 36
+	error_sentencia_ejecucion  goto 37
+	error_control  goto 38
+	error_asignacion  goto 39
+	error_seleccion  goto 40
+	error_invocacion  goto 41
+	error_try_catch  goto 42
+
+
+state 296
+	error_bloque_ejecucion_funcion : bloque_sentencias RETURN '(' condicion ')' ';' . END  (136)
+
+	END  shift 328
+	.  error
+
+
+state 297
+	error_bloque_if : BEGIN sentencia_ejecucion END . ';'  (71)
+	error_bloque_if : BEGIN sentencia_ejecucion END . error  (73)
+
+	error  shift 329
+	';'  shift 330
+	.  error
+
+
+state 298
+	bloque_sentencias : bloque_sentencias . sentencia_ejecucion  (11)
+	bloque_if : BEGIN sentencia_ejecucion bloque_sentencias . END ';'  (69)
+	error_bloque_if : BEGIN sentencia_ejecucion bloque_sentencias . END error  (72)
+
+	IDENTIFICADOR  shift 80
+	ASIGNACION  shift 17
+	IF  shift 18
+	PRINT  shift 19
+	END  shift 331
+	REPEAT  shift 21
+	TRY  shift 22
+	'('  shift 46
+	.  error
+
+	sentencia_ejecucion  goto 98
+	sentencia_ejecutable  goto 29
+	control  goto 30
+	seleccion  goto 31
+	impresion  goto 32
+	invocacion  goto 33
+	asignacion  goto 34
+	error_ejecucion  goto 35
+	try_catch  goto 36
+	error_sentencia_ejecucion  goto 37
+	error_control  goto 38
+	error_asignacion  goto 39
+	error_seleccion  goto 40
+	error_invocacion  goto 41
+	error_try_catch  goto 42
+
+
+state 299
+	seleccion : IF '(' condicion ')' THEN bloque_if ENDIF .  (65)
+
+	.  reduce 65
+
+
+state 300
+	seleccion : IF '(' condicion ')' THEN bloque_if ELSE . bloque_if ENDIF  (66)
+	error_seleccion : IF '(' condicion ')' THEN bloque_if ELSE . ENDIF  (81)
+	error_seleccion : IF '(' condicion ')' THEN bloque_if ELSE . bloque_if  (82)
+
+	IDENTIFICADOR  shift 80
+	ASIGNACION  shift 17
+	IF  shift 18
+	ENDIF  shift 332
+	PRINT  shift 19
+	BEGIN  shift 233
+	REPEAT  shift 21
+	TRY  shift 22
+	'('  shift 46
+	.  error
+
+	sentencia_ejecucion  goto 234
+	sentencia_ejecutable  goto 29
+	control  goto 30
+	seleccion  goto 31
+	impresion  goto 32
+	invocacion  goto 33
+	asignacion  goto 34
+	error_ejecucion  goto 35
+	try_catch  goto 36
+	error_sentencia_ejecucion  goto 37
+	error_control  goto 38
+	error_asignacion  goto 39
+	bloque_if  goto 333
+	error_seleccion  goto 40
+	error_bloque_if  goto 236
+	error_invocacion  goto 41
+	error_try_catch  goto 42
+
+
+state 301
+	error_control : REPEAT '(' ';' condicion ';' CTE_ULONG ')' . bloque_repeat  (41)
+
+	BEGIN  shift 334
+	.  error
+
+	bloque_repeat  goto 335
+
+
+state 302
+	error_control : REPEAT '(' asignacion_repeat ';' ';' CTE_ULONG ')' . bloque_repeat  (43)
+
+	BEGIN  shift 334
+	.  error
+
+	bloque_repeat  goto 336
+
+
+state 303
+	error_control : REPEAT '(' asignacion_repeat ';' condicion CTE_ULONG ')' . bloque_repeat  (44)
+
+	BEGIN  shift 334
+	.  error
+
+	bloque_repeat  goto 337
+
+
+state 304
+	control : REPEAT '(' asignacion_repeat ';' condicion ';' CTE_ULONG . ')' bloque_repeat  (38)
+	error_control : REPEAT '(' asignacion_repeat ';' condicion ';' CTE_ULONG . bloque_repeat  (46)
+	error_control : REPEAT '(' asignacion_repeat ';' condicion ';' CTE_ULONG . ')' error  (47)
+
+	BEGIN  shift 334
+	')'  shift 338
+	.  error
+
+	bloque_repeat  goto 339
+
+
+state 305
+	error_control : REPEAT '(' asignacion_repeat ';' condicion ';' ')' . bloque_repeat  (45)
+
+	BEGIN  shift 334
+	.  error
+
+	bloque_repeat  goto 340
+
+
+state 306
+	error_control : REPEAT '(' asignacion_repeat condicion ';' CTE_ULONG ')' . bloque_repeat  (42)
+
+	BEGIN  shift 334
+	.  error
+
+	bloque_repeat  goto 341
+
+
+state 307
+	error_control : REPEAT asignacion_repeat ';' condicion ';' CTE_ULONG ')' . bloque_repeat  (40)
+
+	BEGIN  shift 334
+	.  error
+
+	bloque_repeat  goto 342
+
+
+state 308
+	error_funcion_type : FUNC '(' ')' ';' . bloque_type  (123)
+
+	IDENTIFICADOR  shift 343
+	.  error
+
+	bloque_type  goto 344
+
+
+state 309
+	error_funcion_type : FUNC '(' tipo ';' . bloque_type  (124)
+
+	IDENTIFICADOR  shift 343
+	.  error
+
+	bloque_type  goto 345
+
+
+state 310
+	funcion_type : FUNC '(' tipo ')' . ';' bloque_type  (119)
+	error_funcion_type : FUNC '(' tipo ')' . bloque_type  (125)
+	error_funcion_type : FUNC '(' tipo ')' . ';' error  (126)
+
+	IDENTIFICADOR  shift 343
+	';'  shift 346
+	.  error
+
+	bloque_type  goto 347
+
+
+state 311
+	error_funcion_type : FUNC tipo ')' ';' . bloque_type  (122)
+
+	IDENTIFICADOR  shift 343
+	.  error
+
+	bloque_type  goto 348
+
+
+state 312
+	error_funcion_type : '(' tipo ')' ';' . bloque_type  (121)
+
+	IDENTIFICADOR  shift 343
+	.  error
+
+	bloque_type  goto 349
+
+
+state 313
+	error_bloque_ejecucion_funcion : BEGIN RETURN '(' condicion ')' ';' END .  (137)
+
+	.  reduce 137
+
+
+state 314
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' ')' ';' bloque_sentencias RETURN . '(' condicion ')' ';' END  (147)
+
+	'('  shift 350
+	.  error
+
+
+state 315
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion ';' bloque_sentencias RETURN . '(' condicion ')' ';' END  (148)
+
+	'('  shift 351
+	.  error
+
+
+state 316
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion ')' ';' RETURN . '(' condicion ')' ';' END  (150)
+
+	'('  shift 352
+	.  error
+
+
+state 317
+	bloque_sentencias : bloque_sentencias . sentencia_ejecucion  (11)
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion ')' ';' bloque_sentencias . '(' condicion ')' ';' END  (151)
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion ')' ';' bloque_sentencias . RETURN condicion ')' ';' END  (152)
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion ')' ';' bloque_sentencias . RETURN '(' ')' ';' END  (153)
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion ')' ';' bloque_sentencias . RETURN '(' condicion ';' END  (154)
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion ')' ';' bloque_sentencias . RETURN '(' condicion ')' END  (155)
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion ')' ';' bloque_sentencias . RETURN '(' condicion ')' ';' error  (156)
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion ')' ';' bloque_sentencias . END  (157)
+
+	IDENTIFICADOR  shift 80
+	ASIGNACION  shift 17
+	IF  shift 18
+	PRINT  shift 19
+	RETURN  shift 353
+	END  shift 354
+	REPEAT  shift 21
+	TRY  shift 22
+	'('  shift 355
+	.  error
+
+	sentencia_ejecucion  goto 98
+	sentencia_ejecutable  goto 29
+	control  goto 30
+	seleccion  goto 31
+	impresion  goto 32
+	invocacion  goto 33
+	asignacion  goto 34
+	error_ejecucion  goto 35
+	try_catch  goto 36
+	error_sentencia_ejecucion  goto 37
+	error_control  goto 38
+	error_asignacion  goto 39
+	error_seleccion  goto 40
+	error_invocacion  goto 41
+	error_try_catch  goto 42
+
+
+state 318
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion ')' bloque_sentencias RETURN . '(' condicion ')' ';' END  (149)
+
+	'('  shift 356
+	.  error
+
+
+state 319
+	bloque_ejecucion_funcion : BEGIN PRE ':' '(' condicion ')' ';' . bloque_sentencias RETURN '(' condicion ')' ';' END  (133)
+	bloque_ejecucion_funcion : BEGIN PRE ':' '(' condicion ')' ';' . RETURN '(' condicion ')' ';' END  (134)
+
+	IDENTIFICADOR  shift 80
+	ASIGNACION  shift 17
+	IF  shift 18
+	PRINT  shift 19
+	RETURN  shift 357
+	REPEAT  shift 21
+	TRY  shift 22
+	'('  shift 46
+	.  error
+
+	bloque_sentencias  goto 358
+	sentencia_ejecucion  goto 28
+	sentencia_ejecutable  goto 29
+	control  goto 30
+	seleccion  goto 31
+	impresion  goto 32
+	invocacion  goto 33
+	asignacion  goto 34
+	error_ejecucion  goto 35
+	try_catch  goto 36
+	error_sentencia_ejecucion  goto 37
+	error_control  goto 38
+	error_asignacion  goto 39
+	error_seleccion  goto 40
+	error_invocacion  goto 41
+	error_try_catch  goto 42
+
+
+state 320
+	error_bloque_ejecucion_funcion : BEGIN PRE condicion ')' ';' bloque_sentencias RETURN . '(' condicion ')' ';' END  (146)
+
+	'('  shift 359
+	.  error
+
+
+state 321
+	error_bloque_ejecucion_funcion : BEGIN bloque_sentencias RETURN '(' ')' ';' END .  (140)
+
+	.  reduce 140
+
+
+state 322
+	error_bloque_ejecucion_funcion : BEGIN bloque_sentencias RETURN '(' condicion ';' END .  (141)
+
+	.  reduce 141
+
+
+state 323
+	error_bloque_ejecucion_funcion : BEGIN bloque_sentencias RETURN '(' condicion ')' END .  (142)
+
+	.  reduce 142
+
+
+state 324
+	bloque_ejecucion_funcion : BEGIN bloque_sentencias RETURN '(' condicion ')' ';' . END  (132)
+	error_bloque_ejecucion_funcion : BEGIN bloque_sentencias RETURN '(' condicion ')' ';' . error  (144)
+
+	error  shift 360
+	END  shift 361
+	.  error
+
+
+state 325
+	error_bloque_ejecucion_funcion : BEGIN bloque_sentencias RETURN condicion ')' ';' END .  (139)
+
+	.  reduce 139
+
+
+state 326
+	error_bloque_ejecucion_funcion : BEGIN bloque_sentencias '(' condicion ')' ';' END .  (138)
+
+	.  reduce 138
+
+
+state 327
+	error_bloque_ejecucion_funcion : PRE '(' condicion ')' ';' bloque_sentencias RETURN . '(' condicion ')' ';' END  (145)
+
+	'('  shift 362
+	.  error
+
+
+state 328
+	error_bloque_ejecucion_funcion : bloque_sentencias RETURN '(' condicion ')' ';' END .  (136)
+
+	.  reduce 136
+
+
+state 329
+	error_bloque_if : BEGIN sentencia_ejecucion END error .  (73)
+
+	.  reduce 73
+
+
+state 330
+	error_bloque_if : BEGIN sentencia_ejecucion END ';' .  (71)
+
+	.  reduce 71
+
+
+state 331
+	bloque_if : BEGIN sentencia_ejecucion bloque_sentencias END . ';'  (69)
+	error_bloque_if : BEGIN sentencia_ejecucion bloque_sentencias END . error  (72)
+
+	error  shift 363
+	';'  shift 364
+	.  error
+
+
+state 332
+	error_seleccion : IF '(' condicion ')' THEN bloque_if ELSE ENDIF .  (81)
+
+	.  reduce 81
+
+
+state 333
+	seleccion : IF '(' condicion ')' THEN bloque_if ELSE bloque_if . ENDIF  (66)
+	error_seleccion : IF '(' condicion ')' THEN bloque_if ELSE bloque_if .  (82)
+
+	ENDIF  shift 365
+	error  reduce 82
+	';'  reduce 82
+
+
+state 334
+	bloque_repeat : BEGIN . bloque_control END  (53)
+
+	IDENTIFICADOR  shift 80
+	ASIGNACION  shift 17
+	IF  shift 18
+	PRINT  shift 19
+	BREAK  shift 366
+	REPEAT  shift 21
+	TRY  shift 22
+	'('  shift 46
+	.  error
+
+	sentencia_ejecucion  goto 367
+	sentencia_ejecutable  goto 29
+	control  goto 30
+	seleccion  goto 31
+	impresion  goto 32
+	invocacion  goto 33
+	asignacion  goto 34
+	error_ejecucion  goto 35
+	try_catch  goto 36
+	error_sentencia_ejecucion  goto 37
+	error_control  goto 38
+	bloque_control  goto 368
+	sentencia_control  goto 369
+	error_sentencia_control  goto 370
+	error_asignacion  goto 39
+	error_seleccion  goto 40
+	error_invocacion  goto 41
+	error_try_catch  goto 42
+
+
+state 335
+	error_control : REPEAT '(' ';' condicion ';' CTE_ULONG ')' bloque_repeat .  (41)
+
+	.  reduce 41
+
+
+state 336
+	error_control : REPEAT '(' asignacion_repeat ';' ';' CTE_ULONG ')' bloque_repeat .  (43)
+
+	.  reduce 43
+
+
+state 337
+	error_control : REPEAT '(' asignacion_repeat ';' condicion CTE_ULONG ')' bloque_repeat .  (44)
+
+	.  reduce 44
+
+
+state 338
+	control : REPEAT '(' asignacion_repeat ';' condicion ';' CTE_ULONG ')' . bloque_repeat  (38)
+	error_control : REPEAT '(' asignacion_repeat ';' condicion ';' CTE_ULONG ')' . error  (47)
+
+	error  shift 371
+	BEGIN  shift 334
+	.  error
+
+	bloque_repeat  goto 372
+
+
+state 339
+	error_control : REPEAT '(' asignacion_repeat ';' condicion ';' CTE_ULONG bloque_repeat .  (46)
+
+	.  reduce 46
+
+
+state 340
+	error_control : REPEAT '(' asignacion_repeat ';' condicion ';' ')' bloque_repeat .  (45)
+
+	.  reduce 45
+
+
+state 341
+	error_control : REPEAT '(' asignacion_repeat condicion ';' CTE_ULONG ')' bloque_repeat .  (42)
+
+	.  reduce 42
+
+
+state 342
+	error_control : REPEAT asignacion_repeat ';' condicion ';' CTE_ULONG ')' bloque_repeat .  (40)
+
+	.  reduce 40
+
+
+state 343
+	bloque_type : IDENTIFICADOR . lista_de_variables  (127)
+
+	IDENTIFICADOR  shift 373
+	.  error
+
+	lista_de_variables  goto 374
+	error_lista_de_variables  goto 52
+
+
+state 344
+	error_funcion_type : FUNC '(' ')' ';' bloque_type .  (123)
+
+	.  reduce 123
+
+
+state 345
+	error_funcion_type : FUNC '(' tipo ';' bloque_type .  (124)
+
+	.  reduce 124
+
+
+state 346
+	funcion_type : FUNC '(' tipo ')' ';' . bloque_type  (119)
+	error_funcion_type : FUNC '(' tipo ')' ';' . error  (126)
+
+	error  shift 375
+	IDENTIFICADOR  shift 343
+	.  error
+
+	bloque_type  goto 376
+
+
+state 347
+	error_funcion_type : FUNC '(' tipo ')' bloque_type .  (125)
+
+	.  reduce 125
+
+
+state 348
+	error_funcion_type : FUNC tipo ')' ';' bloque_type .  (122)
+
+	.  reduce 122
+
+
+state 349
+	error_funcion_type : '(' tipo ')' ';' bloque_type .  (121)
+
+	.  reduce 121
+
+
+state 350
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' ')' ';' bloque_sentencias RETURN '(' . condicion ')' ';' END  (147)
+
+	IDENTIFICADOR  shift 63
+	CTE_ULONG  shift 64
+	CTE_DOUBLE  shift 66
+	'-'  shift 68
+	.  error
+
+	invocacion  goto 69
+	condicion  goto 377
+	expresion2  goto 75
+	termino  goto 76
+	error_invocacion  goto 41
+	expresion  goto 77
+	expresion1  goto 78
+	factor  goto 71
+
+
+state 351
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion ';' bloque_sentencias RETURN '(' . condicion ')' ';' END  (148)
+
+	IDENTIFICADOR  shift 63
+	CTE_ULONG  shift 64
+	CTE_DOUBLE  shift 66
+	'-'  shift 68
+	.  error
+
+	invocacion  goto 69
+	condicion  goto 378
+	expresion2  goto 75
+	termino  goto 76
+	error_invocacion  goto 41
+	expresion  goto 77
+	expresion1  goto 78
+	factor  goto 71
+
+
+state 352
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion ')' ';' RETURN '(' . condicion ')' ';' END  (150)
+
+	IDENTIFICADOR  shift 63
+	CTE_ULONG  shift 64
+	CTE_DOUBLE  shift 66
+	'-'  shift 68
+	.  error
+
+	invocacion  goto 69
+	condicion  goto 379
+	expresion2  goto 75
+	termino  goto 76
+	error_invocacion  goto 41
+	expresion  goto 77
+	expresion1  goto 78
+	factor  goto 71
+
+
+state 353
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion ')' ';' bloque_sentencias RETURN . condicion ')' ';' END  (152)
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion ')' ';' bloque_sentencias RETURN . '(' ')' ';' END  (153)
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion ')' ';' bloque_sentencias RETURN . '(' condicion ';' END  (154)
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion ')' ';' bloque_sentencias RETURN . '(' condicion ')' END  (155)
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion ')' ';' bloque_sentencias RETURN . '(' condicion ')' ';' error  (156)
+
+	IDENTIFICADOR  shift 63
+	CTE_ULONG  shift 64
+	CTE_DOUBLE  shift 66
+	'('  shift 380
+	'-'  shift 68
+	.  error
+
+	invocacion  goto 69
+	condicion  goto 381
+	expresion2  goto 75
+	termino  goto 76
+	error_invocacion  goto 41
+	expresion  goto 77
+	expresion1  goto 78
+	factor  goto 71
+
+
+state 354
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion ')' ';' bloque_sentencias END .  (157)
+
+	.  reduce 157
+
+
+state 355
+	error_seleccion : '(' . condicion ')' THEN bloque_if ENDIF  (74)
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion ')' ';' bloque_sentencias '(' . condicion ')' ';' END  (151)
+
+	IDENTIFICADOR  shift 63
+	CTE_ULONG  shift 64
+	CTE_DOUBLE  shift 66
+	'-'  shift 68
+	.  error
+
+	invocacion  goto 69
+	condicion  goto 382
+	expresion2  goto 75
+	termino  goto 76
+	error_invocacion  goto 41
+	expresion  goto 77
+	expresion1  goto 78
+	factor  goto 71
+
+
+state 356
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion ')' bloque_sentencias RETURN '(' . condicion ')' ';' END  (149)
+
+	IDENTIFICADOR  shift 63
+	CTE_ULONG  shift 64
+	CTE_DOUBLE  shift 66
+	'-'  shift 68
+	.  error
+
+	invocacion  goto 69
+	condicion  goto 383
+	expresion2  goto 75
+	termino  goto 76
+	error_invocacion  goto 41
+	expresion  goto 77
+	expresion1  goto 78
+	factor  goto 71
+
+
+state 357
+	bloque_ejecucion_funcion : BEGIN PRE ':' '(' condicion ')' ';' RETURN . '(' condicion ')' ';' END  (134)
+
+	'('  shift 384
+	.  error
+
+
+state 358
+	bloque_sentencias : bloque_sentencias . sentencia_ejecucion  (11)
+	bloque_ejecucion_funcion : BEGIN PRE ':' '(' condicion ')' ';' bloque_sentencias . RETURN '(' condicion ')' ';' END  (133)
+
+	IDENTIFICADOR  shift 80
+	ASIGNACION  shift 17
+	IF  shift 18
+	PRINT  shift 19
+	RETURN  shift 385
+	REPEAT  shift 21
+	TRY  shift 22
+	'('  shift 46
+	.  error
+
+	sentencia_ejecucion  goto 98
+	sentencia_ejecutable  goto 29
+	control  goto 30
+	seleccion  goto 31
+	impresion  goto 32
+	invocacion  goto 33
+	asignacion  goto 34
+	error_ejecucion  goto 35
+	try_catch  goto 36
+	error_sentencia_ejecucion  goto 37
+	error_control  goto 38
+	error_asignacion  goto 39
+	error_seleccion  goto 40
+	error_invocacion  goto 41
+	error_try_catch  goto 42
+
+
+state 359
+	error_bloque_ejecucion_funcion : BEGIN PRE condicion ')' ';' bloque_sentencias RETURN '(' . condicion ')' ';' END  (146)
+
+	IDENTIFICADOR  shift 63
+	CTE_ULONG  shift 64
+	CTE_DOUBLE  shift 66
+	'-'  shift 68
+	.  error
+
+	invocacion  goto 69
+	condicion  goto 386
+	expresion2  goto 75
+	termino  goto 76
+	error_invocacion  goto 41
+	expresion  goto 77
+	expresion1  goto 78
+	factor  goto 71
+
+
+state 360
+	error_bloque_ejecucion_funcion : BEGIN bloque_sentencias RETURN '(' condicion ')' ';' error .  (144)
+
+	.  reduce 144
+
+
+state 361
+	bloque_ejecucion_funcion : BEGIN bloque_sentencias RETURN '(' condicion ')' ';' END .  (132)
+
+	.  reduce 132
+
+
+state 362
+	error_bloque_ejecucion_funcion : PRE '(' condicion ')' ';' bloque_sentencias RETURN '(' . condicion ')' ';' END  (145)
+
+	IDENTIFICADOR  shift 63
+	CTE_ULONG  shift 64
+	CTE_DOUBLE  shift 66
+	'-'  shift 68
+	.  error
+
+	invocacion  goto 69
+	condicion  goto 387
+	expresion2  goto 75
+	termino  goto 76
+	error_invocacion  goto 41
+	expresion  goto 77
+	expresion1  goto 78
+	factor  goto 71
+
+
+state 363
+	error_bloque_if : BEGIN sentencia_ejecucion bloque_sentencias END error .  (72)
+
+	.  reduce 72
+
+
+state 364
+	bloque_if : BEGIN sentencia_ejecucion bloque_sentencias END ';' .  (69)
+
+	.  reduce 69
+
+
+state 365
+	seleccion : IF '(' condicion ')' THEN bloque_if ELSE bloque_if ENDIF .  (66)
+
+	.  reduce 66
+
+
+state 366
+	sentencia_control : BREAK . ';'  (57)
+	error_sentencia_control : BREAK . error  (59)
+
+	error  shift 388
+	';'  shift 389
+	.  error
+
+
+state 367
+	sentencia_control : sentencia_ejecucion .  (56)
+
+	.  reduce 56
+
+
+state 368
+	bloque_repeat : BEGIN bloque_control . END  (53)
+	bloque_control : bloque_control . sentencia_control  (55)
+
+	IDENTIFICADOR  shift 80
+	ASIGNACION  shift 17
+	IF  shift 18
+	PRINT  shift 19
+	END  shift 390
+	BREAK  shift 366
+	REPEAT  shift 21
+	TRY  shift 22
+	'('  shift 46
+	.  error
+
+	sentencia_ejecucion  goto 367
+	sentencia_ejecutable  goto 29
+	control  goto 30
+	seleccion  goto 31
+	impresion  goto 32
+	invocacion  goto 33
+	asignacion  goto 34
+	error_ejecucion  goto 35
+	try_catch  goto 36
+	error_sentencia_ejecucion  goto 37
+	error_control  goto 38
+	sentencia_control  goto 391
+	error_sentencia_control  goto 370
+	error_asignacion  goto 39
+	error_seleccion  goto 40
+	error_invocacion  goto 41
+	error_try_catch  goto 42
+
+
+state 369
+	bloque_control : sentencia_control .  (54)
+
+	.  reduce 54
+
+
+state 370
+	sentencia_control : error_sentencia_control .  (58)
+
+	.  reduce 58
+
+
+state 371
+	error_control : REPEAT '(' asignacion_repeat ';' condicion ';' CTE_ULONG ')' error .  (47)
+
+	.  reduce 47
+
+
+state 372
+	control : REPEAT '(' asignacion_repeat ';' condicion ';' CTE_ULONG ')' bloque_repeat .  (38)
+
+	.  reduce 38
+
+
+state 373
+	lista_de_variables : IDENTIFICADOR .  (103)
+
+	.  reduce 103
+
+
+state 374
+	lista_de_variables : lista_de_variables . ',' IDENTIFICADOR  (102)
+	error_lista_de_variables : lista_de_variables . IDENTIFICADOR  (105)
+	bloque_type : IDENTIFICADOR lista_de_variables .  (127)
+
+	IDENTIFICADOR  shift 117
+	','  shift 119
+	';'  reduce 127
+
+
+state 375
+	error_funcion_type : FUNC '(' tipo ')' ';' error .  (126)
+
+	.  reduce 126
+
+
+state 376
+	funcion_type : FUNC '(' tipo ')' ';' bloque_type .  (119)
+
+	.  reduce 119
+
+
+state 377
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' ')' ';' bloque_sentencias RETURN '(' condicion . ')' ';' END  (147)
+	condicion : condicion . OR expresion  (159)
+
+	OR  shift 141
+	')'  shift 392
+	.  error
+
+
+state 378
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion ';' bloque_sentencias RETURN '(' condicion . ')' ';' END  (148)
+	condicion : condicion . OR expresion  (159)
+
+	OR  shift 141
+	')'  shift 393
+	.  error
+
+
+state 379
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion ')' ';' RETURN '(' condicion . ')' ';' END  (150)
+	condicion : condicion . OR expresion  (159)
+
+	OR  shift 141
+	')'  shift 394
+	.  error
+
+
+state 380
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion ')' ';' bloque_sentencias RETURN '(' . ')' ';' END  (153)
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion ')' ';' bloque_sentencias RETURN '(' . condicion ';' END  (154)
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion ')' ';' bloque_sentencias RETURN '(' . condicion ')' END  (155)
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion ')' ';' bloque_sentencias RETURN '(' . condicion ')' ';' error  (156)
+
+	IDENTIFICADOR  shift 63
+	CTE_ULONG  shift 64
+	CTE_DOUBLE  shift 66
+	')'  shift 395
+	'-'  shift 68
+	.  error
+
+	invocacion  goto 69
+	condicion  goto 396
+	expresion2  goto 75
+	termino  goto 76
+	error_invocacion  goto 41
+	expresion  goto 77
+	expresion1  goto 78
+	factor  goto 71
+
+
+state 381
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion ')' ';' bloque_sentencias RETURN condicion . ')' ';' END  (152)
+	condicion : condicion . OR expresion  (159)
+
+	OR  shift 141
+	')'  shift 397
+	.  error
+
+
+state 382
+	error_seleccion : '(' condicion . ')' THEN bloque_if ENDIF  (74)
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion ')' ';' bloque_sentencias '(' condicion . ')' ';' END  (151)
+	condicion : condicion . OR expresion  (159)
+
+	OR  shift 141
+	')'  shift 398
+	.  error
+
+
+state 383
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion ')' bloque_sentencias RETURN '(' condicion . ')' ';' END  (149)
+	condicion : condicion . OR expresion  (159)
+
+	OR  shift 141
+	')'  shift 399
+	.  error
+
+
+state 384
+	bloque_ejecucion_funcion : BEGIN PRE ':' '(' condicion ')' ';' RETURN '(' . condicion ')' ';' END  (134)
+
+	IDENTIFICADOR  shift 63
+	CTE_ULONG  shift 64
+	CTE_DOUBLE  shift 66
+	'-'  shift 68
+	.  error
+
+	invocacion  goto 69
+	condicion  goto 400
+	expresion2  goto 75
+	termino  goto 76
+	error_invocacion  goto 41
+	expresion  goto 77
+	expresion1  goto 78
+	factor  goto 71
+
+
+state 385
+	bloque_ejecucion_funcion : BEGIN PRE ':' '(' condicion ')' ';' bloque_sentencias RETURN . '(' condicion ')' ';' END  (133)
+
+	'('  shift 401
+	.  error
+
+
+state 386
+	error_bloque_ejecucion_funcion : BEGIN PRE condicion ')' ';' bloque_sentencias RETURN '(' condicion . ')' ';' END  (146)
+	condicion : condicion . OR expresion  (159)
+
+	OR  shift 141
+	')'  shift 402
+	.  error
+
+
+state 387
+	error_bloque_ejecucion_funcion : PRE '(' condicion ')' ';' bloque_sentencias RETURN '(' condicion . ')' ';' END  (145)
+	condicion : condicion . OR expresion  (159)
+
+	OR  shift 141
+	')'  shift 403
+	.  error
+
+
+state 388
+	error_sentencia_control : BREAK error .  (59)
+
+	.  reduce 59
+
+
+state 389
+	sentencia_control : BREAK ';' .  (57)
+
+	.  reduce 57
+
+
+state 390
+	bloque_repeat : BEGIN bloque_control END .  (53)
+
+	.  reduce 53
+
+
+state 391
+	bloque_control : bloque_control sentencia_control .  (55)
+
+	.  reduce 55
+
+
+state 392
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' ')' ';' bloque_sentencias RETURN '(' condicion ')' . ';' END  (147)
+
+	';'  shift 404
+	.  error
+
+
+state 393
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion ';' bloque_sentencias RETURN '(' condicion ')' . ';' END  (148)
+
+	';'  shift 405
+	.  error
+
+
+state 394
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion ')' ';' RETURN '(' condicion ')' . ';' END  (150)
+
+	';'  shift 406
+	.  error
+
+
+state 395
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion ')' ';' bloque_sentencias RETURN '(' ')' . ';' END  (153)
+
+	';'  shift 407
+	.  error
+
+
+state 396
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion ')' ';' bloque_sentencias RETURN '(' condicion . ';' END  (154)
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion ')' ';' bloque_sentencias RETURN '(' condicion . ')' END  (155)
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion ')' ';' bloque_sentencias RETURN '(' condicion . ')' ';' error  (156)
+	condicion : condicion . OR expresion  (159)
+
+	OR  shift 141
+	';'  shift 408
+	')'  shift 409
+	.  error
+
+
+state 397
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion ')' ';' bloque_sentencias RETURN condicion ')' . ';' END  (152)
+
+	';'  shift 410
+	.  error
+
+
+state 398
+	error_seleccion : '(' condicion ')' . THEN bloque_if ENDIF  (74)
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion ')' ';' bloque_sentencias '(' condicion ')' . ';' END  (151)
+
+	THEN  shift 216
+	';'  shift 411
+	.  error
+
+
+state 399
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion ')' bloque_sentencias RETURN '(' condicion ')' . ';' END  (149)
+
+	';'  shift 412
+	.  error
+
+
+state 400
+	bloque_ejecucion_funcion : BEGIN PRE ':' '(' condicion ')' ';' RETURN '(' condicion . ')' ';' END  (134)
+	condicion : condicion . OR expresion  (159)
+
+	OR  shift 141
+	')'  shift 413
+	.  error
+
+
+state 401
+	bloque_ejecucion_funcion : BEGIN PRE ':' '(' condicion ')' ';' bloque_sentencias RETURN '(' . condicion ')' ';' END  (133)
+
+	IDENTIFICADOR  shift 63
+	CTE_ULONG  shift 64
+	CTE_DOUBLE  shift 66
+	'-'  shift 68
+	.  error
+
+	invocacion  goto 69
+	condicion  goto 414
+	expresion2  goto 75
+	termino  goto 76
+	error_invocacion  goto 41
+	expresion  goto 77
+	expresion1  goto 78
+	factor  goto 71
+
+
+state 402
+	error_bloque_ejecucion_funcion : BEGIN PRE condicion ')' ';' bloque_sentencias RETURN '(' condicion ')' . ';' END  (146)
+
+	';'  shift 415
+	.  error
+
+
+state 403
+	error_bloque_ejecucion_funcion : PRE '(' condicion ')' ';' bloque_sentencias RETURN '(' condicion ')' . ';' END  (145)
+
+	';'  shift 416
+	.  error
+
+
+state 404
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' ')' ';' bloque_sentencias RETURN '(' condicion ')' ';' . END  (147)
+
+	END  shift 417
+	.  error
+
+
+state 405
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion ';' bloque_sentencias RETURN '(' condicion ')' ';' . END  (148)
+
+	END  shift 418
+	.  error
+
+
+state 406
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion ')' ';' RETURN '(' condicion ')' ';' . END  (150)
+
+	END  shift 419
+	.  error
+
+
+state 407
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion ')' ';' bloque_sentencias RETURN '(' ')' ';' . END  (153)
+
+	END  shift 420
+	.  error
+
+
+state 408
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion ')' ';' bloque_sentencias RETURN '(' condicion ';' . END  (154)
+
+	END  shift 421
+	.  error
+
+
+state 409
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion ')' ';' bloque_sentencias RETURN '(' condicion ')' . END  (155)
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion ')' ';' bloque_sentencias RETURN '(' condicion ')' . ';' error  (156)
+
+	END  shift 422
+	';'  shift 423
+	.  error
+
+
+state 410
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion ')' ';' bloque_sentencias RETURN condicion ')' ';' . END  (152)
+
+	END  shift 424
+	.  error
+
+
+state 411
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion ')' ';' bloque_sentencias '(' condicion ')' ';' . END  (151)
+
+	END  shift 425
+	.  error
+
+
+state 412
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion ')' bloque_sentencias RETURN '(' condicion ')' ';' . END  (149)
+
+	END  shift 426
+	.  error
+
+
+state 413
+	bloque_ejecucion_funcion : BEGIN PRE ':' '(' condicion ')' ';' RETURN '(' condicion ')' . ';' END  (134)
+
+	';'  shift 427
+	.  error
+
+
+state 414
+	bloque_ejecucion_funcion : BEGIN PRE ':' '(' condicion ')' ';' bloque_sentencias RETURN '(' condicion . ')' ';' END  (133)
+	condicion : condicion . OR expresion  (159)
+
+	OR  shift 141
+	')'  shift 428
+	.  error
+
+
+state 415
+	error_bloque_ejecucion_funcion : BEGIN PRE condicion ')' ';' bloque_sentencias RETURN '(' condicion ')' ';' . END  (146)
+
+	END  shift 429
+	.  error
+
+
+state 416
+	error_bloque_ejecucion_funcion : PRE '(' condicion ')' ';' bloque_sentencias RETURN '(' condicion ')' ';' . END  (145)
+
+	END  shift 430
+	.  error
+
+
+state 417
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' ')' ';' bloque_sentencias RETURN '(' condicion ')' ';' END .  (147)
+
+	.  reduce 147
+
+
+state 418
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion ';' bloque_sentencias RETURN '(' condicion ')' ';' END .  (148)
+
+	.  reduce 148
+
+
+state 419
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion ')' ';' RETURN '(' condicion ')' ';' END .  (150)
+
+	.  reduce 150
+
+
+state 420
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion ')' ';' bloque_sentencias RETURN '(' ')' ';' END .  (153)
+
+	.  reduce 153
+
+
+state 421
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion ')' ';' bloque_sentencias RETURN '(' condicion ';' END .  (154)
+
+	.  reduce 154
+
+
+state 422
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion ')' ';' bloque_sentencias RETURN '(' condicion ')' END .  (155)
+
+	.  reduce 155
+
+
+state 423
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion ')' ';' bloque_sentencias RETURN '(' condicion ')' ';' . error  (156)
+
+	error  shift 431
+	.  error
+
+
+state 424
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion ')' ';' bloque_sentencias RETURN condicion ')' ';' END .  (152)
+
+	.  reduce 152
+
+
+state 425
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion ')' ';' bloque_sentencias '(' condicion ')' ';' END .  (151)
+
+	.  reduce 151
+
+
+state 426
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion ')' bloque_sentencias RETURN '(' condicion ')' ';' END .  (149)
+
+	.  reduce 149
+
+
+state 427
+	bloque_ejecucion_funcion : BEGIN PRE ':' '(' condicion ')' ';' RETURN '(' condicion ')' ';' . END  (134)
+
+	END  shift 432
+	.  error
+
+
+state 428
+	bloque_ejecucion_funcion : BEGIN PRE ':' '(' condicion ')' ';' bloque_sentencias RETURN '(' condicion ')' . ';' END  (133)
+
+	';'  shift 433
+	.  error
+
+
+state 429
+	error_bloque_ejecucion_funcion : BEGIN PRE condicion ')' ';' bloque_sentencias RETURN '(' condicion ')' ';' END .  (146)
+
+	.  reduce 146
+
+
+state 430
+	error_bloque_ejecucion_funcion : PRE '(' condicion ')' ';' bloque_sentencias RETURN '(' condicion ')' ';' END .  (145)
+
+	.  reduce 145
+
+
+state 431
+	error_bloque_ejecucion_funcion : BEGIN PRE '(' condicion ')' ';' bloque_sentencias RETURN '(' condicion ')' ';' error .  (156)
+
+	.  reduce 156
+
+
+state 432
+	bloque_ejecucion_funcion : BEGIN PRE ':' '(' condicion ')' ';' RETURN '(' condicion ')' ';' END .  (134)
+
+	.  reduce 134
+
+
+state 433
+	bloque_ejecucion_funcion : BEGIN PRE ':' '(' condicion ')' ';' bloque_sentencias RETURN '(' condicion ')' ';' . END  (133)
+
+	END  shift 434
+	.  error
+
+
+state 434
+	bloque_ejecucion_funcion : BEGIN PRE ':' '(' condicion ')' ';' bloque_sentencias RETURN '(' condicion ')' ';' END .  (133)
+
+	.  reduce 133
+
+
+42 terminals, 57 nonterminals
+181 grammar rules, 435 states
