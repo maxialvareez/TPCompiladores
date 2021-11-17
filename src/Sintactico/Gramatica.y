@@ -137,9 +137,11 @@ asignacion_repeat: IDENTIFICADOR ASIGNACION CTE_ULONG {System.out.println("[Sint
                         }
                         else
                             System.out.println("Error semántico: Linea " + Lexico.linea + " los tipos son incompatibles");
-                        }
                     }
-                     | error_asignacion_repeat
+                    else
+                        System.out.println("Error semántico: Linea " + Lexico.linea + " la variable " + $1.sval +" no fue declarada");
+                    }
+                     | error_asignacion_repeat { $$ = new ParserVal(null) }
                     ;
 
 error_asignacion_repeat:  ASIGNACION CTE_ULONG {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {REPEAT mal declarado, falta el identificador }");}
