@@ -15,6 +15,7 @@ public class Terceto {
         this.operando2 = operando2;
         this.resultado = null;
         this.tipo = null;
+
     }
 
     public int getNumero() {

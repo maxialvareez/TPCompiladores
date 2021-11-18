@@ -62,6 +62,7 @@ public class AdministradorTercetos {
     }
 
 
+
     public void generarCodigoIntermedio(int inicio, int finalFuncion, String funcion, int index) {
         ArrayList<Terceto> aux = new ArrayList<>();
         ArrayList<String> invocados = new ArrayList<>();

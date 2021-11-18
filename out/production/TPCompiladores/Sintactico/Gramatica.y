@@ -109,8 +109,35 @@ tipo : ULONG
      {$$ = new ParserVal("DOUBLE");}
      ;
 
-control : REPEAT'(' asignacion_repeat ';'condicion';' CTE_ULONG')' bloque_repeat {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Sentencia REPEAT}");}
+control : REPEAT'(' asignacion_repeat ';'condicion';' CTE_ULONG')' bloque_repeat {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Sentencia REPEAT}");
+        System.out.println("Entro a repeat 1");
+        if(($3.sval != null) && ($5.sval != null)){
+             System.out.println("Entro a if 1");
+            Terceto t = new Terceto("+", $3.sval, $7.sval);
+            t.setTipo("ULONG");
+            adminTercetos.agregarTerceto(t);
+            t = new Terceto("BI", null, null);
+            adminTercetos.agregarTerceto(t);
+            adminTercetos.desapilar(); //para completar BF
+            adminTercetos.desapilarRepeat();
+        }
+    }
+    |REPEAT'(' asignacion_repeat ';'condicion';' '-' CTE_ULONG')' bloque_repeat {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Sentencia REPEAT}");
+                 System.out.println("Entro a repeat 2");
+                 System.out.println("asignacion: " + $3.sval);
+                    System.out.println("condicion: " + $7.sval);
+                if(($3.sval != null) && ($5.sval != null)){
+                   System.out.println("Entro a if 2");
 
+                  Terceto t = new Terceto("-", $3.sval, $7.sval);
+                  t.setTipo("ULONG");
+                  adminTercetos.agregarTerceto(t);
+                  t = new Terceto("BI", null, null);
+                  adminTercetos.agregarTerceto(t);
+                  adminTercetos.desapilar(); //para completar BF
+                  adminTercetos.desapilarRepeat();
+              }
+          }
 	| error_control
 	;
 
@@ -137,9 +164,11 @@ asignacion_repeat: IDENTIFICADOR ASIGNACION CTE_ULONG {System.out.println("[Sint
                         }
                         else
                             System.out.println("Error semántico: Linea " + Lexico.linea + " los tipos son incompatibles");
-                        }
                     }
-                     | error_asignacion_repeat
+                    else
+                        System.out.println("Error semántico: Linea " + Lexico.linea + " la variable " + $1.sval +" no fue declarada");
+                    }
+                     | error_asignacion_repeat { $$ = new ParserVal(null); }
                     ;
 
 error_asignacion_repeat:  ASIGNACION CTE_ULONG {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {REPEAT mal declarado, falta el identificador }");}
@@ -435,14 +464,14 @@ expresion: expresion1 { $$ = new ParserVal((Operando)$1.obj);}
 expresion1: expresion2 { $$ = new ParserVal((Operando)$1.obj);}
 		| expresion1 comparador expresion2 {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Se realizó la operación: " +  $2.sval + "}");
 
-		    Operando op1 = (Operando)$1.obj;
+		                            Operando op1 = (Operando)$1.obj;
                                     Operando op2 = (Operando)$3.obj;
                                     if(op1 != null && op2 !=null){
                                         if (op1.getTipo().equals(op2.getTipo())){
-                                            Terceto t = new Terceto((String)$2.obj, op1.getValor(), op2.getValor());
+                                            Terceto t = new Terceto($2.sval, op1.getValor(), op2.getValor());
                                             t.setTipo(op1.getTipo());
                                             adminTercetos.agregarTerceto(t);
-                                            $$ = new ParserVal(new Operando(op1.getTipo(), "["+t.getNumero()+"]"));
+                                            $$ = new ParserVal("["+t.getNumero()+"]");
                                         }
                                         else{
                                             System.out.println("Error semántico: Linea " + Lexico.linea + " los tipos son incompatibles");
@@ -569,12 +598,12 @@ factor 	: '-' factor  { if (chequearFactorNegado()){
         ;
 
 
-comparador : '<'        { $$ = new ParserVal($1.sval);}
-	   | '>'            { $$ = new ParserVal($1.sval);}
-	   | IGUAL_IGUAL    { $$ = new ParserVal($1.sval);}
-        | MAYOR_IGUAL   { $$ = new ParserVal($1.sval);}
-	   | MENOR_IGUAL    { $$ = new ParserVal($1.sval);}
-	   | DISTINTO       { $$ = new ParserVal((String) $1.obj);}
+comparador : '<'        { $$ = new ParserVal("<");}
+	   | '>'            { $$ = new ParserVal(">");}
+	   | IGUAL_IGUAL    { $$ = new ParserVal("==");}
+        | MAYOR_IGUAL   { $$ = new ParserVal(">=");}
+	   | MENOR_IGUAL    { $$ = new ParserVal("<=");}
+	   | DISTINTO       { $$ = new ParserVal("<>");}
 	   ;
 
 
