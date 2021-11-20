@@ -220,25 +220,30 @@ error_asignacion : ASIGNACION termino {System.out.println("[ERROR SINTÁCTICO] [
 		  ;
 
 
-seleccion: IF condicion_if  THEN bloque_if ENDIF {
-            if($3.sval != null){
+seleccion: IF condicion_if  THEN bloque_then ENDIF {
+            if($2.sval != null){
                 adminTercetos.desapilar();
-                Terceto t = new Terceto("Label"+Integer.toString(adminTercetos.cantTercetos()), null, null);
-                adminTercetos.agregarTerceto(t);
                 }
             }
-	 | IF  condicion_if  THEN bloque_if ELSE bloque_if ENDIF
+	 | IF  condicion_if  THEN bloque_then ELSE bloque_if ENDIF{
+	        if($2.sval != null){
+                 adminTercetos.desapilar();
+                 }
+	 }
 	 | error_seleccion
 	 ;
 
 
 condicion_if: '(' condicion ')'
               {
-                if($1.sval != null){
-                    Terceto t = new Terceto("BF", $1.sval, null);
+
+                System.out.println("ENTRO A CONDICION *****************************");
+                if($2.sval != null){
+                    System.out.println("ENTRO AL IF *****************************");
+                    Terceto t = new Terceto("BF", $2.sval, null);
                     adminTercetos.agregarTerceto(t);
                     adminTercetos.apilar(t.getNumero());
-                    $$ = new ParserVal($1.sval);
+                    $$ = new ParserVal($2.sval);
                 }
                 else
                     $$ = new ParserVal(null);
@@ -248,6 +253,16 @@ condicion_if: '(' condicion ')'
 
 error_condicion_if:  '(' condicion error {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {IF mal declarado, falta un parentesis en la condicion'}");}
                    ;
+
+bloque_then: bloque_if {
+                adminTercetos.desapilar(); //para completar BF
+                Terceto t = new Terceto("BI", null, null);
+                adminTercetos.agregarTerceto(t);
+                adminTercetos.apilar(t.getNumero());
+
+            }
+            ;
+
 
 
 bloque_if : sentencia_ejecucion
@@ -260,13 +275,13 @@ error_bloque_if: BEGIN sentencia_ejecucion END ';' {System.out.println("[ERROR S
                 | BEGIN sentencia_ejecucion END error {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Selección mal declarada: una sola sentencia de ejecución entre un BEGIN y END, y falta ';' después del END}");}
                 ;
 
-error_seleccion :    condicion_if  THEN bloque_if ENDIF {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Selección mal declarada, falta el IF}");}
-		| IF          THEN  bloque_if ENDIF {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {IF mal declarado, falta la condición}");}
-		| IF  condicion_if       bloque_if ENDIF {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {IF mal declarado, falta el THEN}");}
+error_seleccion :    condicion_if  THEN bloque_then ENDIF {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Selección mal declarada, falta el IF}");}
+		| IF          THEN  bloque_then ENDIF {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {IF mal declarado, falta la condición}");}
+		| IF  condicion_if       bloque_then ENDIF {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {IF mal declarado, falta el THEN}");}
 		| IF  condicion_if  THEN              ENDIF {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {IF mal declarado, falta el bloque de sentencias}");}
-		| IF  condicion_if  THEN bloque_if error {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {IF mal declarado, falta el ENDIF o ELSE}");}
-		| IF  condicion_if  THEN  bloque_if  ELSE                 ENDIF{System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {IF mal declarado, falta el bloque de sentencias del ELSE}");}
-		| IF  condicion_if  THEN  bloque_if  ELSE bloque_if error{System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {IF mal declarado, falta el ENDIF}");}
+		| IF  condicion_if  THEN bloque_then error {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {IF mal declarado, falta el ENDIF o ELSE}");}
+		| IF  condicion_if  THEN  bloque_then  ELSE                 ENDIF{System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {IF mal declarado, falta el bloque de sentencias del ELSE}");}
+		| IF  condicion_if  THEN  bloque_then  ELSE bloque_if error{System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {IF mal declarado, falta el ENDIF}");}
 		;
 
 
@@ -485,7 +500,13 @@ error_bloque_ejecucion_funcion :       bloque_sentencias RETURN '('condicion')' 
 
 
 
-condicion : expresion { $$ = new ParserVal((Operando)$1.obj);}
+condicion : expresion { Operando op = (Operando)$1.obj;
+                            if(op != null){
+                                $$ = new ParserVal(op.getValor());
+                            }
+                            else
+                                 $$ = new ParserVal(null);
+                        }
 	  | condicion OR expresion {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Se realizó la operación OR }");
 
 	                    Operando op1 = (Operando)$1.obj;
