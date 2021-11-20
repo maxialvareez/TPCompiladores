@@ -57,8 +57,8 @@ public class AdministradorTercetos {
             System.out.println(t.getNumero() + ". (" + t.getOperador() + ", " + t.getOperando1() + ", " + t.getOperando2()  + ")");
     }
 
-    public void agregarFuncion(String proc) {
-        funciones.put(proc, tercetos.size() - 1);
+    public void agregarFuncion(String funcion) {
+        funciones.put(funcion, tercetos.size() - 1);
     }
 
 
@@ -69,7 +69,7 @@ public class AdministradorTercetos {
         codigoIntermedio.add(index, new ArrayList<>());
         for (int i = inicio; i <= finalFuncion; i++) {
             Terceto t = tercetos.get(i);
-            if (t.getOperador().equals("INV") && !invocados.contains(t.getOperando1())) {
+            if (t.getOperador().equals("InvocacionFuncion") && !invocados.contains(t.getOperando1())) {
                 String funcionInvocada = t.getOperando1();
                 generarCodigoIntermedio(funciones.get(funcionInvocada), this.buscarFinFuncion(funcionInvocada), funcionInvocada, index + 1);
                 invocados.add(funcionInvocada);

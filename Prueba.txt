@@ -2,7 +2,7 @@ programita
 ULONG i,k;
 BEGIN
 
-REPEAT (i := 1; i<10; -2)
+REPEAT (i := 1; i<10; 2)
 BEGIN
 k:= i+3;
 END;
