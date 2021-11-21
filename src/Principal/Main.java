@@ -65,6 +65,8 @@ public class Main {
         }
  */
 
+
+
         System.out.println("\n------ CÓDIGO INTERMEDIO ------");
         adminTercetos.imprimirTercetos();
 

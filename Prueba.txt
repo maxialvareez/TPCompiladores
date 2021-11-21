@@ -1,19 +1,16 @@
 programita
 
-ULONG d,a,s,f;
+ULONG a;
+
+ULONG FUNC f(ULONG x)
+ULONG y, z;
+BEGIN
+PRE: (x > 3);
+RETURN (x + 1);
+END;
 
 BEGIN
-d := 4;
-f := 56;
-s:= 44;
-IF (a <> 55) THEN
-BEGIN
-s :=s;
-a :=f;
-END;
-ELSE
-BEGIN
-d := 2 ;
-END;
-ENDIF;
+a:= 30;
+f(a);
+
 END

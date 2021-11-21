@@ -327,6 +327,8 @@ invocacion : IDENTIFICADOR '(' CTE_ULONG ')' {System.out.println("[Sintáctico] 
                     else
                         System.out.println("Error semántico: Linea " + Lexico.linea+ " la función "+$1.sval+" esta fuera de alcance");
                  }
+
+
             }
 	        | error_invocacion
 	        ;
@@ -338,6 +340,7 @@ error_invocacion: IDENTIFICADOR '(' ')' {System.out.println("[ERROR SINTÁCTICO]
 		;
 
 try_catch: TRY sentencia_ejecutable CATCH bloque_catch
+
            |error_try_catch
             ;
 
@@ -374,10 +377,15 @@ error_lista_de_variables: lista_de_variables IDENTIFICADOR {System.out.println("
 
 funcion :  declaracion_funcion bloque_funcion
          {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Declaración de función llamada '"+ $2.sval +"'" );
-            if($1.sval != null){ //si se declaró bien
+            if($1.sval != null && $1.sval != null ){ //si se declaró bien y se cumplen los PRE (en caso de haberlos)
                 ambito = ambito.substring(0,ambito.lastIndexOf("@"));
-                Terceto t = new Terceto("FinFuncion", $1.sval, null);
+
+                Terceto t = new Terceto("RetornoFuncion", $2.sval, null);
                 adminTercetos.agregarTerceto(t);
+
+                 t = new Terceto("FinFuncion", $1.sval, null);
+                adminTercetos.agregarTerceto(t);
+                adminTercetos.desapilar();     //para el PRE
                 $$ = new ParserVal($1.sval);
             }
             else
@@ -431,7 +439,6 @@ parametro : tipo IDENTIFICADOR{
                 ds.setTipo($1.sval);
                 Main.tablaSimbolos.setDatosSimbolo($2.sval, ds);
                 $$ = new ParserVal($2.sval);
-
                 }
 	  | error_parametro
 	  ;
@@ -457,19 +464,49 @@ bloque_type: IDENTIFICADOR lista_de_variables
 
 
 
-bloque_funcion : bloque_declarativo bloque_ejecucion_funcion
-           | bloque_ejecucion_funcion
- 	       | error_bloque_funcion
+bloque_funcion : bloque_declarativo bloque_ejecucion_funcion{
+                if ($2.sval != null)
+                    $$ = new ParserVal ($2.sval);
+                else
+                    $$ = new ParserVal (null);
+           }
+           | bloque_ejecucion_funcion {
+                if ($1.sval != null)
+                    $$ = new ParserVal ($1.sval);
+                else
+                    $$ = new ParserVal (null);
+           }
+ 	       | error_bloque_funcion { $$ = new ParserVal (null);}
 	       ;
 
 error_bloque_funcion : bloque_declarativo error {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Funcion mal declarada, falta el bloque de sentencias ejecutables}");}
 		     ;
 
 
-bloque_ejecucion_funcion : BEGIN bloque_sentencias RETURN '('condicion')' ';' END 
-			 | BEGIN PRE ':' '(' condicion ')' ';' bloque_sentencias RETURN '('condicion')' ';' END
-			 | BEGIN PRE ':' '(' condicion ')' ';' RETURN '('condicion')' ';' END
-			 | error_bloque_ejecucion_funcion
+bloque_ejecucion_funcion : BEGIN bloque_sentencias RETURN '('condicion')' ';' END{
+                        if ($2.sval != null && $5.sval != null){
+                            $$ = new ParserVal ($5.sval);
+                        }
+                        else
+                            $$ = new ParserVal (null);
+             }
+
+			 | BEGIN pre_condicion ';' bloque_sentencias RETURN '('condicion')' ';' END {
+			            if ($2.sval != null && $7.sval != null){
+			                $$ = new ParserVal ($7.sval);
+			            }
+			            else
+			                $$ = new ParserVal (null);
+			 }
+			 | BEGIN pre_condicion ';' RETURN '('condicion')' ';' END{
+                        if ($2.sval != null && $6.sval != null){
+                            $$ = new ParserVal ($6.sval);
+                        }
+                        else
+                             $$ = new ParserVal (null);
+             }
+
+			 | error_bloque_ejecucion_funcion { $$ = new ParserVal (null);}
    			 ;			
 
 error_bloque_ejecucion_funcion :       bloque_sentencias RETURN '('condicion')' ';' END  {System.out.println("Error sintáctico: Linea " + Lexico.linea + " se detectó un error en una funcion, falta el BEGIN");}
@@ -482,23 +519,37 @@ error_bloque_ejecucion_funcion :       bloque_sentencias RETURN '('condicion')' 
 				|BEGIN bloque_sentencias  END {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Error en una función, falta indicar el retorno ");}
 				|BEGIN bloque_sentencias RETURN '('condicion')' ';' error  {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Error en una funcion, falta el END ");}
 
-				|      PRE '('condicion')' ';' bloque_sentencias RETURN '('condicion')' ';' END  {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Error en una funcion, falta el BEGIN}");}
-				|BEGIN PRE    condicion')' ';' bloque_sentencias RETURN '('condicion')' ';' END {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Error en una funcion, falta '(' }");}
-                |BEGIN PRE '('         ')' ';' bloque_sentencias RETURN '('condicion')' ';' END {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Error en una funcion, falta la condicion del PRE}");}
-                |BEGIN PRE '('condicion   ';' bloque_sentencias RETURN '('condicion')' ';' END {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Error en una funcion, falta ')'}");}
-				|BEGIN PRE '('condicion')'  bloque_sentencias RETURN '('condicion')' ';' END  {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Error en una funcion, ';' despuÉs se la sentencia PRE}");}
-				|BEGIN PRE '('condicion')' ';'                   RETURN '('condicion')' ';' END  {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Error en una funcion, falta el bloque de sentencias ejecutables}");}
-				|BEGIN PRE '('condicion')' ';' bloque_sentencias        '('condicion')' ';' END  {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Error en una funcion, falta el RETURN}");}
-				|BEGIN PRE '('condicion')' ';' bloque_sentencias RETURN    condicion')' ';' END  {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Error en una funcion, falta '(' }");}
-				|BEGIN PRE '('condicion')' ';'bloque_sentencias RETURN '('         ')' ';' END  {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Error en una funcion, falta indicar el retorno}");}
-				|BEGIN PRE '('condicion')' ';'bloque_sentencias RETURN '('condicion    ';' END  {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Error en una funcion, falta ')' }");}
-				|BEGIN PRE '('condicion')' ';'bloque_sentencias RETURN '('condicion')'      END  {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Error en una funcion, falta ';' }");}
-				|BEGIN PRE '('condicion')' ';'bloque_sentencias RETURN '('condicion')' ';' error  {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Error en una funcion, falta el END }");}
-                |BEGIN PRE '('condicion')' ';'bloque_sentencias END  {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Error en una funcion, falta indicar un retorno }");}
+				|      pre_condicion ';' bloque_sentencias RETURN '('condicion')' ';' END  {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Error en una funcion, falta el BEGIN}");}
+				|BEGIN pre_condicion     bloque_sentencias RETURN '('condicion')' ';' END  {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Error en una funcion, ';' después se la sentencia PRE}");}
+				|BEGIN pre_condicion ';' bloque_sentencias        '('condicion')' ';' END  {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Error en una funcion, falta el RETURN}");}
+				|BEGIN pre_condicion ';' bloque_sentencias RETURN    condicion')' ';' END  {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Error en una funcion, falta '(' }");}
+				|BEGIN pre_condicion ';' bloque_sentencias RETURN '('         ')' ';' END  {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Error en una funcion, falta indicar el retorno}");}
+				|BEGIN pre_condicion ';' bloque_sentencias RETURN '('condicion    ';' END  {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Error en una funcion, falta ')' }");}
+				|BEGIN pre_condicion ';' bloque_sentencias RETURN '('condicion')'     END  {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Error en una funcion, falta ';' }");}
+				|BEGIN pre_condicion ';' bloque_sentencias RETURN '('condicion')' ';' error  {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Error en una funcion, falta el END }");}
+                |BEGIN pre_condicion ';' bloque_sentencias END  {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Error en una funcion, falta indicar un retorno }");}
                 ;
 
 
+pre_condicion: PRE ':' '(' condicion ')'{
+                      if($4.sval != null){
+                         Terceto t = new Terceto("BF", $4.sval, null);
+                         adminTercetos.agregarTerceto(t);
+                         adminTercetos.apilar(t.getNumero());
+                         $$ = new ParserVal($4.sval);
+                     }
+                     else
+                         $$ = new ParserVal(null);
+                   }
+             |error_pre_condicion
+             ;
 
+error_pre_condicion:      ':''('condicion')'   {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Error en una funcion, falta la palabra 'PRE' }");}
+                    | PRE    '('condicion')'    {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Error en una funcion, falta ':' }");}
+                    | PRE ':'   condicion')'     {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Error en una funcion, falta '(' }");}
+                    | PRE ':''('         ')'     {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Error en una funcion, falta la condicion del PRE}");}
+                    | PRE ':''('condicion  error {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Error en una funcion, falta ')'}");}
+                    ;
 
 condicion : expresion { Operando op = (Operando)$1.obj;
                             if(op != null){
