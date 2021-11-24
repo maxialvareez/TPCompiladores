@@ -54,7 +54,7 @@ public class AdministradorTercetos {
     }
     public void imprimirTercetos(){
         for(Terceto t : tercetos)
-            System.out.println(t.getNumero() + ". (" + t.getOperador() + ", " + t.getOperando1() + ", " + t.getOperando2()  + ")");
+            System.out.println(t.getNumero() + ". (" + t.getOperador() + ", " + t.getOperando1() + ", " + t.getOperando2() + ")" );
     }
 
     public void agregarFuncion(String funcion) {

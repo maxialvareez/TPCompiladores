@@ -87,10 +87,10 @@ declaracion : tipo lista_de_variables ';'{System.out.println("[Sintáctico] [Lin
     	        lista_variables.clear();
     	        }
     	    |   tipo funcion ';'
-       	        {
-                Main.tablaSimbolos.getDatos($2.sval).setTipo($1.sval);
-    	        }
+
+
     	    | TYPEDEF IDENTIFICADOR '=' tipo funcion_type ';' {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Declaración de función de definición de tipo llamada '" + $2.sval +"'}");}
+
     	    | error_declaracion
             ;
 
@@ -298,34 +298,52 @@ impresion: PRINT '(' CADENA ')'  {System.out.println("[Sintáctico] [Linea " + L
 
 
 invocacion : IDENTIFICADOR '(' CTE_ULONG ')' {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Invocación a la función '" + $1.sval + "'}");
-                if ($3.sval != null){
+               System.out.println("****************");
+               if ($3.sval != null){
                     String ambitoFuncion= Main.tablaSimbolos.verificarAmbito($1.sval, ambito);
-                    if(ambitoFuncion != null){
+                    System.out.println(Main.tablaSimbolos.getDatos($1.sval).getTipo());
+                    if(ambitoFuncion != null && Main.tablaSimbolos.getDatos($1.sval).getTipo() == "ULONG"){
                         Terceto t = new Terceto("InvocacionFuncion", ambitoFuncion, null);
                         adminTercetos.agregarTerceto(t);
                     }
-                }
+                    else
+                        if(ambitoFuncion == null)
+                            System.out.println("Error semántico: Linea " + Lexico.linea+ " la función "+$1.sval+" esta fuera de alcance");
+                        else
+                            System.out.println("Error semántico: Linea " + Lexico.linea+ " se invocó a la función "+$1.sval+" con un parámetro de otro tipo");
+               }
             }
 
             | IDENTIFICADOR '(' CTE_DOUBLE ')' {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Invocación a la función '" + $1.sval + "'}");
                  if ($3.sval != null){
                     String ambitoFuncion= Main.tablaSimbolos.verificarAmbito($1.sval, ambito);
-                    if(ambitoFuncion != null){
+                    if(ambitoFuncion != null && Main.tablaSimbolos.getDatos($1.sval).getTipo() == "DOUBLE"){
                         Terceto t = new Terceto("InvocacionFuncion", ambitoFuncion, null);
                         adminTercetos.agregarTerceto(t);
                     }
+                    else
+                        if(ambitoFuncion == null)
+                            System.out.println("Error semántico: Linea " + Lexico.linea+ " la función "+$1.sval+" esta fuera de alcance");
+                        else
+                            System.out.println("Error semántico: Linea " + Lexico.linea+ " se invocó a la función "+$1.sval+" con un parámetro de otro tipo");
                 }
             }
 
             |IDENTIFICADOR '(' IDENTIFICADOR ')' {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Invocación a la función '" + $1.sval + "'}");
                  if ($3.sval != null){
                     String ambitoFuncion= Main.tablaSimbolos.verificarAmbito($1.sval, ambito);
-                    if(ambitoFuncion != null){
-                        Terceto t = new Terceto("InvocacionFuncion", ambitoFuncion, null);
-                        adminTercetos.agregarTerceto(t);
+                    if(ambitoFuncion != null && Main.tablaSimbolos.getDatos($1.sval).getTipo() == "ULONG"){
+                        String ambitoParametro = Main.tablaSimbolos.verificarAmbito($3.sval, ambito);
+                        if (ambitoParametro != null){
+                            Terceto t = new Terceto("InvocacionFuncion", ambitoFuncion, null);
+                            adminTercetos.agregarTerceto(t);
+                        }
                     }
                     else
-                        System.out.println("Error semántico: Linea " + Lexico.linea+ " la función "+$1.sval+" esta fuera de alcance");
+                        if(ambitoFuncion == null)
+                            System.out.println("Error semántico: Linea " + Lexico.linea+ " la función "+$1.sval+" esta fuera de alcance");
+                        else
+                            System.out.println("Error semántico: Linea " + Lexico.linea+ " se invocó a la función "+$1.sval+" con un parámetro de otro tipo");
                  }
 
 
@@ -340,7 +358,7 @@ error_invocacion: IDENTIFICADOR '(' ')' {System.out.println("[ERROR SINTÁCTICO]
 		;
 
 try_catch: TRY sentencia_ejecutable CATCH bloque_catch
-           
+
            |error_try_catch
             ;
 
@@ -386,7 +404,7 @@ funcion :  declaracion_funcion bloque_funcion
                  t = new Terceto("FinFuncion", $1.sval, null);
                 adminTercetos.agregarTerceto(t);
                 adminTercetos.desapilar();     //para el PRE
-                $$ = new ParserVal($1.sval);
+                $$ = new ParserVal($2.sval);
             }
             else
                  $$ = new ParserVal(null);
@@ -460,6 +478,7 @@ error_funcion_type:  '(' tipo ')' ';' bloque_type {System.out.println("[ERROR SI
                     ;
 
 bloque_type: IDENTIFICADOR lista_de_variables
+
             ;
 
 

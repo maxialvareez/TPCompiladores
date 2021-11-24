@@ -3,7 +3,7 @@ programita
 ULONG a;
 
 ULONG FUNC f(ULONG x)
-ULONG y, z;
+ULONG y;
 BEGIN
 PRE: (x > 3);
 RETURN (x + 1);
@@ -11,6 +11,6 @@ END;
 
 BEGIN
 a:= 30;
-f(a);
+f(2.0);
 
 END
