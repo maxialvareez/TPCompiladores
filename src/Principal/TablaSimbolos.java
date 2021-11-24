@@ -98,10 +98,6 @@ public class TablaSimbolos {
     }
 
 
-
-
-
-
     public void imprimirTablaSimbolos() {
         Enumeration iterador = simbolos.keys();
         while (iterador.hasMoreElements()) {
@@ -126,6 +122,10 @@ public class TablaSimbolos {
         DatosSimbolo ds = simbolos.get(lexema);
        eliminarSimbolo(lexema);
         simbolos.put(nuevoLexema, ds);
+    }
+
+    public Enumeration getKeys(){
+        return simbolos.keys();
     }
 
 
