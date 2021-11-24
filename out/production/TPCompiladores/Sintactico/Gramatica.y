@@ -89,7 +89,22 @@ declaracion : tipo lista_de_variables ';'{System.out.println("[Sintáctico] [Lin
     	    |   tipo funcion ';'
 
 
-    	    | TYPEDEF IDENTIFICADOR '=' tipo funcion_type ';' {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Declaración de función de definición de tipo llamada '" + $2.sval +"'}");}
+    	    | TYPEDEF IDENTIFICADOR '=' tipo funcion_type ';' {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Declaración de función de definición de tipo llamada " + $2.sval +"'}");
+    	        System.out.println("*************** "+ $5.sval);
+    	        if ($5.sval.equals($2.sval)){
+    	            String nuevoLexema = $2.sval+ "@" + ambito;
+    	            if (!Main.tablaSimbolos.existeLexema(nuevoLexema)){
+                        Main.tablaSimbolos.reemplazarLexema($2.sval, nuevoLexema);
+                        DatosSimbolo ds = Main.tablaSimbolos.getDatos(nuevoLexema);
+                        ds.setUso("TypeDef");
+                        ds.setTipo($4.sval);
+                        Main.tablaSimbolos.setDatosSimbolo(nuevoLexema, ds);
+                    }
+    	        }
+                else
+                    System.out.println("[ERROR SEMÁNTICO] [Linea " + Lexico.linea + "] {" + $1.sval + " y " + $5.sval +" deben tener el mismo nombre}");
+
+    	        }
 
     	    | error_declaracion
             ;
@@ -395,17 +410,24 @@ error_lista_de_variables: lista_de_variables IDENTIFICADOR {System.out.println("
 
 funcion :  declaracion_funcion bloque_funcion
          {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Declaración de función llamada '"+ $2.sval +"'" );
-            if($1.sval != null && $1.sval != null ){ //si se declaró bien y se cumplen los PRE (en caso de haberlos)
-                ambito = ambito.substring(0,ambito.lastIndexOf("@"));
+            if($1.sval != null && $2.sval != null ){ //si se declaró bien y se cumplen los PRE (en caso de haberlos)
+                if ($2.sval.equals("PRE")){
+                   ambito = ambito.substring(0,ambito.lastIndexOf("@"));
 
-                Terceto t = new Terceto("RetornoFuncion", $2.sval, null);
-                adminTercetos.agregarTerceto(t);
+                    Terceto t = new Terceto("RetornoFuncion", $2.sval, null);
+                    adminTercetos.agregarTerceto(t);
 
-                 t = new Terceto("FinFuncion", $1.sval, null);
-                adminTercetos.agregarTerceto(t);
-                adminTercetos.desapilar();     //para el PRE
-                $$ = new ParserVal($2.sval);
+                     t = new Terceto("FinFuncion", $1.sval, null);
+                    adminTercetos.agregarTerceto(t);
+                    adminTercetos.desapilar();     //para el PRE
+                    $$ = new ParserVal($2.sval);
             }
+                else {
+                    ambito = ambito.substring(0,ambito.lastIndexOf("@"));
+                    Terceto t = new Terceto("RetornoFuncion", $2.sval, null);
+                    adminTercetos.agregarTerceto(t);
+            }
+           }
             else
                  $$ = new ParserVal(null);
          }
@@ -465,7 +487,17 @@ error_parametro :  tipo error {System.out.println("[ERROR SINTÁCTICO] [Linea " 
 		 ;
 
 
-funcion_type: FUNC '(' tipo ')' ';' bloque_type
+funcion_type: FUNC '(' tipo ')' ';' bloque_type{
+           System.out.println("Bloque type: " + $6.sval + "****************");
+            if ($3.sval != null && $6.sval != null){
+
+                   System.out.println("Le paso al principal: " + $6.sval + "****************");
+                    $$ = new ParserVal($6.sval);
+                 }
+
+            else
+                $$ = new ParserVal(null);
+    }
             |error_funcion_type
             ;
 
@@ -477,7 +509,25 @@ error_funcion_type:  '(' tipo ')' ';' bloque_type {System.out.println("[ERROR SI
                     |FUNC '(' tipo ')' ';' error  {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Función TYPE mal declarada, falta un el bloque de dicha función}");}
                     ;
 
-bloque_type: IDENTIFICADOR lista_de_variables
+bloque_type: IDENTIFICADOR lista_de_variables{
+    	        lista_variables = (ArrayList<String>)$2.obj;
+    	        for(String lexema: lista_variables){
+                    String nuevoLexema = lexema + "@" + ambito;
+                    if (!Main.tablaSimbolos.existeLexema(nuevoLexema)){
+                        Main.tablaSimbolos.reemplazarLexema(lexema, nuevoLexema);
+                        DatosSimbolo ds = Main.tablaSimbolos.getDatos(nuevoLexema);
+                        ds.setUso("VariableTypeDef");
+                        ds.setTipo($1.sval);
+                        Main.tablaSimbolos.setDatosSimbolo(nuevoLexema, ds);
+                    }
+                    else{
+                        System.out.println("[ERROR SEMÁNTICO] [Linea " + Lexico.linea + "] {Ya se declaró la variable de función " + lexema + " en este ámbito}");
+                        Main.tablaSimbolos.eliminarSimbolo(lexema);
+
+                    }
+                }
+                $$ = new ParserVal ($1.sval);
+}
 
             ;
 
@@ -504,7 +554,7 @@ error_bloque_funcion : bloque_declarativo error {System.out.println("[ERROR SINT
 
 bloque_ejecucion_funcion : BEGIN bloque_sentencias RETURN '('condicion')' ';' END{
                         if ($2.sval != null && $5.sval != null){
-                            $$ = new ParserVal ($5.sval);
+                            $$ = new ParserVal ("SINPRE");
                         }
                         else
                             $$ = new ParserVal (null);
@@ -512,14 +562,14 @@ bloque_ejecucion_funcion : BEGIN bloque_sentencias RETURN '('condicion')' ';' EN
 
 			 | BEGIN pre_condicion ';' bloque_sentencias RETURN '('condicion')' ';' END {
 			            if ($2.sval != null && $7.sval != null){
-			                $$ = new ParserVal ($7.sval);
+			                $$ = new ParserVal ("PRE");
 			            }
 			            else
 			                $$ = new ParserVal (null);
 			 }
 			 | BEGIN pre_condicion ';' RETURN '('condicion')' ';' END{
                         if ($2.sval != null && $6.sval != null){
-                            $$ = new ParserVal ($6.sval);
+                            $$ = new ParserVal ("PRE");
                         }
                         else
                              $$ = new ParserVal (null);

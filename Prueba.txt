@@ -1,16 +1,15 @@
-programita
 
-ULONG a;
+programa
+ULONG A;
 
-ULONG FUNC f(ULONG x)
-ULONG y;
+ULONG FUNC f1 (DOUBLE A)
+ULONG s,f;
 BEGIN
-PRE: (x > 3);
-RETURN (x + 1);
+a := f;
+RETURN (A);
 END;
 
 BEGIN
-a:= 30;
-f(2.0);
 
+A:=1;
 END

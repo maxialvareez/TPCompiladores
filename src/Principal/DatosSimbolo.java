@@ -4,7 +4,7 @@ public class DatosSimbolo {
     private int id;  // Para buscar en palabras reservadas
     private String tipo;
     private String uso;  //indica a que hace referencia un identificador (podria ser una funcion, una variable)
-
+    private String funcionReferenciada;
     //dudas
     private boolean parametroRef;
 
@@ -14,6 +14,7 @@ public class DatosSimbolo {
         this.tipo = null;
         this.uso = null;
         this.parametroRef = false;
+        this.funcionReferenciada = "";
     }
 
     public int getId() {
