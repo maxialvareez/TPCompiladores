@@ -72,7 +72,6 @@ public class Terceto {
         return this;
     }
 
-    //para pasar a Assembler
     public boolean esVariable(int op) {
         if (op == 1)
             return !operando1.contains("]");
