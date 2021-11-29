@@ -86,7 +86,9 @@ declaracion : tipo lista_de_variables ';'{System.out.println("[Sintáctico] [Lin
     	        }
     	        lista_variables.clear();
     	        }
-    	    |   tipo funcion ';'
+    	    |  funcion ';'
+
+
 
 
     	    | TYPEDEF IDENTIFICADOR '=' tipo funcion_type ';' {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Declaración de función de definición de tipo llamada " + $2.sval +"'}");
@@ -111,8 +113,7 @@ declaracion : tipo lista_de_variables ';'{System.out.println("[Sintáctico] [Lin
 
 
 error_declaracion : tipo lista_de_variables error {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Sentencia mal declarada, falta ';'}");}
-           	  | tipo funcion error {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Sentencia mal declarada, falta ';'}");}
-           	  | funcion ';' {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Falta indicar el tipo de la función " + $1.sval + "}");}
+           	  | funcion error {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Sentencia mal declarada, falta ';'}");}
            	  ;
 
 
@@ -132,6 +133,8 @@ control : REPEAT'(' asignacion_repeat ';'condicion_repeat';' CTE_ULONG')' bloque
             adminTercetos.agregarTerceto(t);
             adminTercetos.desapilar(); //para completar BF
             adminTercetos.desapilarRepeat();
+            t = new Terceto("Label"+adminTercetos.cantidadTercetos(),null,null);
+            adminTercetos.agregarTerceto(t);
         }
     }
 
@@ -154,6 +157,9 @@ asignacion_repeat: IDENTIFICADOR ASIGNACION CTE_ULONG {System.out.println("[Sint
                         String tipoIdentificador = Main.tablaSimbolos.getDatos(ambitoVariable).getTipo();
                         if(tipoIdentificador.equals("ULONG")){
                             Terceto t = new Terceto(":=", ambitoVariable, $3.sval);
+                            t.setTipo("ULONG");
+                            adminTercetos.agregarTerceto(t);
+                            t = new Terceto("Label"+adminTercetos.cantidadTercetos(), null, null);
                             t.setTipo("ULONG");
                             adminTercetos.agregarTerceto(t);
                             adminTercetos.apilar(t.getNumero());
@@ -235,26 +241,38 @@ error_asignacion : ASIGNACION termino {System.out.println("[ERROR SINTÁCTICO] [
 		  ;
 
 
-seleccion: IF condicion_if  THEN bloque_then ENDIF {
+seleccion: IF condicion_if THEN bloque_if ENDIF {
             if($2.sval != null){
                 adminTercetos.desapilar();
+                Terceto t = new Terceto("Label"+Integer.toString(adminTercetos.cantidadTercetos()), null, null);
+                adminTercetos.agregarTerceto(t);
                 }
             }
-	 | IF  condicion_if  THEN bloque_then ELSE bloque_if ENDIF{
+
+	 | IF  condicion_if  THEN bloque_if{
 	        if($2.sval != null){
-                 adminTercetos.desapilar();
-                 }
-	 }
+                Terceto t = new Terceto("BI", null, null);
+                adminTercetos.agregarTerceto(t);
+                adminTercetos.desapilar();
+                Terceto t1 = new Terceto("Label"+Integer.toString(adminTercetos.cantidadTercetos()), null, null);
+                adminTercetos.agregarTerceto(t1);
+                adminTercetos.apilar(t.getNumero());
+            }
+            }
+            ELSE bloque_if ENDIF{
+                if($2.sval != null) {
+                   adminTercetos.desapilar();
+                   Terceto t = new Terceto("Label"+Integer.toString(adminTercetos.cantidadTercetos()), null, null);
+                   adminTercetos.agregarTerceto(t);
+            }
+       }
 	 | error_seleccion
 	 ;
 
 
 condicion_if: '(' condicion ')'
               {
-
-                System.out.println("ENTRO A CONDICION *****************************");
                 if($2.sval != null){
-                    System.out.println("ENTRO AL IF *****************************");
                     Terceto t = new Terceto("BF", $2.sval, null);
                     adminTercetos.agregarTerceto(t);
                     adminTercetos.apilar(t.getNumero());
@@ -269,17 +287,6 @@ condicion_if: '(' condicion ')'
 error_condicion_if:  '(' condicion error {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {IF mal declarado, falta un parentesis en la condicion'}");}
                    ;
 
-bloque_then: bloque_if {
-                adminTercetos.desapilar(); //para completar BF
-                Terceto t = new Terceto("BI", null, null);
-                adminTercetos.agregarTerceto(t);
-                adminTercetos.apilar(t.getNumero());
-
-            }
-            ;
-
-
-
 bloque_if : sentencia_ejecucion
             | BEGIN sentencia_ejecucion bloque_sentencias END ';'
             | error_bloque_if
@@ -290,14 +297,16 @@ error_bloque_if: BEGIN sentencia_ejecucion END ';' {System.out.println("[ERROR S
                 | BEGIN sentencia_ejecucion END error {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Selección mal declarada: una sola sentencia de ejecución entre un BEGIN y END, y falta ';' después del END}");}
                 ;
 
-error_seleccion :    condicion_if  THEN bloque_then ENDIF {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Selección mal declarada, falta el IF}");}
-		| IF          THEN  bloque_then ENDIF {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {IF mal declarado, falta la condición}");}
-		| IF  condicion_if       bloque_then ENDIF {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {IF mal declarado, falta el THEN}");}
-		| IF  condicion_if  THEN              ENDIF {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {IF mal declarado, falta el bloque de sentencias}");}
-		| IF  condicion_if  THEN bloque_then error {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {IF mal declarado, falta el ENDIF o ELSE}");}
-		| IF  condicion_if  THEN  bloque_then  ELSE                 ENDIF{System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {IF mal declarado, falta el bloque de sentencias del ELSE}");}
-		| IF  condicion_if  THEN  bloque_then  ELSE bloque_if error{System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {IF mal declarado, falta el ENDIF}");}
-		;
+error_seleccion :     condicion_if  THEN  bloque_if ENDIF {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Selección mal declarada, falta el IF}");}
+                | IF                THEN  bloque_if ENDIF {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {IF mal declarado, falta la condición}");}
+                | IF  condicion_if        bloque_if ENDIF {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {IF mal declarado, falta el THEN}");}
+                | IF  condicion_if  THEN            ENDIF {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {IF mal declarado, falta el bloque de sentencias}");}
+                | IF  condicion_if  THEN  bloque_if error {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {IF mal declarado, falta el bloque de sentencias}");}
+
+                | IF  condicion_if  THEN  bloque_if bloque_if ELSE           ENDIF {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {IF mal declarado, falta el ENDIF o ELSE}");}
+	            | IF  condicion_if  THEN  bloque_if bloque_if ELSE bloque_if error {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {IF mal declarado, falta el ENDIF o ELSE}");}
+
+	            ;
 
 
 impresion: PRINT '(' CADENA ')'  {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Impresión : '" + $3.sval  + "'}");
@@ -313,19 +322,23 @@ impresion: PRINT '(' CADENA ')'  {System.out.println("[Sintáctico] [Linea " + L
 
 
 invocacion : IDENTIFICADOR '(' CTE_ULONG ')' {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Invocación a la función '" + $1.sval + "'}");
-               System.out.println("****************");
+
                if ($3.sval != null){
                     String ambitoFuncion= Main.tablaSimbolos.verificarAmbito($1.sval, ambito);
-                    System.out.println(Main.tablaSimbolos.getDatos($1.sval).getTipo());
                     if(ambitoFuncion != null && Main.tablaSimbolos.getDatos($1.sval).getTipo() == "ULONG"){
                         Terceto t = new Terceto("InvocacionFuncion", ambitoFuncion, null);
                         adminTercetos.agregarTerceto(t);
+                        $$ = new ParserVal(ambitoFuncion);
                     }
                     else
-                        if(ambitoFuncion == null)
+                        if(ambitoFuncion == null){
                             System.out.println("Error semántico: Linea " + Lexico.linea+ " la función "+$1.sval+" esta fuera de alcance");
-                        else
+                            $$ = new ParserVal(null);
+                        }
+                        else{
                             System.out.println("Error semántico: Linea " + Lexico.linea+ " se invocó a la función "+$1.sval+" con un parámetro de otro tipo");
+                            $$ = new ParserVal(null);
+                        }
                }
             }
 
@@ -335,30 +348,39 @@ invocacion : IDENTIFICADOR '(' CTE_ULONG ')' {System.out.println("[Sintáctico] 
                     if(ambitoFuncion != null && Main.tablaSimbolos.getDatos($1.sval).getTipo() == "DOUBLE"){
                         Terceto t = new Terceto("InvocacionFuncion", ambitoFuncion, null);
                         adminTercetos.agregarTerceto(t);
+                         $$ = new ParserVal(ambitoFuncion);
                     }
                     else
-                        if(ambitoFuncion == null)
+                        if(ambitoFuncion == null){
                             System.out.println("Error semántico: Linea " + Lexico.linea+ " la función "+$1.sval+" esta fuera de alcance");
-                        else
+                             $$ = new ParserVal(null);
+                        }
+                        else{
                             System.out.println("Error semántico: Linea " + Lexico.linea+ " se invocó a la función "+$1.sval+" con un parámetro de otro tipo");
+                             $$ = new ParserVal(null);
+                        }
                 }
             }
 
             |IDENTIFICADOR '(' IDENTIFICADOR ')' {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Invocación a la función '" + $1.sval + "'}");
                  if ($3.sval != null){
                     String ambitoFuncion= Main.tablaSimbolos.verificarAmbito($1.sval, ambito);
-                    if(ambitoFuncion != null && Main.tablaSimbolos.getDatos($1.sval).getTipo() == "ULONG"){
+                    if(ambitoFuncion != null && Main.tablaSimbolos.getDatos($1.sval).getTipo() == Main.tablaSimbolos.getDatos($3.sval).getTipo()){
                         String ambitoParametro = Main.tablaSimbolos.verificarAmbito($3.sval, ambito);
                         if (ambitoParametro != null){
                             Terceto t = new Terceto("InvocacionFuncion", ambitoFuncion, null);
                             adminTercetos.agregarTerceto(t);
+                             $$ = new ParserVal($1.sval);
                         }
                     }
                     else
-                        if(ambitoFuncion == null)
+                        if(ambitoFuncion == null){
                             System.out.println("Error semántico: Linea " + Lexico.linea+ " la función "+$1.sval+" esta fuera de alcance");
-                        else
+                            $$ = new ParserVal(null);
+                        }
+                        else{
                             System.out.println("Error semántico: Linea " + Lexico.linea+ " se invocó a la función "+$1.sval+" con un parámetro de otro tipo");
+                        }
                  }
 
 
@@ -372,16 +394,29 @@ error_invocacion: IDENTIFICADOR '(' ')' {System.out.println("[ERROR SINTÁCTICO]
 		| IDENTIFICADOR '('IDENTIFICADOR error {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Invocación de función mal declarada, falta el ')'}");}
 		;
 
-try_catch: TRY sentencia_ejecutable CATCH bloque_catch
-
+try_catch: parte_try CATCH bloque_catch{adminTercetos.desapilar();
+                                        Terceto t = new Terceto("Label"+Integer.toString(adminTercetos.cantidadTercetos()), null, null);
+                                        adminTercetos.agregarTerceto(t);}
            |error_try_catch
             ;
 
 
+parte_try: TRY sentencia_ejecutable {
+                                      Terceto t = new Terceto("BI", null, null);
+                                      adminTercetos.agregarTerceto(t);
+                                      adminTercetos.desapilar();
+                                      Terceto t1 = new Terceto("Label"+Integer.toString(adminTercetos.cantidadTercetos()), null, null);
+                                      adminTercetos.agregarTerceto(t1);
+                                      adminTercetos.apilar(t.getNumero());
+}
+            | error_parte_try;
+            ;
 
-error_try_catch:    TRY  CATCH bloque_catch  {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Falta la  sentencia ejecutable después del TRY}");}
-                   | TRY sentencia_ejecutable bloque_catch  {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Falta la palabra CATCH}");}
-                   | TRY sentencia_ejecutable CATCH error {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Falta el bloque de sentencias ejecutables despues del CATCH}");}
+error_parte_try: TRY error {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Falta la  sentencia ejecutable después del TRY}");}
+                ;
+
+error_try_catch:   parte_try bloque_catch  {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Falta la palabra CATCH}");}
+                   | parte_try CATCH error {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Falta el bloque de sentencias ejecutables despues del CATCH}");}
                    | TRY try_catch CATCH bloque_catch {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {No se permiten Try y Catch anidados}");}
                    ;
 
@@ -419,13 +454,14 @@ funcion :  declaracion_funcion bloque_funcion
 
                      t = new Terceto("FinFuncion", $1.sval, null);
                     adminTercetos.agregarTerceto(t);
-                    adminTercetos.desapilar();     //para el PRE
-                    $$ = new ParserVal($2.sval);
+
+                    $$ = new ParserVal($1.sval);
             }
                 else {
                     ambito = ambito.substring(0,ambito.lastIndexOf("@"));
-                    Terceto t = new Terceto("RetornoFuncion", $2.sval, null);
+                    Terceto t = new Terceto("RetornoFuncion", $1.sval, null);
                     adminTercetos.agregarTerceto(t);
+                    $$ = new ParserVal($1.sval);
             }
            }
             else
@@ -437,17 +473,18 @@ funcion :  declaracion_funcion bloque_funcion
 error_funcion : declaracion_funcion   error   {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Función mal declarada, falta bloque de sentencias}");}
 	      ;
 
-declaracion_funcion: FUNC IDENTIFICADOR'('parametro')'{
-                    parametroCopiaValor = $4.sval;
+declaracion_funcion: tipo FUNC IDENTIFICADOR'('parametro')'{
+                    parametroCopiaValor = $5.sval;
                     if (!parametroCopiaValor.equals("")){
-                        String nuevoLexema = $2.sval + "@" + ambito;
+                        String nuevoLexema = $3.sval + "@" + ambito;
                         if (!Main.tablaSimbolos.existeLexema(nuevoLexema)){
-                            Main.tablaSimbolos.reemplazarLexema($2.sval, nuevoLexema);
+                            Main.tablaSimbolos.reemplazarLexema($3.sval, nuevoLexema);
                             DatosSimbolo ds = Main.tablaSimbolos.getDatos(nuevoLexema);
                             ds.setUso("NombreFuncion");
+                            ds.setTipo($1.sval);
                             Main.tablaSimbolos.setDatosSimbolo(nuevoLexema, ds);
 
-                            ambito = ambito + "@" + $2.sval;
+                            ambito = ambito + "@" + $3.sval;
                             Main.tablaSimbolos.reemplazarLexema(parametroCopiaValor, parametroCopiaValor +"@"+ ambito); // Se agrega el ambito al parametro (nombre de la función)
 
                             Terceto t = new Terceto("ComienzaFuncion", nuevoLexema, null);
@@ -457,7 +494,7 @@ declaracion_funcion: FUNC IDENTIFICADOR'('parametro')'{
                             $$ = new ParserVal(nuevoLexema);
                         }
                         else{
-                            System.out.println("[ERROR SEMÁNTICO] [Linea " + Lexico.linea + "] {La funcion '" + $2.sval + "' ya fue declarada en este ámbito}");
+                            System.out.println("[ERROR SEMÁNTICO] [Linea " + Lexico.linea + "] {La funcion '" + $3.sval + "' ya fue declarada en este ámbito}");
                             $$ = new ParserVal(null);  // se setea null para luego comprobar si se declaró o no
                         }
                     }
@@ -466,11 +503,12 @@ declaracion_funcion: FUNC IDENTIFICADOR'('parametro')'{
                     |error_declaracion_funcion
                     ;
 
-error_declaracion_funcion:    IDENTIFICADOR'('parametro')'     {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Función mal declarada, falta la palabra FUNC}");}
-                           |FUNC           '('parametro')'     {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Función mal declarada, falta el nombre}");}
-                           | FUNC IDENTIFICADOR parametro')'    {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Función mal declarada, falta '(' }");}
-                           | FUNC IDENTIFICADOR'('       ')'    {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Función mal declarada, falta el parámetro}");}
-                           | FUNC IDENTIFICADOR'('parametro  error {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Función mal declarada, falta ')'}");}
+error_declaracion_funcion:        FUNC IDENTIFICADOR'('parametro')'     {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Función mal declarada, falta indicar el tipo}");}
+                           |tipo   IDENTIFICADOR'('parametro')'     {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Función mal declarada, falta la palabra FUNC}");}
+                           |tipo FUNC           '('parametro')'     {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Función mal declarada, falta el nombre}");}
+                           |tipo FUNC IDENTIFICADOR parametro')'    {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Función mal declarada, falta '(' }");}
+                           |tipo FUNC IDENTIFICADOR'('       ')'    {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Función mal declarada, falta el parámetro}");}
+                           |tipo  FUNC IDENTIFICADOR'('parametro  error {System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Función mal declarada, falta ')'}");}
                            ;
 
 parametro : tipo IDENTIFICADOR{
@@ -804,7 +842,10 @@ factor 	:  '-' factor  { if (chequearFactorNegado()){
                         $$ = new ParserVal(null);
 	                }
 	          }
-	    | invocacion
+	    | invocacion    {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Invocacion de funcion}");
+                       String ambitoVariable = Main.tablaSimbolos.verificarAmbito($1.sval, ambito);
+                       $$ = new ParserVal(new Operando(Main.tablaSimbolos.getDatos(ambitoVariable).getTipo(), ambitoVariable));
+                       }
         ;
 
 
