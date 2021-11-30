@@ -1,23 +1,7 @@
 
-pruebaTryCatch
-ULONG x,z;
-
-DOUBLE FUNC f (ULONG a)
-ULONG y;
+prueba
+ULONG a,b;
 BEGIN
-PRE: (a >3);
-RETURN (a+1);
-END;
-
-BEGIN
-
-TRY
-x := f(z) + 4;
-CATCH
-BEGIN
-x := 10;
-END;
-
-z:=6;
-
+a:= b;
+PRINT(%hola%);
 END

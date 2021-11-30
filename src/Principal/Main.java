@@ -2,6 +2,7 @@ package Principal;
 import java.io.*;
 
 import CodigoIntermedio.AdministradorTercetos;
+import CodigoIntermedio.Assembler;
 import Sintactico.*;
 public class Main {
 
@@ -50,21 +51,23 @@ public class Main {
 
         //-------------- FIN CARGA DE ARCHIVO --------------
 
-        Lexico l1 = new Lexico(codigo);
         AdministradorTercetos adminTercetos = new AdministradorTercetos();
-
+        Lexico l1 = new Lexico(codigo);
 
 
         Parser p = new Parser(l1, adminTercetos);
         p.run();
 
+        tablaSimbolos.eliminarVariablesRepetidas();
+        adminTercetos.generarCodigoIntermedio();
 /*
         Token t = l1.getToken();
         while (t.getId() != 0){
             l1.getToken();
         }
  */
-
+        Assembler assembler = new Assembler(adminTercetos);
+        assembler.generarAssembler();
 
 
         System.out.println("\n------ CÓDIGO INTERMEDIO ------");
@@ -72,6 +75,8 @@ public class Main {
 
         System.out.println("\n -----TABLA DE SIMBOLOS------");
         tablaSimbolos.imprimirTablaSimbolos();
+
+
 
     }
 }

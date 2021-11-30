@@ -103,10 +103,9 @@ public class TablaSimbolos {
         while (iterador.hasMoreElements()) {
             String lexema = (String) iterador.nextElement();
             DatosSimbolo ds = simbolos.get(lexema);
-            if(lexema.contains("@") || (!lexema.contains("@") && simbolos.get(lexema).getId() != 257)) {
+
                 System.out.println("Lexema: " + lexema + ", id: " + ds.getId() + ", tipo: " + ds.getTipo() + ", uso: " + ds.getUso());
 
-            }
         }
     }
 
@@ -120,10 +119,17 @@ public class TablaSimbolos {
 
     public void reemplazarLexema(String lexema, String nuevoLexema){
         DatosSimbolo ds = simbolos.get(lexema);
-       eliminarSimbolo(lexema);
+        eliminarSimbolo(lexema);
         simbolos.put(nuevoLexema, ds);
     }
-
+    public void eliminarVariablesRepetidas(){
+        Enumeration iterador = simbolos.keys();
+        while (iterador.hasMoreElements()) {
+            String lexema = (String) iterador.nextElement();
+            if(!(lexema.contains("@") || (!lexema.contains("@") && simbolos.get(lexema).getId() != 257) || lexema.contains("var")))
+                simbolos.remove(lexema);
+        }
+    }
     public Enumeration getKeys(){
         return simbolos.keys();
     }
