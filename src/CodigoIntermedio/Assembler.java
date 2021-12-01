@@ -13,7 +13,7 @@ public class Assembler {
     private ArrayList<ArrayList<Terceto>> codigoIntermedio; // ArrayList de ArrayList
     private AdministradorTercetos administradorTerceto;
     private static final int limiteInferiorULONG = 0;
-    private static final long limiteSuperiorULONG= Long.parseUnsignedLong("4294967295");
+    private static final long limiteSuperiorULONG= Long.parseUnsignedLong("100");
 
 
 
@@ -75,7 +75,7 @@ public class Assembler {
 
                 case (Lexico.CADENA):
                     String cadena = lexema;
-                    data = data + "_" + cadena + " DB " + lexema + ", 0 \n";
+                    data = data + "_" + cadena + " DB '" + lexema + "', 0 \n";
                     break;
 
                 case (Lexico.CTE_DOUBLE):
@@ -111,12 +111,14 @@ public class Assembler {
                             if (t.getTipo().equals("ULONG")) {
                                 code += "MOV EBX, _" + t.getOperando1() + '\n';
                                 code += "ADD EBX, _" + t.getOperando2() + '\n';
-                                code += "MOV _var" + t.getNumero() + ", EBX" + '\n';
-
-                                code += "CMP _var"+ t.getNumero() + ", _limiteSuperiorUint" + '\n';
+                                code += "CMP EBX, _limiteSuperiorULONG" + '\n';
                                 code += "JA " + "LabelOverflowSuma" + '\n';
-                                Main.tablaSimbolos.agregarSimbolo("var" + t.getNumero(), Lexico.IDENTIFICADOR, "ULONG", "Variable");
+                                code += "MOV _var"+ t.getNumero() +", EBX"+  '\n';
                                 t.setResultado("var" + t.getNumero());
+                                Main.tablaSimbolos.agregarSimbolo("var" + t.getNumero(), Lexico.IDENTIFICADOR, "ULONG", "Variable");
+
+
+
 
                             }
                             if (t.getTipo().equals("DOUBLE")) {
@@ -152,8 +154,6 @@ public class Assembler {
                             }
                             if (t.getTipo().equals("DOUBLE")) {
                                 String op2 = t.getOperando2();
-
-
                                 op2 = t.getOperando2().replace('.', '_');
                                 op2 = op2.replace('-', '_');
                                 op2 = op2.replace("+", "__");
@@ -161,8 +161,9 @@ public class Assembler {
                                 String numeroTerceto = t.getOperando1().substring(1, t.getOperando1().lastIndexOf("]"));
                                 Terceto t1 = administradorTerceto.getTerceto(Integer.parseInt(numeroTerceto));
 
-                                // TODO esPuntero??
-                                // TODO set resultado y agregar a la tabla de simbolos.
+                                code += "FSTP _" + "var" + t.getNumero() + '\n';
+                                t.setResultado("var" + t.getNumero());
+                                Main.tablaSimbolos.agregarSimbolo("var" + t.getNumero(), Lexico.IDENTIFICADOR, "DOUBLE", "Variable");
                             }
                         }
 
@@ -170,17 +171,27 @@ public class Assembler {
 
                         if (!t.esVariable(1) && !t.esVariable(2)) {
                             if (t.getTipo().equals("ULONG")) {
-                                //TODO
+                                String nroTerceto1 = t.getOperando1().substring(1, t.getOperando1().lastIndexOf("]"));
+                                Terceto t1 = administradorTerceto.getTerceto(Integer.parseInt(nroTerceto1));
+
+                                String nroTerceto2 = t.getOperando2().substring(1, t.getOperando2().lastIndexOf("]"));
+                                Terceto t2 = administradorTerceto.getTerceto(Integer.parseInt(nroTerceto2));
+
+                                code += "ADD " + t1.getResultado() + ", " + t2.getResultado() + '\n';
+                                code += "CMP " + t1.getResultado() + ", _limiteSuperiorUint" + '\n';
+                                code += "JA " + "LabelOverflowSuma" + '\n';
+                                t.setResultado(t1.getResultado());
                             }
                             if (t.getTipo().equals("DOUBLE")) {
-
                                 String numeroTerceto1 = t.getOperando1().substring(1, t.getOperando1().lastIndexOf("]"));
                                 Terceto t1 = administradorTerceto.getTerceto(Integer.parseInt(numeroTerceto1));
-
                                 String numeroTerceto2 = t.getOperando2().substring(1, t.getOperando2().lastIndexOf("]"));
                                 Terceto t2 = administradorTerceto.getTerceto(Integer.parseInt(numeroTerceto2));
-
-                                //TODO agregar code y a la tabla de simbolos
+                                code += "FLD _" + t1.getResultado() + '\n';
+                                code += "FADD _" + t2.getResultado() + '\n';
+                                code += "FSTP _" + "var" + t.getNumero() + '\n';
+                                t.setResultado("var" + t.getNumero());
+                                Main.tablaSimbolos.agregarSimbolo("var" + t.getNumero(), Lexico.IDENTIFICADOR, "DOUBLE", "Variable");
                             }
                         }
 
@@ -188,7 +199,13 @@ public class Assembler {
 
                         if (t.esVariable(1) && !t.esVariable(2)) {
                             if (t.getTipo().equals("ULONG")) {
-                                //TODO
+                                String nroTerceto = t.getOperando2().substring(1, t.getOperando2().lastIndexOf("]"));
+                                Terceto t1 = administradorTerceto.getTerceto(Integer.parseInt(nroTerceto));
+
+                                code += "CMP " + t1.getResultado() + ", _limiteSuperiorULONG" + '\n';
+                                code += "JA " + "LabelOverflowSuma" + '\n';
+                                t.setResultado(t1.getResultado());
+
                             }
                             if (t.getTipo().equals("DOUBLE")) {
 
@@ -201,7 +218,10 @@ public class Assembler {
                                 String numeroTerceto = t.getOperando2().substring(1, t.getOperando2().lastIndexOf("]"));
                                 Terceto t1 = administradorTerceto.getTerceto(Integer.parseInt(numeroTerceto));
 
-                                //TODO code y agregar a la tabla de simbolos
+                                code += "FADD _" + t1.getResultado() + '\n';
+                                code += "FSTP _" + "var" + t.getNumero() + '\n';
+                                t.setResultado("var" + t.getNumero());
+                                Main.tablaSimbolos.agregarSimbolo("var" + t.getNumero(), Lexico.IDENTIFICADOR, "DOUBLE", "variable");
                             }
                         }
 
@@ -215,7 +235,14 @@ public class Assembler {
 
                         if (t.esVariable(1) && t.esVariable(2)) {
                             if (t.getTipo().equals("ULONG")) {
+                                code += "MOV EBX, _" + t.getOperando1() + '\n';
+                                code += "SUB EBX, _" + t.getOperando2() + '\n';
+                                code += "MOV _var" + t.getNumero() + ", EBX" + '\n';
 
+                                code += "CMP _var"+ t.getNumero() + ", _limiteSuperiorUint" + '\n';
+                                code += "JA " + "LabelOverflowSuma" + '\n';
+                                Main.tablaSimbolos.agregarSimbolo("var" + t.getNumero(), Lexico.IDENTIFICADOR, "ULONG", "Variable");
+                                t.setResultado("var" + t.getNumero());
                             }
 
                             if (t.getTipo().equals("DOUBLE")) {
@@ -377,8 +404,9 @@ public class Assembler {
                             if (t.getTipo().equals("ULONG")) {
                                 String nroTerceto = t.getOperando2().substring(1, t.getOperando2().lastIndexOf("]"));
                                 Terceto t1 = administradorTerceto.getTerceto(Integer.parseInt(nroTerceto));
-                                code += "MOV _" + t.getOperando1() + ", " + t1.getResultado() + '\n';
-                                //this.marcarRegLibre(t1.getResultado());
+                                code += "MOV EBX, _" + t1.getResultado() + '\n';
+                                code += "MOV _" + t.getOperando1() + ", EBX" + '\n';
+
                             }
 
                             if (t.getTipo().equals("DOUBLE")) {
