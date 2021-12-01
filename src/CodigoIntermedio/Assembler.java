@@ -15,9 +15,7 @@ public class Assembler {
     private static final int limiteInferiorULONG = 0;
     private static final long limiteSuperiorULONG= Long.parseUnsignedLong("100");
 
-
-
-    private Hashtable<String, String> varAuxPunteros = new Hashtable<>(); // TODO ver si se usa.
+    //private Hashtable<String, String> varAuxPunteros = new Hashtable<>(); // TODO ver si se usa.
 
     public Assembler(AdministradorTercetos administradorTerceto) {
         this.codigoIntermedio = administradorTerceto.getCodigoIntermedio();
@@ -109,21 +107,20 @@ public class Assembler {
 
                         if (t.esVariable(1) && t.esVariable(2)) {
                             if (t.getTipo().equals("ULONG")) {
-                                code += "MOV EBX, _" + t.getOperando1() + '\n';
-                                code += "ADD EBX, _" + t.getOperando2() + '\n';
-                                code += "CMP EBX, _limiteSuperiorULONG" + '\n';
-                                code += "JA " + "LabelOverflowSuma" + '\n';
-                                code += "MOV _var"+ t.getNumero() +", EBX"+  '\n';
-                                t.setResultado("var" + t.getNumero());
-                                Main.tablaSimbolos.agregarSimbolo("var" + t.getNumero(), Lexico.IDENTIFICADOR, "ULONG", "Variable");
-
-
-
-
+                                // [+,A,B]
+                                code += "MOV EBX, _" + t.getOperando1() + '\n'; // A a EBX
+                                code += "ADD EBX, _" + t.getOperando2() + '\n'; // Sumo B a A en EBX
+                                code += "CMP EBX, _limiteSuperiorULONG" + '\n'; // Comparo que no exceda el rango.
+                                code += "JA " + "LabelOverflowSuma" + '\n'; // Si excede salto.
+                                code += "MOV _var"+ t.getNumero() +", EBX"+  '\n'; // Muevo a la variable.
+                                t.setResultado("var" + t.getNumero()); // Seteo el resultado en el terceto.
+                                Main.tablaSimbolos.agregarSimbolo("var" + t.getNumero(), Lexico.IDENTIFICADOR, "ULONG", "Variable"); // Agrego la variable a tabla de simbolos.
                             }
                             if (t.getTipo().equals("DOUBLE")) {
+
                                 String op1 = t.getOperando1();
                                 String op2 = t.getOperando2();
+
                                 op1 = t.getOperando1().replace('.', '_');
                                 op1 = op1.replace('-', '_');
                                 op1 = op1.replace("+", "__");
@@ -146,11 +143,15 @@ public class Assembler {
                         if (!t.esVariable(1) && t.esVariable(2)) {
                             if (t.getTipo().equals("ULONG")) {
                                 String nroTerceto = t.getOperando1().substring(1, t.getOperando1().lastIndexOf("]"));
-                                Terceto t1 = administradorTerceto.getTerceto(Integer.parseInt(nroTerceto));
+                                Terceto t1 = administradorTerceto.getTerceto(Integer.parseInt(nroTerceto)); //Traigo el terceto
 
-                                code += "CMP " + t1.getResultado() + ", _limiteSuperiorULONG" + '\n';
-                                code += "JA " + "LabelOverflowSuma" + '\n';
-                                t.setResultado(t1.getResultado());
+                                code += "MOV EBX, _" + t1.getResultado() + '\n'; // Muevo _varTerceto a EBX por problema de memoria, memoria
+                                code += "ADD EBX, _"  + t.getOperando2() + '\n'; // Sumo en EBX lo que estaba con la variable.
+                                code += "CMP EBX, _limiteSuperiorULONG" + '\n'; // Comparo EBX con el limite superior por si se pasa.
+                                code += "JA " + "LabelOverflowSuma" + '\n'; // Si se pasa, salto.
+                                code += "MOV _var"+ t.getNumero() +", EBX"+  '\n'; // Muevo lo del registro a la variable.
+                                t.setResultado("var" + t.getNumero()); // Seteo la variable.
+                                Main.tablaSimbolos.agregarSimbolo("var" + t.getNumero(), Lexico.IDENTIFICADOR, "ULONG", "Variable"); // Agrego a la tabla de simbolos.
                             }
                             if (t.getTipo().equals("DOUBLE")) {
                                 String op2 = t.getOperando2();
@@ -177,10 +178,13 @@ public class Assembler {
                                 String nroTerceto2 = t.getOperando2().substring(1, t.getOperando2().lastIndexOf("]"));
                                 Terceto t2 = administradorTerceto.getTerceto(Integer.parseInt(nroTerceto2));
 
-                                code += "ADD " + t1.getResultado() + ", " + t2.getResultado() + '\n';
-                                code += "CMP " + t1.getResultado() + ", _limiteSuperiorUint" + '\n';
+                                code += "MOV EBX, _" + t1.getResultado() + '\n'; // Agrego el primer registro.
+                                code += "ADD EBX, _" + t2.getResultado() + '\n'; // Sumo con el segundo registro.
+                                code += "CMP EBX, _limiteSuperiorUint" + '\n';
                                 code += "JA " + "LabelOverflowSuma" + '\n';
-                                t.setResultado(t1.getResultado());
+                                code += "MOV _var"+ t.getNumero() +", EBX"+  '\n'; // Muevo lo del registro a la variable.
+                                t.setResultado("var" + t.getNumero()); // Seteo la variable.
+                                Main.tablaSimbolos.agregarSimbolo("var" + t.getNumero(), Lexico.IDENTIFICADOR, "ULONG", "Variable"); // Agrego a la tabla de simbolos.
                             }
                             if (t.getTipo().equals("DOUBLE")) {
                                 String numeroTerceto1 = t.getOperando1().substring(1, t.getOperando1().lastIndexOf("]"));
@@ -195,7 +199,7 @@ public class Assembler {
                             }
                         }
 
-                        //Situación 4.a: Operación conmutativa entre una variable (o constante) y un registro. Conmutativa.
+                        //Situación 4.a: Operación conmutativa entre una variable (o constante) y un registro. Conmutativa. TODO
 
                         if (t.esVariable(1) && !t.esVariable(2)) {
                             if (t.getTipo().equals("ULONG")) {
@@ -239,8 +243,6 @@ public class Assembler {
                                 code += "SUB EBX, _" + t.getOperando2() + '\n';
                                 code += "MOV _var" + t.getNumero() + ", EBX" + '\n';
 
-                                code += "CMP _var"+ t.getNumero() + ", _limiteSuperiorUint" + '\n';
-                                code += "JA " + "LabelOverflowSuma" + '\n';
                                 Main.tablaSimbolos.agregarSimbolo("var" + t.getNumero(), Lexico.IDENTIFICADOR, "ULONG", "Variable");
                                 t.setResultado("var" + t.getNumero());
                             }
@@ -254,6 +256,15 @@ public class Assembler {
 
                         if (!t.esVariable(1) && t.esVariable(2)) {
                             if (t.getTipo().equals("ULONG")) {
+                                String nroTerceto = t.getOperando1().substring(1, t.getOperando1().lastIndexOf("]"));
+                                Terceto t1 = administradorTerceto.getTerceto(Integer.parseInt(nroTerceto)); //Traigo el terceto
+
+                                code += "MOV EBX, _" + t1.getResultado() + '\n'; // Muevo _varTerceto a EBX por problema de memoria, memoria
+                                code += "SUB EBX, _"  + t.getOperando2() + '\n'; // Sumo en EBX lo que estaba con la variable.
+                                code += "MOV _var"+ t.getNumero() +", EBX"+  '\n'; // Muevo lo del registro a la variable.
+
+                                t.setResultado("var" + t.getNumero()); // Seteo la variable.
+                                Main.tablaSimbolos.agregarSimbolo("var" + t.getNumero(), Lexico.IDENTIFICADOR, "ULONG", "Variable");
 
                             }
                             if (t.getTipo().equals("DOUBLE")) {
@@ -265,14 +276,24 @@ public class Assembler {
 
                         if (!t.esVariable(1) && !t.esVariable(2)) {
                             if (t.getTipo().equals("ULONG")) {
+                                String nroTerceto1 = t.getOperando1().substring(1, t.getOperando1().lastIndexOf("]"));
+                                Terceto t1 = administradorTerceto.getTerceto(Integer.parseInt(nroTerceto1));
 
+                                String nroTerceto2 = t.getOperando2().substring(1, t.getOperando2().lastIndexOf("]"));
+                                Terceto t2 = administradorTerceto.getTerceto(Integer.parseInt(nroTerceto2));
+
+                                code += "MOV EBX, _" + t1.getResultado() + '\n'; // Agrego el primer registro.
+                                code += "SUB EBX, _" + t2.getResultado() + '\n'; // Sumo con el segundo registro.
+                                code += "MOV _var"+ t.getNumero() +", EBX"+  '\n'; // Muevo lo del registro a la variable.
+                                t.setResultado("var" + t.getNumero()); // Seteo la variable.
+                                Main.tablaSimbolos.agregarSimbolo("var" + t.getNumero(), Lexico.IDENTIFICADOR, "ULONG", "Variable");
                             }
                             if (t.getTipo().equals("DOUBLE")) {
 
                             }
                         }
 
-                        //Situación 4.b: Operación conmutativa entre una variable (o constante) y un registro. No conmutativa.
+                        //Situación 4.b: Operación conmutativa entre una variable (o constante) y un registro. No conmutativa. //TODO
 
                         if (t.esVariable(1) && !t.esVariable(2)) {
                             if (t.getTipo().equals("ULONG")) {
@@ -292,6 +313,12 @@ public class Assembler {
                         if (t.esVariable(1) && t.esVariable(2)) {
                             if (t.getTipo().equals("ULONG")) {
 
+                                code += "MOV EBX, _" + t.getOperando1() + '\n'; // A a EBX
+                                code += "MUL EBX, _" + t.getOperando2() + '\n'; // Sumo B a A en EBX
+                                code += "MOV _var"+ t.getNumero() +", EBX"+  '\n'; // Muevo a la variable.
+                                t.setResultado("var" + t.getNumero()); // Seteo el resultado en el terceto.
+                                Main.tablaSimbolos.agregarSimbolo("var" + t.getNumero(), Lexico.IDENTIFICADOR, "ULONG", "Variable");
+
                             }
 
                             if (t.getTipo().equals("DOUBLE")) {
@@ -303,6 +330,15 @@ public class Assembler {
 
                         if (!t.esVariable(1) && t.esVariable(2)) {
                             if (t.getTipo().equals("ULONG")) {
+
+                                String nroTerceto = t.getOperando1().substring(1, t.getOperando1().lastIndexOf("]"));
+                                Terceto t1 = administradorTerceto.getTerceto(Integer.parseInt(nroTerceto)); //Traigo el terceto
+
+                                code += "MOV EBX, _" + t1.getResultado() + '\n'; // Muevo _varTerceto a EBX por problema de memoria, memoria
+                                code += "MUL EBX, _"  + t.getOperando2() + '\n'; // Sumo en EBX lo que estaba con la variable.
+                                code += "MOV _var"+ t.getNumero() +", EBX"+  '\n'; // Muevo lo del registro a la variable.
+                                t.setResultado("var" + t.getNumero()); // Seteo la variable.
+                                Main.tablaSimbolos.agregarSimbolo("var" + t.getNumero(), Lexico.IDENTIFICADOR, "ULONG", "Variable");
 
                             }
 
@@ -318,6 +354,18 @@ public class Assembler {
 
                             if (t.getTipo().equals("ULONG")) {
 
+                                String nroTerceto1 = t.getOperando1().substring(1, t.getOperando1().lastIndexOf("]"));
+                                Terceto t1 = administradorTerceto.getTerceto(Integer.parseInt(nroTerceto1));
+
+                                String nroTerceto2 = t.getOperando2().substring(1, t.getOperando2().lastIndexOf("]"));
+                                Terceto t2 = administradorTerceto.getTerceto(Integer.parseInt(nroTerceto2));
+
+                                code += "MOV EBX, _" + t1.getResultado() + '\n'; // Agrego el primer registro.
+                                code += "MUL EBX, _" + t2.getResultado() + '\n'; // Sumo con el segundo registro.
+                                code += "MOV _var"+ t.getNumero() +", EBX"+  '\n'; // Muevo lo del registro a la variable.
+                                t.setResultado("var" + t.getNumero()); // Seteo la variable.
+                                Main.tablaSimbolos.agregarSimbolo("var" + t.getNumero(), Lexico.IDENTIFICADOR, "ULONG", "Variable");
+
                             }
                             if (t.getTipo().equals("DOUBLE")) {
 
@@ -325,7 +373,7 @@ public class Assembler {
 
                         }
 
-                        //Situación 4.a: Operación conmutativa entre una variable (o constante) y un registro. Conmutativa.
+                        //Situación 4.a: Operación conmutativa entre una variable (o constante) y un registro. Conmutativa. TODO
 
                         if (t.esVariable(1) && !t.esVariable(2)) {
 

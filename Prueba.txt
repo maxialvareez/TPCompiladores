@@ -1,7 +1,10 @@
 
 prueba
-ULONG a;
+ULONG a,b,c,d,e;
 BEGIN
-a:= 11 + 90;
-
+a:= 2;
+b:= 3;
+c := a - b;
+d := c - 4;
+e := c - d;
 END
