@@ -72,16 +72,19 @@ public class Assembler {
                             data = data + "_" + lexema + " DQ ?" + '\n';
                     }
                     break;
+
                 case (Lexico.CADENA):
                     String cadena = lexema;
                     data = data + "_" + cadena + " DB " + lexema + ", 0 \n";
                     break;
+
                 case (Lexico.CTE_DOUBLE):
                     String nombre = lexema.replace('.', '_');
                     nombre = nombre.replace('-', '_');
                     nombre = nombre.replace("+", "__");
                     data = data + "_" + nombre + " DQ " + lexema + '\n';
                     break;
+
                 case (Lexico.CTE_ULONG):
                     data = data + "_" + lexema + " DD " + lexema + '\n';
                     break;
@@ -434,7 +437,12 @@ public class Assembler {
 
                     case "Impresion":
                         String cadena = t.getOperando1();
+                        System.out.println(t.getOperando1());
                         code += "invoke MessageBox, NULL, addr _" + cadena + ", addr _" + cadena + ", MB_OK \n";
+                        break;
+
+                    default: //Para terceto (Label..., , )
+                        code += t.getOperador() + ": \n";
                         break;
                 }
             }

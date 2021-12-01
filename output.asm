@@ -20,7 +20,7 @@ start:
 FINIT 
 MOV EBX, _b@main
 MOV _a@main, EBX
-invoke StdOut, NULL, addr hola, addr _hola, MB_OK 
+invoke MessageBox, NULL, addr _hola, addr _hola, MB_OK 
 FINIT
 invoke ExitProcess, 0 
 FINIT
