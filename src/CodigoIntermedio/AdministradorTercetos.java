@@ -52,6 +52,15 @@ public class AdministradorTercetos {
         nuevoTerceto.setOperando1(Integer.toString(nroTerceto));
         tercetos.set(tercetos.size() - 1, nuevoTerceto);
     }
+
+    public void printCodigoIntermedio() {
+        for (ArrayList<Terceto> a : codigoIntermedio) {
+            for (Terceto t : a) {
+                System.out.println(t.getNumero() + ". (" + t.getOperador() + ", " + t.getOperando1() + ", " + t.getOperando2() + ")");
+            }
+        }
+    }
+
     public void imprimirTercetos(){
         for(Terceto t : tercetos)
             System.out.println(t.getNumero() + ". (" + t.getOperador() + ", " + t.getOperando1() + ", " + t.getOperando2() + ")" );

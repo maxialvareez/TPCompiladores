@@ -1,10 +1,22 @@
+pruebaTryCatch
+ULONG x,z;
 
-prueba
-ULONG a,b,c,d,e;
+ULONG FUNC f (ULONG a)
+ULONG y;
 BEGIN
-a:= 2;
-b:= 3;
-c := a - b;
-d := c - 4;
-e := c - d;
+PRE:(a > 3);
+RETURN (a+1);
+END;
+
+BEGIN
+
+TRY
+x := f(z) + 4;
+CATCH
+BEGIN
+x := 10;
+END;
+
+z:=6;
+
 END

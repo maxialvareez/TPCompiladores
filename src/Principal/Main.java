@@ -71,7 +71,7 @@ public class Main {
 
 
         System.out.println("\n------ CÓDIGO INTERMEDIO ------");
-        adminTercetos.imprimirTercetos();
+        adminTercetos.printCodigoIntermedio();
 
         System.out.println("\n -----TABLA DE SIMBOLOS------");
         tablaSimbolos.imprimirTablaSimbolos();
