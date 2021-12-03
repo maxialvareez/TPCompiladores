@@ -4,11 +4,11 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 
 public class TablaSimbolos {
-    private static Hashtable<String, DatosSimbolo> simbolos;
+    private  Hashtable<String, DatosSimbolo> simbolos;
 
 
     public TablaSimbolos() {
-        simbolos = new Hashtable<>();
+        simbolos = new Hashtable<String,DatosSimbolo>();
     }
 
 

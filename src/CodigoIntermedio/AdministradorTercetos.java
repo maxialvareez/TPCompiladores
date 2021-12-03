@@ -1,7 +1,12 @@
 package CodigoIntermedio;
 
+
+import Principal.Lexico;
+import Principal.Main;
 import java.util.ArrayList;
 import java.util.Hashtable;
+
+
 
 public class AdministradorTercetos {
 
@@ -9,8 +14,7 @@ public class AdministradorTercetos {
     private ArrayList<Integer> pila = new ArrayList<>();
 
     private Hashtable<String, Integer> funciones = new Hashtable<String, Integer>();
-    private ArrayList<ArrayList<Terceto>> codigoIntermedio = new ArrayList<>(5);
-
+    private ArrayList<ArrayList<Terceto>> codigoIntermedio = new ArrayList<>();
 
 
     public AdministradorTercetos() {
@@ -71,22 +75,27 @@ public class AdministradorTercetos {
     }
 
 
-
     public void generarCodigoIntermedio(int inicio, int finalFuncion, String funcion, int index) {
         ArrayList<Terceto> aux = new ArrayList<>();
         ArrayList<String> invocados = new ArrayList<>();
         codigoIntermedio.add(index, new ArrayList<>());
+        Main.tablaSimbolos.agregarSimbolo("jeje",257);
         for (int i = inicio; i <= finalFuncion; i++) {
             Terceto t = tercetos.get(i);
-            if (t.getOperador().equals("InvocacionFuncion") && !invocados.contains(t.getOperando1())) {
+            System.out.println(t.getOperador());
+
+            if ((t.getOperador().equals("InvocacionFuncion") && !invocados.contains(t.getOperando1()))){
+
                 String funcionInvocada = t.getOperando1();
                 generarCodigoIntermedio(funciones.get(funcionInvocada), this.buscarFinFuncion(funcionInvocada), funcionInvocada, index + 1);
                 invocados.add(funcionInvocada);
             }
-            while ((t.getOperador().equals("ComienzaFuncion") && !t.getOperando1().equals(funcion)) && (i <= finalFuncion)) {
-                i = this.buscarFinFuncion(t.getOperando1()) + 1;
-                if (i <= finalFuncion)
+           while ((t.getOperador().equals("ComienzaFuncion") && !t.getOperando1().equals(funcion)) && (i <= finalFuncion)) {
+                i = this.buscarFinFuncion(t.getOperando1())+1 ;
+                System.out.println("i: "+ i);
+                if (i <= finalFuncion) {
                     t = tercetos.get(i);
+                }
             }
             if (i <= finalFuncion) {
                 aux.add(t);
@@ -98,6 +107,7 @@ public class AdministradorTercetos {
     public void generarCodigoIntermedio(){
         this.generarCodigoIntermedio(0, tercetos.size() - 1, "main", 0);
     }
+
     public int buscarFinFuncion(String funcion) {
         for (Terceto t : tercetos) {
             if (t.getOperador().equals("FinFuncion") && t.getOperando1().equals(funcion)) {

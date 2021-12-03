@@ -51,14 +51,18 @@ public class Main {
 
         //-------------- FIN CARGA DE ARCHIVO --------------
 
+
         AdministradorTercetos adminTercetos = new AdministradorTercetos();
+
         Lexico l1 = new Lexico(codigo);
 
 
         Parser p = new Parser(l1, adminTercetos);
         p.run();
 
+
         tablaSimbolos.eliminarVariablesRepetidas();
+
         adminTercetos.generarCodigoIntermedio();
 /*
         Token t = l1.getToken();
@@ -69,6 +73,8 @@ public class Main {
         Assembler assembler = new Assembler(adminTercetos);
         assembler.generarAssembler();
 
+        System.out.println("\n------TERCETOS ------");
+        adminTercetos.imprimirTercetos();
 
         System.out.println("\n------ CÓDIGO INTERMEDIO ------");
         adminTercetos.printCodigoIntermedio();

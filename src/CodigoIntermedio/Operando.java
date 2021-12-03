@@ -5,11 +5,14 @@ public class Operando {
     private String tipo;
     private String valor;
 
+
     public Operando(String tipo, String valor) {
         this.id = 0;
         this.tipo = tipo;
         this.valor = valor;
+
     }
+
 
     public int getId() {
         return id;
