@@ -10,7 +10,8 @@ RETURN (a+1);
 END;
 
 BEGIN
-
+x:=11;
+x:= 12;
 TRY
 x := f(z) + 4;
 CATCH
