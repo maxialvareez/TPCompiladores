@@ -104,7 +104,7 @@ public class TablaSimbolos {
             String lexema = (String) iterador.nextElement();
             DatosSimbolo ds = simbolos.get(lexema);
 
-                System.out.println("Lexema: " + lexema + ", id: " + ds.getId() + ", tipo: " + ds.getTipo() + ", uso: " + ds.getUso());
+                System.out.println("Lexema: " + lexema + ", id: " + ds.getId() + ", tipo: " + ds.getTipo() + ", uso: " + ds.getUso()+ ", parametro: " + ds.getParametro());
 
         }
     }

@@ -71,7 +71,7 @@ public class Main {
         }
  */
         Assembler assembler = new Assembler(adminTercetos);
-        assembler.generarAssembler();
+        //assembler.generarAssembler();
 
         System.out.println("\n------TERCETOS ------");
         adminTercetos.imprimirTercetos();

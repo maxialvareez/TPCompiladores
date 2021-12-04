@@ -16,7 +16,6 @@ public class Assembler {
     private static final long limiteSuperiorULONG= Long.parseUnsignedLong("100");
     private static final int divisorCeroULONG = 0;
     private static final double divisorCeroDOUBLE = 0.0;
-    //private Hashtable<String, String> varAuxPunteros = new Hashtable<>(); // TODO ver si se usa.
 
     public Assembler(AdministradorTercetos administradorTerceto) {
         this.codigoIntermedio = administradorTerceto.getCodigoIntermedio();
@@ -24,7 +23,6 @@ public class Assembler {
     }
 
     public void generarAssembler() throws IOException {
-
 
         String code = this.generarCodeAssembler();
         String data = this.generarDataAssembler();

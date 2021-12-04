@@ -5,6 +5,7 @@ public class DatosSimbolo {
     private String tipo;
     private String uso;  //indica a que hace referencia un identificador (podria ser una funcion, una variable)
     private String funcionReferenciada;
+    private String parametro;  //en caso de ser funcion
     //dudas
     private boolean parametroRef;
 
@@ -15,6 +16,16 @@ public class DatosSimbolo {
         this.uso = null;
         this.parametroRef = false;
         this.funcionReferenciada = "";
+        this.parametro = "";
+    }
+
+
+    public String getParametro() {
+        return parametro;
+    }
+
+    public void setParametro(String parametro) {
+        this.parametro = parametro;
     }
 
     public int getId() {
