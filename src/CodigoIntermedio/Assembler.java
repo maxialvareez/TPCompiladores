@@ -611,6 +611,9 @@ public class Assembler {
                         }
                         // Situacion b ( := , vble , vble )
                         if (t.esVariable(1) && t.esVariable(2)) {
+                            System.out.println("-------------" +t.getNumero());
+                            System.out.println("-------------" +t.getTipo());
+                            System.out.println("-------------" +t.getOperando1());
                             if (t.getTipo().equals("ULONG")) {
                                 code += "MOV EBX, _" + t.getOperando2() + '\n';
                                 code += "MOV _" + t.getOperando1() + ", EBX" + '\n';

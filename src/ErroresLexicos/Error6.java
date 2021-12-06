@@ -1,8 +1,8 @@
 package ErroresLexicos;
 
-import Principal.Accion;
-import Principal.Lexico;
-import Principal.Token;
+import Principal.*;
+
+
 
 public class Error6 extends Accion {
 
@@ -15,7 +15,7 @@ public class Error6 extends Accion {
 
         buffer += "|";
         Lexico.cursor --;
-        System.out.println("[WARNING] [Linea " + Lexico.linea + "] {Se espera un | y recibe otro caracter]");
+        Main.listaWarnings.add("[WARNING] [Linea " + Lexico.linea + "] {Se espera un | y recibe otro caracter]");
         return (new Token(Lexico.OR));
     }
 }

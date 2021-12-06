@@ -23,7 +23,7 @@ public class AccionSemantica5 extends Accion {
         }
 
         else
-            System.out.println("[ERROR LEXICO] [Linea " + Lexico.linea + "] {Valor de constante DOUBLE fuera de rango}");
+            Main.listaErrores.add("[ERROR LEXICO] [Linea " + Lexico.linea + "] {Valor de constante DOUBLE fuera de rango}");
             return null;
     }
 }

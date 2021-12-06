@@ -1,8 +1,6 @@
 package ErroresLexicos;
 
-import Principal.Accion;
-import Principal.Lexico;
-import Principal.Token;
+import Principal.*;
 
 public class Error2 extends Accion {
 
@@ -12,7 +10,7 @@ public class Error2 extends Accion {
     @Override
     public Token ejecutar() {
         Lexico.cursor --;
-        System.out.println("[ERROR LEXICO] [Linea " +Lexico.linea + "] {Se espera un digito, un '+' , o un '-' y recibe otro caracter}");
+        Main.listaErrores.add("[ERROR LEXICO] [Linea " +Lexico.linea + "] {Se espera un digito, un '+' , o un '-' y recibe otro caracter}");
         return null;
     }
 }

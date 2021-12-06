@@ -18,7 +18,7 @@ public class AccionSemantica4 extends Accion {
             return (new Token(buffer, Lexico.CTE_ULONG));
         }
         else{
-            System.out.println("[ERROR LEXICO] [Linea " + Lexico.linea + "] {Valor de tipo UINT fuera de rango}");
+            Main.listaErrores.add("[ERROR LEXICO] [Linea " + Lexico.linea + "] {Valor de tipo UINT fuera de rango}");
             return null;
 
         }

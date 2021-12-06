@@ -1,5 +1,6 @@
 package Principal;
 import java.io.*;
+import java.util.ArrayList;
 
 import CodigoIntermedio.AdministradorTercetos;
 import CodigoIntermedio.Assembler;
@@ -8,6 +9,8 @@ public class Main {
 
     private static BufferedReader codigo;
     public static TablaSimbolos tablaSimbolos = new TablaSimbolos();
+    public static ArrayList<String> listaErrores = new ArrayList<>();
+    public static ArrayList<String> listaWarnings= new ArrayList<>();
 
     private static StringBuilder getCodigo(BufferedReader ubicacion){
 
@@ -62,7 +65,6 @@ public class Main {
 
 
         tablaSimbolos.eliminarVariablesRepetidas();
-
         adminTercetos.generarCodigoIntermedio();
 /*
         Token t = l1.getToken();
@@ -70,8 +72,26 @@ public class Main {
             l1.getToken();
         }
  */
-        Assembler assembler = new Assembler(adminTercetos);
-        //assembler.generarAssembler();
+        System.out.println("\n------WARNINGS ------");
+        for (String s: listaWarnings){
+            System.out.println(s);
+        }
+
+        System.out.println("\n -----TABLA DE SIMBOLOS------");
+        tablaSimbolos.imprimirTablaSimbolos();
+
+
+        if (listaErrores.isEmpty()) {
+            Assembler assembler = new Assembler(adminTercetos);
+            assembler.generarAssembler();
+        } else {
+            listaErrores.add("No se generó el código assembler por haber errores en la generación de código intermedio");
+            System.out.println("\n------ERRORES ------");
+            for (String s: listaErrores){
+                System.out.println(s);
+            }
+        }
+
 
         System.out.println("\n------TERCETOS ------");
         adminTercetos.imprimirTercetos();

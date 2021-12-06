@@ -23,7 +23,7 @@ public class TablaSimbolos {
 
     public void agregarSimbolo(String lexema, Integer id) {
         if (simbolos.containsKey(lexema))
-            System.out.println("El identificador " + lexema + " ya existe");
+            Main.listaErrores.add("[ERROR]El identificador " + lexema + " ya existe");
         else {
             DatosSimbolo ds = new DatosSimbolo();
             ds.setId(id);
@@ -104,7 +104,7 @@ public class TablaSimbolos {
             String lexema = (String) iterador.nextElement();
             DatosSimbolo ds = simbolos.get(lexema);
 
-                System.out.println("Lexema: " + lexema + ", id: " + ds.getId() + ", tipo: " + ds.getTipo() + ", uso: " + ds.getUso()+ ", parametro: " + ds.getParametro());
+                System.out.println("Lexema: " + lexema + ", id: " + ds.getId() + ", tipo: " + ds.getTipo() + ", uso: " + ds.getUso()+ ", parametro: " + ds.getParametro()+ ", funcionRef: " + ds.getFuncionReferenciada() );
 
         }
     }

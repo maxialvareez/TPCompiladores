@@ -9,7 +9,7 @@ public class Terceto {
     private String operando2;
     private String resultado; // resultado de la operación del terceto
     private String tipo;  // tipo del resultado de la operación (por ejemplo si es la suma de dos enteros, será entero)
-    private boolean contieneInvocacion;
+
 
     public Terceto(String operador, String operando1, String operando2) {
         this.operador = operador;
@@ -17,7 +17,6 @@ public class Terceto {
         this.operando2 = operando2;
         this.resultado = null;
         this.tipo = null;
-        this.contieneInvocacion = false;
 
     }
 

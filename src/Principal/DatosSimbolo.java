@@ -4,21 +4,37 @@ public class DatosSimbolo {
     private int id;  // Para buscar en palabras reservadas
     private String tipo;
     private String uso;  //indica a que hace referencia un identificador (podria ser una funcion, una variable)
-    private String funcionReferenciada;
     private String parametro;  //en caso de ser funcion
-    //dudas
-    private boolean parametroRef;
+    private boolean typeDef;
+    private String funcionReferenciada;
 
 
     public DatosSimbolo() {
         this.id = 0;
         this.tipo = null;
         this.uso = null;
-        this.parametroRef = false;
-        this.funcionReferenciada = "";
         this.parametro = "";
+        this.typeDef = false;
+        this.funcionReferenciada = "";
     }
 
+    public String getFuncionReferenciada() {
+        return funcionReferenciada;
+    }
+
+    public DatosSimbolo setFuncionReferenciada(String funcionReferenciada) {
+        this.funcionReferenciada = funcionReferenciada;
+        return this;
+    }
+
+    public boolean esTypeDef() {
+        return typeDef;
+    }
+
+    public DatosSimbolo setTypeDef(boolean typeDef) {
+        this.typeDef = typeDef;
+        return this;
+    }
 
     public String getParametro() {
         return parametro;
@@ -40,9 +56,7 @@ public class DatosSimbolo {
         return uso;
     }
 
-    public boolean isParametroRef() {
-        return parametroRef;
-    }
+
 
     public DatosSimbolo setId(int id) {
         this.id = id;
@@ -59,10 +73,7 @@ public class DatosSimbolo {
         return this;
     }
 
-    public DatosSimbolo setParametroRef(boolean parametroRef) {
-        this.parametroRef = parametroRef;
-        return this;
-    }
+
 
 
 }

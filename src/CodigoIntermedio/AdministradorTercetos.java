@@ -3,6 +3,8 @@ package CodigoIntermedio;
 
 import Principal.Lexico;
 import Principal.Main;
+
+import javax.jws.soap.SOAPBinding;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
@@ -67,7 +69,7 @@ public class AdministradorTercetos {
 
     public void imprimirTercetos(){
         for(Terceto t : tercetos)
-            System.out.println(t.getNumero() + ". (" + t.getOperador() + ", " + t.getOperando1() + ", " + t.getOperando2() + ")" );
+            System.out.println(t.getNumero() + ". (" + t.getOperador() + ", " + t.getOperando1() + ", " + t.getOperando2() + ", " + t.getTipo() + ")" );
     }
 
     public void agregarFuncion(String funcion) {
@@ -77,7 +79,6 @@ public class AdministradorTercetos {
 
     public void generarCodigoIntermedio(int inicio, int finalFuncion, String funcion, int index) {
         ArrayList<Terceto> aux = new ArrayList<>();
-        ArrayList<String> invocados = new ArrayList<>();
         codigoIntermedio.add(index, new ArrayList<>());
         Hashtable<String, Integer> funcs = new Hashtable<>();
 
@@ -85,15 +86,18 @@ public class AdministradorTercetos {
             Terceto t = tercetos.get(i);
 
 
-            if (t.getOperador().equals("InvocacionFuncion") && !invocados.contains(t.getOperando1())) {
+            if (t.getOperador().equals("InvocacionFuncion") ) {
                 String funcionInvocada = t.getOperando1();
                 aux.add(t);
-                aux.add(tercetos.get(i+1));
+                i++;
+                aux.add(tercetos.get(i));
                 addFuncion(funciones.get(funcionInvocada), this.buscarFinFuncion(funcionInvocada), funcionInvocada, index + 1, aux);
-                invocados.add(funcionInvocada);
+
             }
             while ((t.getOperador().equals("ComienzaFuncion") && !t.getOperando1().equals(funcion)) && (i <= finalFuncion)) {
                 String operando = t.getOperando1();
+                System.out.println("jdoqiwjodjqo: " + t.getOperando1());
+                System.out.println("HSOIFHOHFEOQIHFWO: "+this.buscarFinFuncion(t.getOperando1()));
                 if (tercetos.get(this.buscarFinFuncion(t.getOperando1())-1).getOperador().equals("RetornoFuncion")) {
                   funcs.put(operando,this.buscarFinFuncion(t.getOperando1())-1);
                 }

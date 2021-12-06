@@ -2,6 +2,8 @@ package AccionesSemanticas;
 
 import Principal.*;
 
+
+
 public class AccionSemantica3 extends Accion {
 
     public AccionSemantica3() {
@@ -19,7 +21,7 @@ public class AccionSemantica3 extends Accion {
         else {
                 if (buffer.length() > 22) {
                     buffer = buffer.substring(0, 22);
-                    System.out.println("[WARNING] [Linea " + Lexico.linea + "] {Un identificador superó el limite de 22 caracteres, por lo que fue cortado}");
+                    Main.listaWarnings.add("[WARNING] [Linea " + Lexico.linea + "] {Un identificador superó el limite de 22 caracteres, por lo que fue cortado}");
                 }
                 if (!Main.tablaSimbolos.existeLexema(buffer)) {
                     Main.tablaSimbolos.agregarSimbolo(buffer, Lexico.IDENTIFICADOR);
