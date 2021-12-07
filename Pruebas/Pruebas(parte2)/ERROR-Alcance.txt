@@ -4,16 +4,21 @@ DOUBLE a;
 ULONG b;
 
 DOUBLE FUNC f (ULONG u)
+
+ULONG f2(ULONG a)
+ULONG j;
 BEGIN
-u:= u+4;
+a:=5;
+RETURN (a);
+END;
+
+BEGIN
 RETURN(u+1);
 END;
 
 BEGIN
 
-a:= b;
+a:= j;
 
-f(a);
 
-b := f(b);
 END

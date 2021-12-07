@@ -1,0 +1,19 @@
+pruebaTypeDef
+
+TYPEDEF f1 = ULONG FUNC (ULONG);
+f1 x,y,z;
+
+ULONG a,b,c;
+
+ULONG FUNC f(ULONG p)
+BEGIN
+p:=p+1;
+RETURN (p+2);
+END;
+BEGIN
+
+x:=f;
+z:=x;
+a:= x(b) + z(3);
+
+END

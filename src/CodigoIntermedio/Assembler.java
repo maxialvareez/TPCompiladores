@@ -61,8 +61,10 @@ public class Assembler {
                 case (Lexico.IDENTIFICADOR):
                     if (!Main.tablaSimbolos.getDatos(lexema).getUso().equals("NombreFuncion")) {
                         if (Main.tablaSimbolos.getDatos(lexema).getTipo().equals("ULONG")) {
-
-                            data = data + "_" + lexema + " DD ?" + '\n';
+                            if (lexema.contains("2bytes"))
+                                data = data + "_" + lexema + " DW ?" + '\n';
+                            else
+                                data = data + "_" + lexema + " DD ?" + '\n';
                         }
                         if (Main.tablaSimbolos.getDatos(lexema).getTipo().equals("DOUBLE"))
                             data = data + "_" + lexema + " DQ ?" + '\n';

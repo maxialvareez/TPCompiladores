@@ -1,19 +1,19 @@
-pruebaTipos
+pruebaRedeclaracion
 
 DOUBLE a;
 ULONG b;
-
+DOUBLE b;
 DOUBLE FUNC f (ULONG u)
+ULONG j;
+ULONG j;
 BEGIN
-u:= u+4;
+u:= 6;
 RETURN(u+1);
 END;
 
 BEGIN
 
-a:= b;
+a:=14;
 
-f(a);
 
-b := f(b);
 END
