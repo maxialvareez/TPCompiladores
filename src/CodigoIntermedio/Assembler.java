@@ -94,8 +94,8 @@ public class Assembler {
     public String generarCodeAssembler() {
 
 
-        String code = "FINIT \n"; //TODO Ver si esto está bien
-        String funcionActual = "main"; //TODO Funcion actual o ambito actual
+        String code = "FINIT \n";
+        String funcionActual = "main";
 
         for (ArrayList<Terceto> lista : codigoIntermedio) {
             for (Terceto t : lista) {
@@ -224,7 +224,7 @@ public class Assembler {
                                 Main.tablaSimbolos.agregarSimbolo("var" + t.getNumero(), Lexico.IDENTIFICADOR, "DOUBLE", "Variable");
                             }
                         }
-                        //TODO las verificaciones de la suma en tiempo de ejecución
+
 
                         break;
 
@@ -613,9 +613,6 @@ public class Assembler {
                         }
                         // Situacion b ( := , vble , vble )
                         if (t.esVariable(1) && t.esVariable(2)) {
-                            System.out.println("-------------" +t.getNumero());
-                            System.out.println("-------------" +t.getTipo());
-                            System.out.println("-------------" +t.getOperando1());
                             if (t.getTipo().equals("ULONG")) {
                                 code += "MOV EBX, _" + t.getOperando2() + '\n';
                                 code += "MOV _" + t.getOperando1() + ", EBX" + '\n';
@@ -698,7 +695,7 @@ public class Assembler {
                             if (t.getTipo().equals("UINT")) {
                                 String nroTerceto = t.getOperando1().substring(1, t.getOperando1().lastIndexOf("]"));
                                 Terceto t1 = administradorTerceto.getTerceto(Integer.parseInt(nroTerceto));
-                                code += "CMP " + t1.getResultado() + ", _" + t.getOperando2() + '\n';  //TODO ACA NO DEBERIA LLEVAR _ EL t1.getResultado()?
+                                code += "CMP " + t1.getResultado() + ", _" + t.getOperando2() + '\n';
 
                             }
                             if (t.getTipo().equals("DOUBLE")) {
@@ -713,7 +710,7 @@ public class Assembler {
                                 code += "FLD _" + t1.getResultado() + '\n';
                                 code += "FCOMP _" + op2 + '\n';
 
-                                //TODO Esto de aca abajo iria? el tema de los 2 bytes
+
                                 code += "FSTSW _" + "var" + t.getNumero() + "_2bytes" + '\n';
                                 code += "MOV AX , _" + "var" + t.getNumero() + "_2bytes" + '\n';
                                 code += "SAHF" + '\n';
@@ -741,7 +738,7 @@ public class Assembler {
                                 code += "FLD _" + t1.getResultado() + '\n';
                                 code += "FCOMP _" + t2.getResultado() + '\n';
 
-                                //TODO Esto de aca abajo iria? el tema de los 2 bytes
+
                                 code += "FSTSW _" + "var" + t.getNumero() + "_2bytes" + '\n';
                                 code += "MOV AX , _" + "var" + t.getNumero() + "_2bytes" + '\n';
                                 code += "SAHF" + '\n';
@@ -768,7 +765,7 @@ public class Assembler {
 
                                 code += "FLD _" + op1 + '\n';
 
-                                //TODO Esto de aca abajo iria? el tema de los 2 bytes
+
                                 code += "FCOMP _" + t1.getResultado() + '\n';
                                 code += "FSTSW _" + "var" + t.getNumero() + "_2bytes" + '\n';
                                 code += "MOV AX , _" + "var" + t.getNumero() + "_2bytes" + '\n';

@@ -1,19 +1,16 @@
-pruebaTipos
-
-DOUBLE a;
-ULONG b;
-
-DOUBLE FUNC f (ULONG u)
+pruebaCondicion
+ULONG a,b;
 BEGIN
-u:= u+4;
-RETURN(u+1);
-END;
+a:= 7;
+b:= 6+2;
 
-BEGIN
+IF (a <> b) THEN
 
-a:= b;
+PRINT(%DISTINTOS%);
 
-f(a);
+ELSE
 
-b := f(b);
+PRINT(%IGUALES%);
+ENDIF;
+
 END

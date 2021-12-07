@@ -1208,7 +1208,6 @@ case 60:
 
                if (tipoIdentificador.equals(op.getTipo())){
                     Terceto t = new Terceto(":=", ambitoVariable, op.getValor());
-                   System.out.println("TIPOOOOOOOOOOOOO: " + op.getTipo());
                    t.setTipo(op.getTipo());
                    adminTercetos.agregarTerceto(t);
                     yyval = new ParserVal(new Operando(tipoIdentificador, "[" + t.getNumero()+ "]"));
