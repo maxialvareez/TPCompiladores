@@ -96,8 +96,7 @@ public class AdministradorTercetos {
             }
             while ((t.getOperador().equals("ComienzaFuncion") && !t.getOperando1().equals(funcion)) && (i <= finalFuncion)) {
                 String operando = t.getOperando1();
-                System.out.println("jdoqiwjodjqo: " + t.getOperando1());
-                System.out.println("HSOIFHOHFEOQIHFWO: "+this.buscarFinFuncion(t.getOperando1()));
+
                 if (tercetos.get(this.buscarFinFuncion(t.getOperando1())-1).getOperador().equals("RetornoFuncion")) {
                   funcs.put(operando,this.buscarFinFuncion(t.getOperando1())-1);
                 }

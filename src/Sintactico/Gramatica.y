@@ -18,6 +18,7 @@ programa : IDENTIFICADOR bloque_declarativo bloque_ejecutable {System.out.printl
 
 error_programa : bloque_declarativo bloque_ejecutable {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Se debe indicar un nombre para el programa}");}
 	       | IDENTIFICADOR bloque_ejecutable bloque_declarativo {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "{Mal posicionamiento de sentencias declarativas");}
+	       | IDENTIFICADOR bloque_declarativo error {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "{Falta el bloque de ejecución en el programa");}
 	       ;
 
 
@@ -38,6 +39,8 @@ bloque_sentencias: sentencia_ejecucion
 
 error_bloque_ejecutable : bloque_sentencias END {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Se detectó un END pero falta un BEGIN para iniciar el bloque}");}
 				|BEGIN bloque_sentencias error {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Se detectó un BEGIN pero falta un END para cerrar el bloque}");}
+		        | BEGIN bloque_declarativo bloque_sentencias END {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {No se pueden incluir declaraciones en el bloque ejecutable}");}
+		        | BEGIN bloque_sentencias bloque_declarativo END {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {No se pueden incluir declaraciones en el bloque ejecutable}");}
 		        ;
 
 
@@ -46,16 +49,16 @@ sentencia_ejecutable: control ';'
                         | impresion ';'
                         | invocacion ';'
                         | asignacion ';'
-                        |error_ejecucion
+                        |error_ejecutable
                         ;
 
 
-error_ejecucion: control error {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Sentencia mal declarada, falta ';'}");}
+error_ejecutable: control error {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Sentencia mal declarada, falta ';'}");}
                 |seleccion error {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Sentencia mal declarada, falta ';'}");}
                 | impresion error {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Sentencia mal declarada, falta ';'}");}
            	    | asignacion error {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Sentencia mal declarada, falta ';'}");}
              	| invocacion error {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Sentencia mal declarada, falta ';'}");}
-               	 ;
+               	;
 
 sentencia_ejecucion : sentencia_ejecutable
                       |try_catch ';'
@@ -101,6 +104,7 @@ declaracion : tipo lista_de_variables ';'{System.out.println("[Sintáctico] [Lin
                         ds.setTipo($4.sval);
                         Main.tablaSimbolos.setDatosSimbolo(nuevoLexema, ds);
                     }
+                    //TODO ELSE
     	        }
                 else
                     Main.listaErrores.add("[ERROR SEMÁNTICO] [Linea " + Lexico.linea + "] {" + $1.sval + " y " + $5.sval +" deben tener el mismo nombre}");
@@ -135,6 +139,7 @@ control : REPEAT'(' asignacion_repeat ';'condicion_repeat';' CTE_ULONG')' bloque
             t = new Terceto("Label"+adminTercetos.cantidadTercetos(),null,null);
             adminTercetos.agregarTerceto(t);
         }
+        //TODO ELSE
     }
 
 	| error_control
@@ -179,17 +184,17 @@ error_asignacion_repeat:  ASIGNACION CTE_ULONG {Main.listaErrores.add("[ERROR SI
                         ;
 
 
-condicion_repeat: expresion1{
+condicion_repeat: condicion_booleana{
                                 Operando op = (Operando)$1.obj;
                                 if(op != null){
                                     Terceto t = new Terceto("BF", op.getValor(), null);
                                     adminTercetos.agregarTerceto(t);
                                     adminTercetos.apilar(t.getNumero());
                                     $$ = new ParserVal(op.getValor());
-                            }
-                            else
-                                $$ = new ParserVal(null);
-                             }
+                                }
+                                else
+                                    $$ = new ParserVal(null);
+                                 }
                 ;
 
 
@@ -209,8 +214,9 @@ sentencia_control : sentencia_ejecucion
 error_sentencia_control : BREAK error {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Se detectó una sentencia mal declarada, falta ';' despues del BREAK}");}
                	 	;
 
-asignacion : IDENTIFICADOR ASIGNACION expresion2  {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Asignacion de " + $1.sval +"}");
+asignacion : IDENTIFICADOR ASIGNACION expresion  {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Asignacion de " + $1.sval +"}");
             String ambitoVariable = Main.tablaSimbolos.verificarAmbito($1.sval, ambito);
+            //TODO MUCHOS ELSE
             if(ambitoVariable != null){
                 String tipoIdentificador = Main.tablaSimbolos.getDatos(ambitoVariable).getTipo();
                 Operando op = (Operando)$3.obj;
@@ -259,6 +265,7 @@ seleccion: IF condicion_if THEN bloque_if ENDIF {
                 Terceto t = new Terceto("Label"+Integer.toString(adminTercetos.cantidadTercetos()), null, null);
                 adminTercetos.agregarTerceto(t);
                 }
+            //TODO ELSE
             }
 
 	 | IF  condicion_if  THEN bloque_if{
@@ -270,6 +277,7 @@ seleccion: IF condicion_if THEN bloque_if ENDIF {
                 adminTercetos.agregarTerceto(t1);
                 adminTercetos.apilar(t.getNumero());
             }
+            //TODO ELSE
             }
             ELSE bloque_if ENDIF{
                 if($2.sval != null) {
@@ -277,6 +285,7 @@ seleccion: IF condicion_if THEN bloque_if ENDIF {
                    Terceto t = new Terceto("Label"+Integer.toString(adminTercetos.cantidadTercetos()), null, null);
                    adminTercetos.agregarTerceto(t);
             }
+            //TODO ELSE
        }
 	 | error_seleccion
 	 ;
@@ -508,7 +517,7 @@ error_lista_de_variables: lista_de_variables IDENTIFICADOR {Main.listaErrores.ad
 
 funcion :  declaracion_funcion bloque_funcion
          {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Declaración de función llamada '"+ $1.sval +"'" );
-
+            System.out.println("CONDICION :"  + $2.sval);
             if($1.sval != null && $2.sval != null ){ //si se declaró bien y se cumplen los PRE (en caso de haberlos)
                 if ($2.sval.equals("PRE")){
                    ambito = ambito.substring(0,ambito.lastIndexOf("@"));
@@ -532,6 +541,7 @@ funcion :  declaracion_funcion bloque_funcion
             }
            }
             else
+
                  $$ = new ParserVal(null);
          }
         | error_funcion
@@ -644,13 +654,14 @@ error_bloque_funcion : bloque_declarativo error {Main.listaErrores.add("[ERROR S
 
 
 bloque_ejecucion_funcion : BEGIN bloque_sentencias RETURN '('condicion')' ';' END{
-
-                        if  ($5.sval != null){
-                            $$ = new ParserVal ($5.sval);
-                        }
-                        else
-                            $$ = new ParserVal (null);
-             }
+                        Operando op = (Operando)$5.obj;
+                        if (op != null){
+                            System.out.println("laCONDI: " + op.getValor());
+                             $$ = new ParserVal(op.getValor());
+                         }
+                            else
+                                $$ = new ParserVal (null);
+                 }
 
 			 | BEGIN pre_condicion ';' bloque_sentencias RETURN '('condicion')' ';' END {
 			            if ($2.sval != null && $7.sval != null){
@@ -712,24 +723,36 @@ error_pre_condicion:      ':''('condicion')'   {Main.listaErrores.add("[ERROR SI
                     | PRE ':''('condicion  error {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Error en una funcion, falta ')'}");}
                     ;
 
-condicion : expresion {
+
+
+condicion: condicion_or {
                             Operando op = (Operando)$1.obj;
-                           if(op != null){
-                               $$ = new ParserVal(op.getValor());
-                           }
-                           else
+                            if(op != null){
+
+                             System.out.println("CONDI: " + op.getValor());
+                                $$ = new ParserVal((Operando)$1.obj);
+                            }
+                            else{
+                                System.out.println("IUSGHFIUHGIQUHGFBIQHGFQI9WHQIGFQI8GFW");
                                 $$ = new ParserVal(null);
-                        }
-	  | condicion OR expresion {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Se realizó la operación OR }");
+                                }
+
+                }
+
+condicion_or : condicion_and  { $$ = new ParserVal((Operando)$1.obj);}
+
+
+	  | condicion_or OR condicion_and{System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Se realizó la operación OR }");
 
 	                    Operando op1 = (Operando)$1.obj;
                         Operando op2 = (Operando)$3.obj;
+
                         if(op1 != null && op2 !=null){
                             if (op1.getTipo().equals(op2.getTipo())){
                                 Terceto t = new Terceto("OR", op1.getValor(), op2.getValor());
                                 t.setTipo(op1.getTipo());
                                 adminTercetos.agregarTerceto(t);
-                                $$ = new ParserVal("["+t.getNumero()+"]");
+                               $$ = new ParserVal(new Operando(op1.getTipo(), "["+t.getNumero()+"]"));
                             }
                             else{
                                 Main.listaErrores.add("[ERROR SEMÁNTICO] [Linea " + Lexico.linea + "] {Los tipos son incompatibles}");
@@ -742,8 +765,9 @@ condicion : expresion {
         }
 	  ;
 
-expresion: expresion1 { $$ = new ParserVal((Operando)$1.obj);}
-	    | expresion AND expresion1 {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Se realizó la operación: AND}");
+condicion_and: condicion_booleana { $$ = new ParserVal((Operando)$1.obj);}
+
+	    | condicion_and AND condicion_booleana {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Se realizó la operación: AND}");
 	                    Operando op1 = (Operando)$1.obj;
                         Operando op2 = (Operando)$3.obj;
                         if(op1 != null && op2 !=null){
@@ -751,7 +775,7 @@ expresion: expresion1 { $$ = new ParserVal((Operando)$1.obj);}
                                 Terceto t = new Terceto("AND", op1.getValor(), op2.getValor());
                                 t.setTipo(op1.getTipo());
                                 adminTercetos.agregarTerceto(t);
-                                $$ = new ParserVal("["+t.getNumero()+"]");
+                                $$ = new ParserVal(new Operando(op1.getTipo(), "["+t.getNumero()+"]"));
                             }
                             else{
                                 Main.listaErrores.add("[ERROR SEMÁNTICO] [Linea " + Lexico.linea + "] {Los tipos son incompatibles}");
@@ -764,8 +788,7 @@ expresion: expresion1 { $$ = new ParserVal((Operando)$1.obj);}
         }
 	    ;
 
-expresion1: expresion2 { $$ = new ParserVal((Operando)$1.obj);}
-		| expresion1 comparador expresion2 {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Se realizó la operación: " +  $2.sval + "}");
+condicion_booleana: expresion comparador expresion {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Se realizó la operación: " +  $2.sval + "}");
 
 		                            Operando op1 = (Operando)$1.obj;
                                     Operando op2 = (Operando)$3.obj;
@@ -784,13 +807,14 @@ expresion1: expresion2 { $$ = new ParserVal((Operando)$1.obj);}
                                     else{
                                            $$ = new ParserVal(null);
                                     }
-                    }
+                   }
+                | expresion { $$ = new ParserVal((Operando)$1.obj);}
 
         ;
 
-expresion2: termino { $$ = new ParserVal((Operando)$1.obj);}
+expresion: termino { $$ = new ParserVal((Operando)$1.obj);}
 
-	  | expresion2 '+' termino
+	  | expresion '+' termino
 	  {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Se realizó la operación: SUMA }");
 	    Operando op1 = (Operando)$1.obj;
                         Operando op2 = (Operando)$3.obj;
@@ -810,7 +834,7 @@ expresion2: termino { $$ = new ParserVal((Operando)$1.obj);}
                                $$ = new ParserVal(null);
                         }
       }
-	  | expresion2 '-' termino
+	  | expresion '-' termino
 	  {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Se realizó la operación: RESTA}");
 	    Operando op1 = (Operando)$1.obj;
                         Operando op2 = (Operando)$3.obj;
@@ -897,7 +921,7 @@ factor 	:  '-' factor  { if (chequearFactorNegado()){
                         $$ = new ParserVal(null);
 	                }
 	          }
-	    | invocacion    {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Invocacion de funcion}");
+	    | invocacion   {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Invocacion de funcion}");
                        if($1.sval != null){
                            String ambitoVariable = Main.tablaSimbolos.verificarAmbito($1.sval, ambito);
                            $$ = new ParserVal(new Operando(Main.tablaSimbolos.getDatos(ambitoVariable).getTipo(), ambitoVariable));
@@ -909,7 +933,7 @@ factor 	:  '-' factor  { if (chequearFactorNegado()){
 comparador : '<'        { $$ = new ParserVal("<");}
 	   | '>'            { $$ = new ParserVal(">");}
 	   | IGUAL_IGUAL    { $$ = new ParserVal("==");}
-       | MAYOR_IGUAL   { $$ = new ParserVal(">=");}
+       | MAYOR_IGUAL    { $$ = new ParserVal(">=");}
 	   | MENOR_IGUAL    { $$ = new ParserVal("<=");}
 	   | DISTINTO       { $$ = new ParserVal("<>");}
 	   ;

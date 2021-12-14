@@ -22,7 +22,7 @@ public class TablaSimbolos {
     // ----------Agregar Simbolo (con distintas variantes)
 
     public void agregarSimbolo(String lexema, Integer id) {
-        if (simbolos.containsKey(lexema))
+        if (simbolos.containsKey(lexema) && id != 258  &&  id != 264)
             Main.listaErrores.add("[ERROR]El identificador " + lexema + " ya existe");
         else {
             DatosSimbolo ds = new DatosSimbolo();

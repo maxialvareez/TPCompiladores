@@ -1,16 +1,13 @@
-pruebaCondicion
-ULONG a,b;
+programita
+DOUBLE numero;
+ULONG a,b,d;
+ULONG FUNC f1 (DOUBLE A)
+ULONG s,f;
 BEGIN
-a:= 7;
-b:= 6+2;
-
-IF (a <> b) THEN
-
-PRINT(%DISTINTOS%);
-
-ELSE
-
-PRINT(%IGUALES%);
-ENDIF;
-
+a := f;
+a:= 4;
+RETURN (A < A && A|| 3.0);
+END;
+BEGIN
+d := 4;
 END
