@@ -104,7 +104,8 @@ declaracion : tipo lista_de_variables ';'{System.out.println("[Sintáctico] [Lin
                         ds.setTipo($4.sval);
                         Main.tablaSimbolos.setDatosSimbolo(nuevoLexema, ds);
                     }
-                    //TODO ELSE
+                    else
+                         Main.listaErrores.add("[ERROR SEMÁNTICO] [Linea " + Lexico.linea + "] { La funcion "+ $2.sval +" ya esta declarada}");
     	        }
                 else
                     Main.listaErrores.add("[ERROR SEMÁNTICO] [Linea " + Lexico.linea + "] {" + $1.sval + " y " + $5.sval +" deben tener el mismo nombre}");
@@ -243,11 +244,12 @@ asignacion : IDENTIFICADOR ASIGNACION expresion  {System.out.println("[Sintácti
                         Main.listaErrores.add("[ERROR SEMÁNTICO] [Linea " + Lexico.linea + "] {Los tipos son incompatibles}");
                     }
            }
+           }
             else{
                 Main.listaErrores.add("[ERROR SEMÁNTICO] [Linea " + Lexico.linea + "] {La variable " + $1.sval +" no fue declarada}");
             }
 
-        }
+
         }
 	   	  |error_asignacion;
 	   ;
@@ -417,45 +419,48 @@ invocacion : IDENTIFICADOR '(' CTE_ULONG ')' {System.out.println("[Sintáctico] 
                  if ($3.sval != null && $1.sval != null){
                     String ambitoFuncion= Main.tablaSimbolos.verificarAmbito($1.sval, ambito);
                     String ambitoParametro = Main.tablaSimbolos.verificarAmbito($3.sval, ambito);
-                    if(ambitoFuncion != null && Main.tablaSimbolos.getDatos(ambitoFuncion).getTipo().equals(Main.tablaSimbolos.getDatos(ambitoParametro).getTipo())){
-                        if (ambitoParametro != null){
-                             if (!Main.tablaSimbolos.getDatos(ambitoFuncion).getFuncionReferenciada().equals("")){
-                                String funcionRef = Main.tablaSimbolos.getDatos(ambitoFuncion).getFuncionReferenciada();
-                                Terceto t = new Terceto("InvocacionFuncion", funcionRef, null);
-                                adminTercetos.agregarTerceto(t);
-                                String variableFuncion = Main.tablaSimbolos.getDatos(funcionRef).getParametro();
-                                t = new Terceto(":=", variableFuncion ,ambitoParametro );
-                                t.setTipo(Main.tablaSimbolos.getDatos(variableFuncion).getTipo());
-                                adminTercetos.agregarTerceto(t);
-                                funcionRef = funcionRef.substring(0, funcionRef.lastIndexOf("@"));
-                                $$ = new ParserVal(funcionRef);
-                            }
-                            else{
-                                 Terceto t = new Terceto("InvocacionFuncion", ambitoFuncion, null);
-                                 adminTercetos.agregarTerceto(t);
-                                 String variableFuncion = Main.tablaSimbolos.getDatos(ambitoFuncion).getParametro();
-                                 t = new Terceto(":=", variableFuncion ,ambitoParametro );
-                                 t.setTipo(Main.tablaSimbolos.getDatos(variableFuncion).getTipo());
-                                 adminTercetos.agregarTerceto(t);
 
-                                 $$ = new ParserVal($1.sval);
+                    if(ambitoFuncion != null){
+                        if (ambitoParametro != null){
+                             String nombreParametro = Main.tablaSimbolos.getDatos(ambitoFuncion).getParametro();
+                                if (Main.tablaSimbolos.getDatos(nombreParametro).getTipo().equals(Main.tablaSimbolos.getDatos(ambitoParametro).getTipo())){
+                                     if (!Main.tablaSimbolos.getDatos(ambitoFuncion).getFuncionReferenciada().equals("")){
+                                        String funcionRef = Main.tablaSimbolos.getDatos(ambitoFuncion).getFuncionReferenciada();
+                                        Terceto t = new Terceto("InvocacionFuncion", funcionRef, null);
+                                        adminTercetos.agregarTerceto(t);
+                                        String variableFuncion = Main.tablaSimbolos.getDatos(funcionRef).getParametro();
+                                        t = new Terceto(":=", variableFuncion ,ambitoParametro );
+                                        t.setTipo(Main.tablaSimbolos.getDatos(variableFuncion).getTipo());
+                                        adminTercetos.agregarTerceto(t);
+                                        funcionRef = funcionRef.substring(0, funcionRef.lastIndexOf("@"));
+                                        $$ = new ParserVal(funcionRef);
+                                    }
+                                    else{
+                                         Terceto t = new Terceto("InvocacionFuncion", ambitoFuncion, null);
+                                         adminTercetos.agregarTerceto(t);
+                                         String variableFuncion = Main.tablaSimbolos.getDatos(ambitoFuncion).getParametro();
+                                         t = new Terceto(":=", variableFuncion ,ambitoParametro );
+                                         t.setTipo(Main.tablaSimbolos.getDatos(variableFuncion).getTipo());
+                                         adminTercetos.agregarTerceto(t);
+                                         $$ = new ParserVal($1.sval);
+                                    }
+                                }
+                                else{
+                                   Main.listaErrores.add("[ERROR SEMÁNTICO] [Linea " + Lexico.linea+ "] {Se invocó a la función "+$1.sval+" con un parámetro de otro tipo}");
+                                   $$ = new ParserVal(null);
+                                    }
                         }
+                        else{
+                             Main.listaErrores.add("[ERROR SEMÁNTICO] [Linea " + Lexico.linea+ "] {El parámetro "+$3.sval+" esta fuera de alcance o no esta declarado}");
                         }
-                        else
-                            Main.listaErrores.add("[ERROR SEMÁNTICO] [Linea " + Lexico.linea+ "] {El parámetro "+$3.sval+" esta fuera de alcance}");
                     }
-                    else
-                        if(ambitoFuncion == null){
+                    else{
                            Main.listaErrores.add("[ERROR SEMÁNTICO] [Linea " + Lexico.linea+ "] {La función "+$1.sval+" esta fuera de alcance}");
                            $$ = new ParserVal(null);
                         }
-                        else{
-                            Main.listaErrores.add("[ERROR SEMÁNTICO] [Linea " + Lexico.linea+ "] {Se invocó a la función "+$1.sval+" con un parámetro de otro tipo}");
-                            $$ = new ParserVal(null);
-                        }
                  }
-
-
+                 else
+                     $$ = new ParserVal(null);
             }
 	        | error_invocacion
 	        ;
@@ -517,7 +522,6 @@ error_lista_de_variables: lista_de_variables IDENTIFICADOR {Main.listaErrores.ad
 
 funcion :  declaracion_funcion bloque_funcion
          {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Declaración de función llamada '"+ $1.sval +"'" );
-            System.out.println("CONDICION :"  + $2.sval);
             if($1.sval != null && $2.sval != null ){ //si se declaró bien y se cumplen los PRE (en caso de haberlos)
                 if ($2.sval.equals("PRE")){
                    ambito = ambito.substring(0,ambito.lastIndexOf("@"));
@@ -653,10 +657,18 @@ error_bloque_funcion : bloque_declarativo error {Main.listaErrores.add("[ERROR S
 		     ;
 
 
-bloque_ejecucion_funcion : BEGIN bloque_sentencias RETURN '('condicion')' ';' END{
+bloque_ejecucion_funcion :  BEGIN RETURN '('condicion')' ';' END{
+                             Operando op = (Operando)$4.obj;
+                             if (op != null){
+                                  $$ = new ParserVal(op.getValor());
+                              }
+                                 else
+                                     $$ = new ParserVal (null);
+                      }
+
+                |BEGIN bloque_sentencias RETURN '('condicion')' ';' END{
                         Operando op = (Operando)$5.obj;
                         if (op != null){
-                            System.out.println("laCONDI: " + op.getValor());
                              $$ = new ParserVal(op.getValor());
                          }
                             else
@@ -682,7 +694,6 @@ bloque_ejecucion_funcion : BEGIN bloque_sentencias RETURN '('condicion')' ';' EN
    			 ;			
 
 error_bloque_ejecucion_funcion :       bloque_sentencias RETURN '('condicion')' ';' END  {Main.listaErrores.add("Error sintáctico: Linea " + Lexico.linea + " se detectó un error en una funcion, falta el BEGIN");}
-				|BEGIN                   RETURN '('condicion')' ';' END  {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Error en una funcion, falta el bloque de sentencias ejecutables");}
 				|BEGIN bloque_sentencias        '('condicion')' ';' END  {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Error en una funcion, falta el RETURN");}
 				|BEGIN bloque_sentencias RETURN    condicion')' ';' END  {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Error en una funcion, falta '(' ");}
 				|BEGIN bloque_sentencias RETURN '('         ')' ';' END  {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Error en una funcion, falta indicar el retorno");}
@@ -727,17 +738,15 @@ error_pre_condicion:      ':''('condicion')'   {Main.listaErrores.add("[ERROR SI
 
 condicion: condicion_or {
                             Operando op = (Operando)$1.obj;
-                            if(op != null){
-
-                             System.out.println("CONDI: " + op.getValor());
+                            if(op != null)
                                 $$ = new ParserVal((Operando)$1.obj);
-                            }
+
                             else{
-                                System.out.println("IUSGHFIUHGIQUHGFBIQHGFQI9WHQIGFQI8GFW");
                                 $$ = new ParserVal(null);
                                 }
 
                 }
+                ;
 
 condicion_or : condicion_and  { $$ = new ParserVal((Operando)$1.obj);}
 
@@ -926,6 +935,7 @@ factor 	:  '-' factor  { if (chequearFactorNegado()){
                            String ambitoVariable = Main.tablaSimbolos.verificarAmbito($1.sval, ambito);
                            $$ = new ParserVal(new Operando(Main.tablaSimbolos.getDatos(ambitoVariable).getTipo(), ambitoVariable));
                        }
+                       //TODO ELSE
                      }
         ;
 

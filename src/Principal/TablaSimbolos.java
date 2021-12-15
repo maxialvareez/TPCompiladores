@@ -97,6 +97,23 @@ public class TablaSimbolos {
         return null;
     }
 
+    public boolean estaDeclarada(String lexema){
+        Enumeration<String> e = simbolos.keys();
+        while (e.hasMoreElements()) {
+            String key = e.nextElement();
+            String lex = key;
+            System.out.println(key);
+
+            if (lex.contains("@")) {
+                lex = lex.substring(0, lex.indexOf("@"));
+                System.out.println(lex);
+                if (lex.equals(lexema))
+                    return true;
+            }
+        }
+        return false;
+    }
+    //TODO habria que hacer algo con respecto a distinguir entre dos casos: que una variable no este al alcance, o que una variable no este declarada. Se me ocurre hacer un metodo que busque el nombre de una variable sin importarle el contexto, para el caso de que el verificar ambito de null
 
     public void imprimirTablaSimbolos() {
         Enumeration iterador = simbolos.keys();

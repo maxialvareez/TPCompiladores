@@ -65,7 +65,7 @@ public class Main {
 
 
         tablaSimbolos.eliminarVariablesRepetidas();
-        //adminTercetos.generarCodigoIntermedio();
+        adminTercetos.generarCodigoIntermedio();
 /*
         Token t = l1.getToken();
         while (t.getId() != 0){

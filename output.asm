@@ -14,19 +14,24 @@ _divisorCeroULONG DD 0
 _divisorCeroDOUBLE DD 0.0
 _OverflowSuma DB "Overflow en suma", 0 
 _DivisionCero DB "Division por cero", 0 
-_numero@main DQ ?
-_d@main DD ?
-_a@main DD ?
-_s@main@f1 DD ?
-_4 DD 4
+_b@main@g DQ ?
+_b@main@f DQ ?
+_j@main@g DD ?
+_j@main@f DD ?
+_1_4300000000000002 DQ 1.4300000000000002
+_a@main DQ ?
+_z@main@g DD ?
+_u@main@f DD ?
 _b@main DD ?
-_A@main@f1 DQ ?
-_3_0 DQ 3.0
-_f@main@f1 DD ?
+_6 DD 6
+_3 DD 3
+_1 DD 1
 
 .code
 start: 
 FINIT 
+FLD _1_4300000000000002
+FSTP _a@main
 FINIT
 invoke ExitProcess, 0 
 FINIT

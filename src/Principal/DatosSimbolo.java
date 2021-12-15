@@ -9,6 +9,7 @@ public class DatosSimbolo {
     private String funcionReferenciada;
 
 
+
     public DatosSimbolo() {
         this.id = 0;
         this.tipo = null;
@@ -16,6 +17,7 @@ public class DatosSimbolo {
         this.parametro = "";
         this.typeDef = false;
         this.funcionReferenciada = "";
+
     }
 
     public String getFuncionReferenciada() {
@@ -26,6 +28,7 @@ public class DatosSimbolo {
         this.funcionReferenciada = funcionReferenciada;
         return this;
     }
+
 
     public boolean esTypeDef() {
         return typeDef;
