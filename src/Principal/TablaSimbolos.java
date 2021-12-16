@@ -24,6 +24,7 @@ public class TablaSimbolos {
     public void agregarSimbolo(String lexema, Integer id) {
         if (simbolos.containsKey(lexema) && id != 258  &&  id != 264)
             Main.listaErrores.add("[ERROR]El identificador " + lexema + " ya existe");
+
         else {
             DatosSimbolo ds = new DatosSimbolo();
             ds.setId(id);
@@ -32,7 +33,7 @@ public class TablaSimbolos {
     }
 
     public void agregarSimbolo(String lexema, Integer id, String tipo) {
-        if (simbolos.containsKey(lexema))
+        if (simbolos.containsKey(lexema)&& id != 258  &&  id != 264)
             System.out.println("El identificador " + lexema + " ya existe");
         else {
             DatosSimbolo ds = new DatosSimbolo();
@@ -43,7 +44,7 @@ public class TablaSimbolos {
     }
 
     public void agregarSimbolo(String lexema, Integer id, String tipo, String uso) {
-        if (simbolos.containsKey(lexema))
+        if (simbolos.containsKey(lexema)&& id != 258  &&  id != 264)
             System.out.println("El identificador " + lexema + " ya existe");
         else {
             DatosSimbolo ds = new DatosSimbolo();

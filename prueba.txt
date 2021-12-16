@@ -1,23 +1,6 @@
 pruebaRedeclaracion
-DOUBLE a;
-ULONG b;
+ULONG a;
 
-DOUBLE FUNC f (ULONG u)
-ULONG j;
-DOUBLE b;
-BEGIN
-u:= 6;
-RETURN(u+1);
-END;
 
-DOUBLE FUNC g (ULONG z)
-ULONG j;
-DOUBLE b;
-BEGIN
-
-RETURN(z+3);
-END;
-
-BEGIN
-a:=14.3E-1;
+a:= 23;
 END

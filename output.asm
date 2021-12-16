@@ -14,24 +14,31 @@ _divisorCeroULONG DD 0
 _divisorCeroDOUBLE DD 0.0
 _OverflowSuma DB "Overflow en suma", 0 
 _DivisionCero DB "Division por cero", 0 
-_b@main@g DQ ?
-_b@main@f DQ ?
-_j@main@g DD ?
-_j@main@f DD ?
-_1_4300000000000002 DQ 1.4300000000000002
-_a@main DQ ?
-_z@main@g DD ?
-_u@main@f DD ?
-_b@main DD ?
-_6 DD 6
-_3 DD 3
+_4 DD 4
+_var5 DD ?
+_10 DD 10
 _1 DD 1
+_u@main DD ?
+_i@main DD ?
 
 .code
 start: 
 FINIT 
-FLD _1_4300000000000002
-FSTP _a@main
+MOV EBX, _1
+MOV _i@main, EBX
+Label1: 
+JAE Label8
+MOV EBX, _4
+MOV _u@main, EBX
+MOV EBX, _i@main
+ADD EBX, _1
+CMP EBX, _limiteSuperiorULONG
+JA LabelOverflowSuma
+MOV _var5, EBX
+MOV EBX, _var5
+MOV _i@main, EBX
+JMP Label1
+Label8: 
 FINIT
 invoke ExitProcess, 0 
 FINIT
