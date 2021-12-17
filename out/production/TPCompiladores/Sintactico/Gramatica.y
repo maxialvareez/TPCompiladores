@@ -49,12 +49,12 @@ sentencia_ejecutable: control ';'
                         | impresion ';'
                         | invocacion ';'
                         | asignacion ';'
-                        |error_ejecutable
+                        | error_ejecutable
                         ;
 
 
 error_ejecutable: control error {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Sentencia mal declarada, falta ';'}");}
-                |seleccion error {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Sentencia mal declarada, falta ';'}");}
+                | seleccion error {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Sentencia mal declarada, falta ';'}");}
                 | impresion error {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Sentencia mal declarada, falta ';'}");}
            	    | asignacion error {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Sentencia mal declarada, falta ';'}");}
              	| invocacion error {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Sentencia mal declarada, falta ';'}");}
@@ -133,6 +133,10 @@ control : REPEAT'(' asignacion_repeat ';'condicion_repeat';' CTE_ULONG')' bloque
             Terceto t = new Terceto("+", $3.sval, $7.sval);
             t.setTipo("ULONG");
             adminTercetos.agregarTerceto(t);
+            int cantidad = adminTercetos.cantidadTercetos() -1;
+            t =  new Terceto(":=", $3.sval, "["+ cantidad + "]");
+            t.setTipo("ULONG");
+            adminTercetos.agregarTerceto(t);
             t = new Terceto("BI", null, null);
             adminTercetos.agregarTerceto(t);
             adminTercetos.desapilar(); //para completar BF
@@ -187,7 +191,7 @@ error_asignacion_repeat:  ASIGNACION CTE_ULONG {Main.listaErrores.add("[ERROR SI
 
 condicion_repeat: condicion_booleana{
                                 Operando op = (Operando)$1.obj;
-                                if(op != null){
+                                if (op != null){
                                     Terceto t = new Terceto("BF", op.getValor(), null);
                                     adminTercetos.agregarTerceto(t);
                                     adminTercetos.apilar(t.getNumero());
@@ -196,7 +200,7 @@ condicion_repeat: condicion_booleana{
                                 else
                                     $$ = new ParserVal(null);
                                  }
-                ;
+                                ;
 
 
 
@@ -255,8 +259,8 @@ asignacion : IDENTIFICADOR ASIGNACION expresion  {System.out.println("[Sintácti
 	   ;
 
 
-error_asignacion : ASIGNACION termino {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Falta el identificador del lado izquierdo de la asignación}");}
-			   |IDENTIFICADOR termino {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Falta ':=' en la asignación}");}
+error_asignacion : ASIGNACION expresion {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Falta el identificador del lado izquierdo de la asignación}");}
+			   |IDENTIFICADOR expresion {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Falta ':=' en la asignación}");}
 			   |IDENTIFICADOR ASIGNACION error {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Falta una expresión aritmética del lado derecho de la asignación}");}
 		  ;
 
@@ -295,11 +299,12 @@ seleccion: IF condicion_if THEN bloque_if ENDIF {
 
 condicion_if: '(' condicion ')'
               {
-                if($2.sval != null){
-                    Terceto t = new Terceto("BF", $2.sval, null);
+                Operando op = (Operando)$2.obj;
+                if(op != null){
+                    Terceto t = new Terceto("BF", op.getValor(), null);
                     adminTercetos.agregarTerceto(t);
                     adminTercetos.apilar(t.getNumero());
-                    $$ = new ParserVal($2.sval);
+                    $$ = new ParserVal(op.getValor());
                 }
                 else
                     $$ = new ParserVal(null);
@@ -676,15 +681,17 @@ bloque_ejecucion_funcion :  BEGIN RETURN '('condicion')' ';' END{
                  }
 
 			 | BEGIN pre_condicion ';' bloque_sentencias RETURN '('condicion')' ';' END {
-			            if ($2.sval != null && $7.sval != null){
-			                $$ = new ParserVal ($7.sval);
+			            Operando op = (Operando)$7.obj;
+			            if ($2.sval != null && op != null){
+			                $$ = new ParserVal (op.getValor());
 			            }
 			            else
 			                $$ = new ParserVal (null);
 			 }
 			 | BEGIN pre_condicion ';' RETURN '('condicion')' ';' END{
-                        if ($2.sval != null && $6.sval != null){
-                            $$ = new ParserVal ($6.sval);
+                        Operando op = (Operando)$6.obj;
+                        if ($2.sval != null && op != null){
+                            $$ = new ParserVal (op.getValor());
                         }
                         else
                              $$ = new ParserVal (null);
@@ -715,11 +722,12 @@ error_bloque_ejecucion_funcion :       bloque_sentencias RETURN '('condicion')' 
 
 
 pre_condicion: PRE ':' '(' condicion ')'{
-                      if($4.sval != null){
-                         Terceto t = new Terceto("BF", $4.sval, null);
+                      Operando op = (Operando)$4.obj;
+                      if (op != null){
+                         Terceto t = new Terceto("BF", op.getValor(), null);
                          adminTercetos.agregarTerceto(t);
                          adminTercetos.apilar(t.getNumero());
-                         $$ = new ParserVal($4.sval);
+                         $$ = new ParserVal(op.getValor());
                      }
                      else
                          $$ = new ParserVal(null);
@@ -749,7 +757,6 @@ condicion: condicion_or {
                 ;
 
 condicion_or : condicion_and  { $$ = new ParserVal((Operando)$1.obj);}
-
 
 	  | condicion_or OR condicion_and{System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Se realizó la operación OR }");
 
@@ -984,7 +991,7 @@ public boolean chequearFactorNegado(){
 	String lexema = yylval.sval;
 	int id = Main.tablaSimbolos.getId(lexema);
 	if(id == Lexico.CTE_ULONG){
-		System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Se detectó una constante ULONG fuera de rango}");
+	    Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Se detectó una constante ULONG fuera de rango}");
 		Main.tablaSimbolos.eliminarSimbolo(lexema);
 	}
 	else if (id == Lexico.CTE_DOUBLE) {
@@ -994,7 +1001,7 @@ public boolean chequearFactorNegado(){
                 	return true;
         }
         else {
-            System.out.println("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "]  {Se detectó una constante DOUBLE fuera de rango}");
+            Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "]  {Se detectó una constante DOUBLE fuera de rango}");
             Main.tablaSimbolos.eliminarSimbolo(lexema);
 	 	}
 	}

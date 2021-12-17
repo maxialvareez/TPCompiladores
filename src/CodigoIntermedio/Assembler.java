@@ -662,11 +662,10 @@ public class Assembler {
                     case "==":
                     case ">=":
                     case "<=":
-
                     case "<>":
                         //situacion 1: (operador, var/cte, var/cte)
                         if (t.esVariable(1) && t.esVariable(2)) {
-                            if (t.getTipo().equals("UINT")) {
+                            if (t.getTipo().equals("ULONG")) {
                                 code += "MOV EBX, _" + t.getOperando2() + '\n';
                                 code += "CMP _" + t.getOperando1() + ", EBX" + '\n';
                             }
@@ -687,12 +686,12 @@ public class Assembler {
                                 code += "FSTSW _" + "var" + t.getNumero() + "_2bytes" + '\n';
                                 code += "MOV AX , _" + "var" + t.getNumero() + "_2bytes" + '\n';
                                 code += "SAHF" + '\n';
-                                Main.tablaSimbolos.agregarSimbolo("var" + t.getNumero() + "_2bytes", Lexico.IDENTIFICADOR, "UINT", "Variable");
+                                Main.tablaSimbolos.agregarSimbolo("var" + t.getNumero() + "_2bytes", Lexico.IDENTIFICADOR, "ULONG", "Variable");
                             }
                         }
                         //situacion 2: (operador, registro, var/cte)
                         if (!t.esVariable(1) && t.esVariable(2)) {
-                            if (t.getTipo().equals("UINT")) {
+                            if (t.getTipo().equals("ULONG")) {
                                 String nroTerceto = t.getOperando1().substring(1, t.getOperando1().lastIndexOf("]"));
                                 Terceto t1 = administradorTerceto.getTerceto(Integer.parseInt(nroTerceto));
                                 code += "CMP " + t1.getResultado() + ", _" + t.getOperando2() + '\n';
@@ -714,12 +713,12 @@ public class Assembler {
                                 code += "FSTSW _" + "var" + t.getNumero() + "_2bytes" + '\n';
                                 code += "MOV AX , _" + "var" + t.getNumero() + "_2bytes" + '\n';
                                 code += "SAHF" + '\n';
-                                Main.tablaSimbolos.agregarSimbolo("var" + t.getNumero() + "_2bytes", Lexico.IDENTIFICADOR, "UINT", "Variable");
+                                Main.tablaSimbolos.agregarSimbolo("var" + t.getNumero() + "_2bytes", Lexico.IDENTIFICADOR, "ULONG", "Variable");
                             }
                         }
                         //situacion 3: (operador, registro, registro)
                         if (!t.esVariable(1) && !t.esVariable(2)) {
-                            if (t.getTipo().equals("UINT")) {
+                            if (t.getTipo().equals("ULONG")) {
                                 String nroTerceto = t.getOperando1().substring(1, t.getOperando1().lastIndexOf("]"));
                                 Terceto t1 = administradorTerceto.getTerceto(Integer.parseInt(nroTerceto));
 
@@ -742,13 +741,13 @@ public class Assembler {
                                 code += "FSTSW _" + "var" + t.getNumero() + "_2bytes" + '\n';
                                 code += "MOV AX , _" + "var" + t.getNumero() + "_2bytes" + '\n';
                                 code += "SAHF" + '\n';
-                                Main.tablaSimbolos.agregarSimbolo("var" + t.getNumero() + "_2bytes", Lexico.IDENTIFICADOR, "UINT", "Variable");
+                                Main.tablaSimbolos.agregarSimbolo("var" + t.getNumero() + "_2bytes", Lexico.IDENTIFICADOR, "ULONG", "Variable");
                             }
                         }
                         //situacion 4: (operador, var/cte, registro)
 
                         if (t.esVariable(1) && !t.esVariable(2)) {
-                            if (t.getTipo().equals("UINT")) {
+                            if (t.getTipo().equals("ULONG")) {
                                 String nroTerceto = t.getOperando2().substring(1, t.getOperando2().lastIndexOf("]"));
                                 Terceto t1 = administradorTerceto.getTerceto(Integer.parseInt(nroTerceto));
                                 code += "CMP _" + t.getOperando1() + ", " + t1.getResultado() + '\n';
@@ -770,7 +769,7 @@ public class Assembler {
                                 code += "FSTSW _" + "var" + t.getNumero() + "_2bytes" + '\n';
                                 code += "MOV AX , _" + "var" + t.getNumero() + "_2bytes" + '\n';
                                 code += "SAHF" + '\n';
-                                Main.tablaSimbolos.agregarSimbolo("var" + t.getNumero() + "_2bytes", Lexico.IDENTIFICADOR, "UINT", "Variable");
+                                Main.tablaSimbolos.agregarSimbolo("var" + t.getNumero() + "_2bytes", Lexico.IDENTIFICADOR, "ULONG", "Variable");
                             }
                         }
                         break;
