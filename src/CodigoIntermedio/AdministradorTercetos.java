@@ -7,7 +7,7 @@ import Principal.Main;
 import javax.jws.soap.SOAPBinding;
 import java.util.ArrayList;
 import java.util.Hashtable;
-
+import java.util.List;
 
 
 public class AdministradorTercetos {
@@ -17,7 +17,7 @@ public class AdministradorTercetos {
 
     private Hashtable<String, Integer> funciones = new Hashtable<String, Integer>();
     private ArrayList<ArrayList<Terceto>> codigoIntermedio = new ArrayList<>();
-
+    private List<String> invocaciones = new ArrayList<>();
 
     public AdministradorTercetos() {
     }
@@ -31,6 +31,10 @@ public class AdministradorTercetos {
         tercetos.add(t);
     }
 
+    public void imprimirInvocaciones(){
+        for (String s :invocaciones)
+            System.out.println(s);
+    }
     public int cantidadTercetos() {
         return tercetos.size();
     }
@@ -62,14 +66,14 @@ public class AdministradorTercetos {
     public void printCodigoIntermedio() {
         for (ArrayList<Terceto> a : codigoIntermedio) {
             for (Terceto t : a) {
-                System.out.println(t.getNumero() + ". (" + t.getOperador() + ", " + t.getOperando1() + ", " + t.getOperando2() + ")");
+                System.out.println(t.getNumero() + ". (" + t.getOperador() + ", " + t.getOperando1() + ", " + t.getOperando2() + ", " + t.getAmbitoInvocacion() +")");
             }
         }
     }
 
     public void imprimirTercetos(){
         for(Terceto t : tercetos)
-            System.out.println(t.getNumero() + ". (" + t.getOperador() + ", " + t.getOperando1() + ", " + t.getOperando2() + ", " + t.getTipo() + ")" );
+            System.out.println(t.getNumero() + ". (" + t.getOperador() + ", " + t.getOperando1() + ", " + t.getOperando2() + ", " + t.getTipo() + ", " + t.getAmbitoInvocacion() + ")" );
     }
 
     public void agregarFuncion(String funcion) {
@@ -92,11 +96,13 @@ public class AdministradorTercetos {
                 i++;
                 aux.add(tercetos.get(i));
                 addFuncion(funciones.get(funcionInvocada), this.buscarFinFuncion(funcionInvocada), funcionInvocada, index + 1, aux);
-
+                System.out.println("\n------ CÓDIGO INTERMEDIO ------");
+                System.out.println("---INVOCA---");
+                imprimirInvocaciones();
+                invocaciones.clear();
             }
             while ((t.getOperador().equals("ComienzaFuncion") && !t.getOperando1().equals(funcion)) && (i <= finalFuncion)) {
                 String operando = t.getOperando1();
-
                 if (tercetos.get(this.buscarFinFuncion(t.getOperando1())-1).getOperador().equals("RetornoFuncion")) {
                   funcs.put(operando,this.buscarFinFuncion(t.getOperando1())-1);
                 }
@@ -126,20 +132,64 @@ public class AdministradorTercetos {
     }
 
     public void addFuncion(int inicio, int fin, String funcion, int index,ArrayList<Terceto> aux ){
-
+        int finfunc = -1;
+        int comienzafunc = -1;
         for(int i =inicio; i <= fin ; i++){
             Terceto t = tercetos.get(i);
-            aux.add(t);
+            System.out.println(t.getOperador()+ " , "+ t.getOperando1() + " , " + t.getOperando2() );
+            String operando1 = t.getOperando1();
+            if (operando1.contains("@"))
+                operando1 = operando1.substring(0,operando1.indexOf("@") );
+            String func = funcion;
+            if (func.contains("@"))
+                func = func.substring(0,func.indexOf("@") );
+            System.out.println("Func: "+ func);
+            if (t.getOperador().equals("InvocacionFuncion") && !invocaciones.contains(operando1)){
+                if (t.getAmbitoInvocacion() != null ) {
+                    System.out.println(func);
+                    System.out.println(t.getAmbitoInvocacion());
+                        invocaciones.add(t.getAmbitoInvocacion());
+                }
+                    aux.add(t);
+                    Terceto t1 = tercetos.get(i+1);
+                    aux.add(t1);
+                    i++;
+                    finfunc = buscarFinFuncion(t.getOperando1());
+                    comienzafunc = buscarComienzoFuncion(t.getOperando1());
+
+                    addFuncion(comienzafunc,finfunc, t.getOperando1(),index, aux);
+
+            }
+            else {
+                if (invocaciones.contains(operando1) && !func.equals(operando1)) {
+                    System.out.println("Operando: "+ operando1);
+                    System.out.println("Func: "+ func);
+                    System.out.println("Funcion: " + funcion);
+                    System.out.println("ERROOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOR");
+                    Main.listaErrores.add("ERROR POR INVOCACION");
+
+                }
+                if (t.getOperador().equals("ComienzaFuncion") && !t.getOperando1().equals(funcion)){
+                    i = buscarFinFuncion(t.getOperando1()) ;
+                }
+                else
+                    aux.add(t);
+            }
         }
-
     }
-
-
 
     public void generarCodigoIntermedio(){
         this.generarCodigoIntermedio(0, tercetos.size() - 1, "main", 0);
     }
 
+    public int buscarComienzoFuncion(String funcion) {
+        for (Terceto t : tercetos) {
+            if (t.getOperador().equals("ComienzaFuncion") && t.getOperando1().equals(funcion)) {
+                return t.getNumero();
+            }
+        }
+        return 0;
+    }
     public int buscarFinFuncion(String funcion) {
         for (Terceto t : tercetos) {
             if (t.getOperador().equals("FinFuncion") && t.getOperando1().equals(funcion)) {

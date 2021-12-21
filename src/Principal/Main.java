@@ -93,11 +93,12 @@ public class Main {
         }
 
 
-        //System.out.println("\n------TERCETOS ------");
-        //adminTercetos.imprimirTercetos();
+        System.out.println("\n------TERCETOS ------");
+        adminTercetos.imprimirTercetos();
 
         System.out.println("\n------ CÓDIGO INTERMEDIO ------");
         adminTercetos.printCodigoIntermedio();
+
 
         System.out.println("\n -----TABLA DE SIMBOLOS------");
         tablaSimbolos.imprimirTablaSimbolos();
