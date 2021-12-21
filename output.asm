@@ -8,56 +8,32 @@ includelib \masm32\lib\kernel32.lib
 includelib \masm32\lib\user32.lib
 
 .data
-_limiteSuperiorULONG DD 100
+_limiteSuperiorULONG DD 4294967295
 _limiteInferiorULONG DD 0
 _divisorCeroULONG DD 0
 _divisorCeroDOUBLE DD 0.0
 _OverflowSuma DB "Overflow en suma", 0 
 _DivisionCero DB "Division por cero", 0 
-_MENOR DB 'MENOR', 0 
-_9_0 DQ 9.0
-_4_8 DQ 4.8
-_2_0 DQ 2.0
-_MAYOR DB 'MAYOR', 0 
-_a@main DQ ?
-_i@main DD ?
-_10 DD 10
-_b@main DD ?
-_9 DD 9
-_z@main DQ ?
-_5 DD 5
 _c@main DD ?
-_4 DD 4
-_55 DD 55
-_var3 DD ?
+_b@main DD ?
 _var2 DD ?
+_1500000 DD 1500000
+_15000606 DD 15000606
 
 .code
 start: 
 FINIT 
-FLD _4_8
-FSTP _a@main
-MOV EBX, _10
+MOV EBX, _1500000
 MOV _b@main, EBX
+MOV EBX, _15000606
+MOV _c@main, EBX
 MOV EBX, _b@main
-ADD EBX, _5
+ADD EBX, _c@main
 CMP EBX, _limiteSuperiorULONG
 JA LabelOverflowSuma
 MOV _var2, EBX
-MOV EBX, _9
-MUL EBX, _4
-MOV _var3, EBX
-CMP var2, null
-JAE Label11
-FLD _null
-FSTP _a@main
-invoke MessageBox, NULL, addr _MENOR, addr _MENOR, MB_OK 
-JMP Label15
-Label11: 
-FLD _null
-FSTP _a@main
-invoke MessageBox, NULL, addr _MAYOR, addr _MAYOR, MB_OK 
-Label15: 
+MOV EBX, _var2
+MOV _b@main, EBX
 FINIT
 invoke ExitProcess, 0 
 FINIT
