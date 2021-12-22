@@ -1,0 +1,20 @@
+pruebaTipos
+
+DOUBLE a,z;
+ULONG b,c,i;
+
+BEGIN
+a := 4.8;
+b := 10;
+IF (b + 5 < 55 - 9 * 4) THEN
+BEGIN
+a := a *2.0;
+PRINT(%MENOR%);
+END;
+ELSE
+BEGIN
+a := a *9.0;
+PRINT(%MAYOR%);
+END;
+ENDIF;
+END
