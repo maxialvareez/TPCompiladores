@@ -14,50 +14,32 @@ _divisorCeroULONG DD 0
 _divisorCeroDOUBLE DD 0.0
 _OverflowSuma DB "Overflow en suma", 0 
 _DivisionCero DB "Division por cero", 0 
-_MENOR DB 'MENOR', 0 
-_9_0 DQ 9.0
-_4_8 DQ 4.8
-_2_0 DQ 2.0
-_MAYOR DB 'MAYOR', 0 
-_a@main DQ ?
-_i@main DD ?
-_10 DD 10
-_b@main DD ?
-_9 DD 9
-_z@main DQ ?
-_5 DD 5
 _c@main DD ?
-_4 DD 4
-_55 DD 55
-_var3 DD ?
-_var2 DD ?
+_var7 DD ?
+_p@main@f DD ?
+_a@main DD ?
+_b@main DD ?
 
 .code
 start: 
 FINIT 
-FLD _4_8
-FSTP _a@main
-MOV EBX, _10
-MOV _b@main, EBX
 MOV EBX, _b@main
-ADD EBX, _5
-CMP EBX, _limiteSuperiorULONG
+MOV _p@main@f, EBX
+CALL f@main
+MOV EBX, _c@main
+MOV _p@main@f, EBX
+FINIT
+invoke ExitProcess, 0 
+f@main: 
+RetornoFuncion: 
+RET 
+MOV EBX, _null
+ADD EBX, _null
+CMP EBX, _limiteSuperiorUint
 JA LabelOverflowSuma
-MOV _var2, EBX
-MOV EBX, _9
-MUL EBX, _4
-MOV _var3, EBX
-CMP var2, null
-JAE Label11
-FLD _null
-FSTP _a@main
-invoke MessageBox, NULL, addr _MENOR, addr _MENOR, MB_OK 
-JMP Label15
-Label11: 
-FLD _null
-FSTP _a@main
-invoke MessageBox, NULL, addr _MAYOR, addr _MAYOR, MB_OK 
-Label15: 
+MOV _var7, EBX
+MOV EBX, _var7
+MOV _a@main, EBX
 FINIT
 invoke ExitProcess, 0 
 FINIT

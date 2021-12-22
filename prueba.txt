@@ -1,20 +1,17 @@
-pruebaTipos
+pruebaTypeDef
 
-DOUBLE a,z;
-ULONG b,c,i;
+
+ULONG a,b,c;
+
+ULONG FUNC f(ULONG p)
+BEGIN
+
+RETURN (p);
+END;
 
 BEGIN
-a := 4.8;
-b := 10;
-IF (b + 5 < 55 - 9 * 4) THEN
-BEGIN
-a := a *2.0;
-PRINT(%MENOR%);
-END;
-ELSE
-BEGIN
-a := a *9.0;
-PRINT(%MAYOR%);
-END;
-ENDIF;
+
+
+a:= f(b) + f(c) ;
+
 END

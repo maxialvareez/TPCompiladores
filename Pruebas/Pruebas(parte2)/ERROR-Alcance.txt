@@ -5,7 +5,7 @@ ULONG b;
 
 DOUBLE FUNC f (ULONG u)
 
-ULONG f2(ULONG a)
+ULONG FUNC f2(ULONG a)
 ULONG j;
 BEGIN
 a:=5;
@@ -19,6 +19,7 @@ END;
 BEGIN
 
 a:= j;
+f(b);
 
 
 END

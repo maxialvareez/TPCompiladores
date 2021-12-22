@@ -3,6 +3,7 @@ package Sintactico;
 import Principal.*;
 import CodigoIntermedio.*;
 import java.util.ArrayList;
+import java.util.Enumeration;
 %}
 
 %token IDENTIFICADOR CTE_ULONG MAYOR_IGUAL MENOR_IGUAL IGUAL_IGUAL DISTINTO ASIGNACION CTE_DOUBLE CADENA AND OR IF THEN ENDIF PRINT FUNC RETURN BEGIN END BREAK ULONG DOUBLE REPEAT PRE TRY CATCH TYPEDEF ELSE
@@ -101,6 +102,14 @@ declaracion : tipo lista_de_variables ';'{System.out.println("[Sintáctico] [Lin
                         ds.setUso("TypeDef");
                         ds.setTipo($4.sval);
                         Main.tablaSimbolos.setDatosSimbolo(nuevoLexema, ds);
+                        Enumeration iterador = Main.tablaSimbolos.getKeys();
+                        while (iterador.hasMoreElements()) {
+                            String lexema = (String) iterador.nextElement();
+                            ds = Main.tablaSimbolos.getDatos(lexema);
+                            if (ds.getTipo() != null)
+                                if (ds.getTipo().equals("SinAsignar"))
+                                    ds.setTipo($4.sval);
+                        }
                     }
                     else
                          Main.listaErrores.add("[ERROR SEMÁNTICO] [Linea " + Lexico.linea + "] { La funcion "+ $2.sval +" ya esta declarada}");
@@ -227,8 +236,10 @@ asignacion : IDENTIFICADOR ASIGNACION expresion ';' {System.out.println("[Sintá
                      String valorOp = op.getValor();
                         if(valorOp!= null && !valorOp.contains("[")){
                             if(Main.tablaSimbolos.getDatos(valorOp).getUso() != null && Main.tablaSimbolos.getDatos(ambitoVariable).getUso() != null)
-                                if(Main.tablaSimbolos.getDatos(valorOp).getUso().equals("NombreFuncion") && Main.tablaSimbolos.getDatos(ambitoVariable).getUso().equals("VariableTypeDef"))
+                                if(Main.tablaSimbolos.getDatos(valorOp).getUso().equals("NombreFuncion") && Main.tablaSimbolos.getDatos(ambitoVariable).getUso().equals("VariableTypeDef")){
                                     Main.tablaSimbolos.getDatos(ambitoVariable).setFuncionReferenciada(valorOp);
+                                    Main.tablaSimbolos.getDatos(ambitoVariable).setParametro(Main.tablaSimbolos.getDatos(valorOp).getParametro());
+                                }
 
                             if(Main.tablaSimbolos.getDatos(valorOp).getUso() != null && Main.tablaSimbolos.getDatos(ambitoVariable).getUso() != null)
                                 if(Main.tablaSimbolos.getDatos(valorOp).getUso().equals("VariableTypeDef") && Main.tablaSimbolos.getDatos(ambitoVariable).getUso().equals("VariableTypeDef"))
@@ -427,43 +438,56 @@ invocacion : IDENTIFICADOR '(' CTE_ULONG ')' {System.out.println("[Sintáctico] 
                     if(ambitoFuncion != null){
                         if (ambitoParametro != null){
                              String nombreParametro = Main.tablaSimbolos.getDatos(ambitoFuncion).getParametro();
-                                if (Main.tablaSimbolos.getDatos(nombreParametro).getTipo().equals(Main.tablaSimbolos.getDatos(ambitoParametro).getTipo())){
-                                     if (!Main.tablaSimbolos.getDatos(ambitoFuncion).getFuncionReferenciada().equals("")){
-                                        String funcionRef = Main.tablaSimbolos.getDatos(ambitoFuncion).getFuncionReferenciada();
-                                        Terceto t = new Terceto("InvocacionFuncion", funcionRef, null);
-                                        if (ambito.contains("@")){
-                                            String ambitoInvocacion = ambito;
-                                            ambitoInvocacion = ambitoInvocacion.substring(ambitoInvocacion.lastIndexOf("@") +1);
-                                            t.setAmbitoInvocacion(ambitoInvocacion);
+                                System.out.println("nombreParametro: " + nombreParametro);
+                                System.out.println("ambitoFuncion: " + ambitoFuncion);
+                                System.out.println("ambitoParametro: " + ambitoParametro);
+                                System.out.println("\n -----TABLA DE SIMBOLOS------");
+                                Main.tablaSimbolos.imprimirTablaSimbolos();
+                                System.out.println("ELPRIMERO: " + Main.tablaSimbolos.getDatos(nombreParametro).getTipo());
+                                System.out.println("ELsegundo: " + Main.tablaSimbolos.getDatos(ambitoParametro).getTipo());
+                                if (!nombreParametro.equals("")){
+                                    if (Main.tablaSimbolos.getDatos(nombreParametro).getTipo().equals(Main.tablaSimbolos.getDatos(ambitoParametro).getTipo())){
+                                         if (!Main.tablaSimbolos.getDatos(ambitoFuncion).getFuncionReferenciada().equals("")){
+                                            String funcionRef = Main.tablaSimbolos.getDatos(ambitoFuncion).getFuncionReferenciada();
+                                            Terceto t = new Terceto("InvocacionFuncion", funcionRef, null);
+                                            if (ambito.contains("@")){
+                                                String ambitoInvocacion = ambito;
+                                                ambitoInvocacion = ambitoInvocacion.substring(ambitoInvocacion.lastIndexOf("@") +1);
+                                                t.setAmbitoInvocacion(ambitoInvocacion);
+                                            }
+                                            adminTercetos.agregarTerceto(t);
+                                            String variableFuncion = Main.tablaSimbolos.getDatos(funcionRef).getParametro();
+                                            t = new Terceto(":=", variableFuncion ,ambitoParametro );
+                                            t.setTipo(Main.tablaSimbolos.getDatos(variableFuncion).getTipo());
+                                            adminTercetos.agregarTerceto(t);
+                                            funcionRef = funcionRef.substring(0, funcionRef.lastIndexOf("@"));
+                                            $$ = new ParserVal(funcionRef);
                                         }
-                                        adminTercetos.agregarTerceto(t);
-                                        String variableFuncion = Main.tablaSimbolos.getDatos(funcionRef).getParametro();
-                                        t = new Terceto(":=", variableFuncion ,ambitoParametro );
-                                        t.setTipo(Main.tablaSimbolos.getDatos(variableFuncion).getTipo());
-                                        adminTercetos.agregarTerceto(t);
-                                        funcionRef = funcionRef.substring(0, funcionRef.lastIndexOf("@"));
-                                        $$ = new ParserVal(funcionRef);
-                                    }
-                                    else{
-                                         Terceto t = new Terceto("InvocacionFuncion", ambitoFuncion, null);
-                                         if (ambito.contains("@")){
-                                              String ambitoInvocacion = ambito;
-                                              ambitoInvocacion = ambitoInvocacion.substring(ambitoInvocacion.lastIndexOf("@") +1);
-                                              t.setAmbitoInvocacion(ambitoInvocacion);
-                                          }
+                                        else{
+                                             Terceto t = new Terceto("InvocacionFuncion", ambitoFuncion, null);
+                                             if (ambito.contains("@")){
+                                                  String ambitoInvocacion = ambito;
+                                                  ambitoInvocacion = ambitoInvocacion.substring(ambitoInvocacion.lastIndexOf("@") +1);
+                                                  t.setAmbitoInvocacion(ambitoInvocacion);
+                                              }
 
-                                         adminTercetos.agregarTerceto(t);
-                                         String variableFuncion = Main.tablaSimbolos.getDatos(ambitoFuncion).getParametro();
-                                         t = new Terceto(":=", variableFuncion ,ambitoParametro );
-                                         t.setTipo(Main.tablaSimbolos.getDatos(variableFuncion).getTipo());
-                                         adminTercetos.agregarTerceto(t);
-                                         $$ = new ParserVal($1.sval);
-                                    }
+                                             adminTercetos.agregarTerceto(t);
+                                             String variableFuncion = Main.tablaSimbolos.getDatos(ambitoFuncion).getParametro();
+                                             t = new Terceto(":=", variableFuncion ,ambitoParametro );
+                                             t.setTipo(Main.tablaSimbolos.getDatos(variableFuncion).getTipo());
+                                             adminTercetos.agregarTerceto(t);
+                                             $$ = new ParserVal($1.sval);
+                                        }
                                 }
                                 else{
                                    Main.listaErrores.add("[ERROR SEMÁNTICO] [Linea " + Lexico.linea+ "] {Se invocó a la función "+$1.sval+" con un parámetro de otro tipo}");
                                    $$ = new ParserVal(null);
                                     }
+
+                            }
+                            else{
+
+                            }
                         }
                         else{
                              Main.listaErrores.add("[ERROR SEMÁNTICO] [Linea " + Lexico.linea+ "] {El parámetro "+$3.sval+" esta fuera de alcance o no esta declarado}");
@@ -626,27 +650,25 @@ funcion_type: FUNC '(' tipo ')' ';' IDENTIFICADOR lista_de_variables{
             if ($3.sval != null){
                  lista_variables = (ArrayList<String>)$7.obj;
                  if (lista_variables != null){
-                 for(String lexema: lista_variables){
-                     String nuevoLexema = lexema + "@" + ambito;
-                     if (!Main.tablaSimbolos.existeLexema(nuevoLexema)){
-                         Main.tablaSimbolos.reemplazarLexema(lexema, nuevoLexema);
-                         DatosSimbolo ds = Main.tablaSimbolos.getDatos(nuevoLexema);
-                         ds.setUso("VariableTypeDef");
-                         ds.setTipo($3.sval);
-                         Main.tablaSimbolos.setDatosSimbolo(nuevoLexema, ds);
+                     for(String lexema: lista_variables){
+                         String nuevoLexema = lexema + "@" + ambito;
+                         if (!Main.tablaSimbolos.existeLexema(nuevoLexema)){
+                             Main.tablaSimbolos.reemplazarLexema(lexema, nuevoLexema);
+                             DatosSimbolo ds = Main.tablaSimbolos.getDatos(nuevoLexema);
+                             ds.setUso("VariableTypeDef");
+                             ds.setTipo("SinAsignar");
+                             Main.tablaSimbolos.setDatosSimbolo(nuevoLexema, ds);
+                         }
+                         else{
+                             Main.listaErrores.add("[ERROR SEMÁNTICO] [Linea " + Lexico.linea + "] {Ya se declaró la variable de función " + lexema + " en este ámbito}");
+                             Main.tablaSimbolos.eliminarSimbolo(lexema);
+                            }
                      }
-                     else{
-                         Main.listaErrores.add("[ERROR SEMÁNTICO] [Linea " + Lexico.linea + "] {Ya se declaró la variable de función " + lexema + " en este ámbito}");
-                         Main.tablaSimbolos.eliminarSimbolo(lexema);
-
-                                     }
-                         }
-                         }
-                         }
-                   $$= new ParserVal($6.sval);
-                         }
-
-            ;
+                 }
+            }
+            $$= new ParserVal($6.sval);
+         }
+         ;
 
 
 
