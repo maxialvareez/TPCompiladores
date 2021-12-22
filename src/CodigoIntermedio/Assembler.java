@@ -66,8 +66,12 @@ public class Assembler {
                             else
                                 data = data + "_" + lexema + " DD ?" + '\n';
                         }
-                        if (Main.tablaSimbolos.getDatos(lexema).getTipo().equals("DOUBLE"))
-                            data = data + "_" + lexema + " DQ ?" + '\n';
+                        if (Main.tablaSimbolos.getDatos(lexema).getTipo().equals("DOUBLE")) {
+                            if (lexema.contains("2bytes"))
+                                data = data + "_" + lexema + " DW ?" + '\n';
+                            else
+                                data = data + "_" + lexema + " DQ ?" + '\n';
+                        }
                     }
                     break;
 
@@ -506,10 +510,10 @@ public class Assembler {
                                 code += "CMP EBX, _divisorCeroULONG" + '\n';
                                 code += "JZ " + "LabelDivisionCero" + '\n';
 
-                                code += "MOV EBX, _" + t.getOperando1() + '\n'; //
-                                code += "DIV _" + t.getOperando2() + '\n';  //Divide y el resultado queda en EBX
+                                code += "MOV EAX, _" + t.getOperando1() + '\n';
+                                code += "DIV _" + t.getOperando2() + '\n';
 
-                                code += "MOV _var"+ t.getNumero() +", EBX"+  '\n'; // Muevo a la variable.
+                                code += "MOV _var"+ t.getNumero() +", EAX"+  '\n'; // Muevo a la variable.
                                 t.setResultado("var" + t.getNumero()); // Seteo el resultado en el terceto.
                                 Main.tablaSimbolos.agregarSimbolo("var" + t.getNumero(), Lexico.IDENTIFICADOR, "ULONG", "Variable");
                             }
@@ -525,8 +529,12 @@ public class Assembler {
                                 op2 = op2.replace("+","__");
 
                                 code += "FLD _" + op2 + '\n';
-                                code += "CMP EBX, _divisorCeroDOUBLE" + '\n';
+                                code += "FCOM _divisorCeroDOUBLE" + '\n';
+                                code += "FSTSW _" + "var1_" + t.getNumero() + "_2bytes" + '\n';
+                                code += "MOV AX , _" + "var1_" + t.getNumero() + "_2bytes" + '\n';
+                                code += "SAHF" + '\n';
                                 code += "JZ " + "LabelDivisionCero" + '\n';
+                                Main.tablaSimbolos.agregarSimbolo("var1_" + t.getNumero() + "_2bytes", Lexico.IDENTIFICADOR, "DOUBLE", "Variable");
 
                                 code += "FLD _" + op1 + '\n';
                                 code += "FDIV _" + op2 + '\n';
@@ -543,9 +551,13 @@ public class Assembler {
                                 String nroTerceto = t.getOperando1().substring(1, t.getOperando1().lastIndexOf("]"));
                                 Terceto t1 = administradorTerceto.getTerceto(Integer.parseInt(nroTerceto)); //Traigo el terceto
 
-                                code += "MOV EBX, _" + t1.getResultado() + '\n';
-                                code += "DIV EBX, _"  + t.getOperando2() + '\n';
-                                code += "MOV _var"+ t.getNumero() +", EBX"+  '\n';
+                                code += "MOV EBX, _"  + t.getOperando2() + '\n';
+                                code += "CMP EBX, _divisorCeroULONG" + '\n';
+                                code += "JZ " + "LabelDivisionCero" + '\n';
+
+                                code += "MOV EAX, _" + t1.getResultado() + '\n';
+                                code += "DIV _"  + t.getOperando2() + '\n';
+                                code += "MOV _var"+ t.getNumero() +", EAX"+  '\n';
                                 t.setResultado("var" + t.getNumero()); // Seteo la variable.
                                 Main.tablaSimbolos.agregarSimbolo("var" + t.getNumero(), Lexico.IDENTIFICADOR, "ULONG", "Variable");
                             }
@@ -558,6 +570,14 @@ public class Assembler {
 
                                 String nroTerceto = t.getOperando1().substring(1, t.getOperando1().lastIndexOf("]"));
                                 Terceto t1 = administradorTerceto.getTerceto(Integer.parseInt(nroTerceto));
+
+                                code += "FLD _" + op2 + '\n';
+                                code += "FCOM _divisorCeroDOUBLE" + '\n';
+                                code += "FSTSW _" + "var1_" + t.getNumero() + "_2bytes" + '\n';
+                                code += "MOV AX , _" + "var1_" + t.getNumero() + "_2bytes" + '\n';
+                                code += "SAHF" + '\n';
+                                code += "JZ " + "LabelDivisionCero" + '\n';
+                                Main.tablaSimbolos.agregarSimbolo("var1_" + t.getNumero() + "_2bytes", Lexico.IDENTIFICADOR, "DOUBLE", "Variable");
 
                                 code += "FLD _" + t1.getResultado() + '\n';
                                 code += "FDIV _" + op2 + '\n';
@@ -573,24 +593,39 @@ public class Assembler {
                         if (!t.esVariable(1) && !t.esVariable(2)) {
 
                             if (t.getTipo().equals("ULONG")) {
+
                                 String nroTerceto1 = t.getOperando1().substring(1, t.getOperando1().lastIndexOf("]"));
                                 Terceto t1 = administradorTerceto.getTerceto(Integer.parseInt(nroTerceto1));
 
                                 String nroTerceto2 = t.getOperando2().substring(1, t.getOperando2().lastIndexOf("]"));
                                 Terceto t2 = administradorTerceto.getTerceto(Integer.parseInt(nroTerceto2));
 
-                                code += "MOV EBX, _" + t1.getResultado() + '\n';
-                                code += "DIV EBX, _" + t2.getResultado() + '\n';
-                                code += "MOV _var"+ t.getNumero() +", EBX"+  '\n';
+                                code += "MOV EBX, _" + t2.getResultado() + '\n';
+                                code += "CMP EBX, _divisorCeroULONG" + '\n';
+                                code += "JZ " + "LabelDivisionCero" + '\n';
+
+                                code += "MOV EAX, _" + t1.getResultado() + '\n';
+                                code += "DIV _"  + t2.getResultado() + '\n';
+                                code += "MOV _var"+ t.getNumero() +", EAX"+  '\n';
+
                                 t.setResultado("var" + t.getNumero()); // Seteo la variable.
                                 Main.tablaSimbolos.agregarSimbolo("var" + t.getNumero(), Lexico.IDENTIFICADOR, "ULONG", "Variable");
 
                             }
                             if (t.getTipo().equals("DOUBLE")) {
+
                                 String nroTerceto = t.getOperando1().substring(1, t.getOperando1().lastIndexOf("]"));
                                 Terceto t1 = administradorTerceto.getTerceto(Integer.parseInt(nroTerceto));
                                 String nroTerceto2 = t.getOperando2().substring(1, t.getOperando2().lastIndexOf("]"));
                                 Terceto t2 = administradorTerceto.getTerceto(Integer.parseInt(nroTerceto2));
+
+                                code += "FLD _" + t2.getResultado() + '\n';
+                                code += "FCOM _divisorCeroDOUBLE" + '\n';
+                                code += "FSTSW _" + "var1_" + t.getNumero() + "_2bytes" + '\n';
+                                code += "MOV AX , _" + "var1_" + t.getNumero() + "_2bytes" + '\n';
+                                code += "SAHF" + '\n';
+                                code += "JZ " + "LabelDivisionCero" + '\n';
+                                Main.tablaSimbolos.agregarSimbolo("var1_" + t.getNumero() + "_2bytes", Lexico.IDENTIFICADOR, "DOUBLE", "Variable");
 
                                 code += "FLD _" + t1.getResultado() + '\n';
                                 code += "FDIV _" + t2.getResultado() + '\n';
@@ -608,9 +643,13 @@ public class Assembler {
                                 String nroTerceto = t.getOperando2().substring(1, t.getOperando1().lastIndexOf("]"));
                                 Terceto t1 = administradorTerceto.getTerceto(Integer.parseInt(nroTerceto)); //Traigo el terceto
 
-                                code += "MOV EBX, _" + t.getOperando1() + '\n'; // Muevo _varTerceto a EBX por problema de memoria, memoria
-                                code += "DIV EBX, _"  + t1.getResultado() + '\n'; // Sumo en EBX lo que estaba con la variable.
-                                code += "MOV _var"+ t.getNumero() +", EBX"+  '\n'; // Muevo lo del registro a la variable.
+                                code += "MOV EBX, _" + t.getOperando2() + '\n'; // Muevo _varTerceto a EBX por problema de memoria, memoria
+                                code += "CMP EBX, _divisorCeroULONG" + '\n';
+                                code += "JZ " + "LabelDivisionCero" + '\n';
+
+                                code += "MOV EAX, _" + t1.getResultado() + '\n';
+                                code += "DIV _"  + t.getOperando2() + '\n'; // Sumo en EBX lo que estaba con la variable.
+                                code += "MOV _var"+ t.getNumero() +", EAX"+  '\n'; // Muevo lo del registro a la variable.
                                 t.setResultado("var" + t.getNumero()); // Seteo la variable.
                                 Main.tablaSimbolos.agregarSimbolo("var" + t.getNumero(), Lexico.IDENTIFICADOR, "ULONG", "Variable");
 
@@ -625,7 +664,15 @@ public class Assembler {
                                 String nroTerceto = t.getOperando2().substring(1, t.getOperando2().lastIndexOf("]"));
                                 Terceto t1 = administradorTerceto.getTerceto(Integer.parseInt(nroTerceto));
 
-                                code += "FLD _" + op1 + '\n';
+                                code += "FLD _" + t1.getResultado() + '\n';
+                                code += "FCOM _divisorCeroDOUBLE" + '\n';
+                                code += "FSTSW _" + "var1_" + t.getNumero() + "_2bytes" + '\n';
+                                code += "MOV AX , _" + "var1_" + t.getNumero() + "_2bytes" + '\n';
+                                code += "SAHF" + '\n';
+                                code += "JZ " + "LabelDivisionCero" + '\n';
+                                Main.tablaSimbolos.agregarSimbolo("var1_" + t.getNumero() + "_2bytes", Lexico.IDENTIFICADOR, "DOUBLE", "Variable");
+
+                                code += "FLD _" + t.getOperando1() + '\n';
                                 code += "FDIV _" + t1.getResultado() + '\n';
                                 code += "FSTP _" + "var" + t.getNumero() + '\n';
                                 t.setResultado("var" + t.getNumero());

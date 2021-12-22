@@ -1,0 +1,13 @@
+pruebaTipos
+
+DOUBLE a,z;
+ULONG b,c,i;
+
+BEGIN
+
+REPEAT (i := 1; i<10; 1)
+BEGIN
+PRINT(%REPEAT%);
+END;
+
+END

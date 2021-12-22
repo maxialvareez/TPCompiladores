@@ -1,17 +1,28 @@
-pruebaTypeDef
+pruebaTipos
 
+ULONG a,b;
 
-ULONG a,b,c;
-
-ULONG FUNC f(ULONG p)
+ULONG FUNC f (ULONG b)
 BEGIN
-
-RETURN (p);
+b:= 2;
+RETURN (b);
 END;
 
 BEGIN
 
+b:= 3;
+a := f(b);
 
-a:= f(b) + f(c) ;
+IF  (a < 3) THEN
+BEGIN
+a := a;
+PRINT(%MENOR%);
+END;
+ELSE
+BEGIN
+a := a;
+PRINT(%MAYOR%);
+END;
+ENDIF;
 
 END
