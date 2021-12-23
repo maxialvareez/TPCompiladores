@@ -739,7 +739,6 @@ public class Assembler {
                         break;
 
                     case "FinFuncion":
-                        code += "MOV " + "EAX \n"; //TODO
                         break;
 
                     case "InvocacionFuncion":
@@ -882,26 +881,49 @@ public class Assembler {
 
                     case "RetornoFuncion":
                         if (t.esVariable(1)) {
-                            //if (t.getResultado().equals("ULONG")) {
-                                code += "MOV _varRet"+ t.getNumero() +", EAX"+  '\n'; // Muevo a la variable.
+                            if (t.getTipo().equals("ULONG")) {
+
+                                code += "MOV EBX, _" + t.getOperando1() + '\n'; // Muevo a la variable.
+                                code += "MOV _varRet"+ t.getNumero() +", EBX" + '\n'; // Muevo a la variable.
                                 t.setResultado("varRet" + t.getNumero()); // Seteo el resultado en el terceto.
                                 Main.tablaSimbolos.agregarSimbolo("varRet" + t.getNumero(), Lexico.IDENTIFICADOR, "ULONG", "Variable"); // Agrego la variable a tabla de simbolos.
-                            //}
+                            }
+
+                            if (t.getTipo().equals("DOUBLE")) {
+                                String op1 = t.getOperando1();
+                                op1 = t.getOperando1().replace('.', '_');
+                                op1 = op1.replace('-', '_');
+                                op1 = op1.replace("+", "__");
+
+                                code += "FLD _" + op1 + '\n';
+                                code += "FSTP _" + "varRet" + t.getNumero() + '\n';
+                                t.setResultado("varRet" + t.getNumero());
+                                Main.tablaSimbolos.agregarSimbolo("varRet" + t.getNumero(), Lexico.IDENTIFICADOR, "DOUBLE", "Variable");
+                            }
 
                         }
 
                         if (!t.esVariable(1)) {
-                            //if (t.getTipo().equals("ULONG")) {
+                            if (t.getTipo().equals("ULONG")) {
+                                nroTerceto = t.getOperando1().substring(1, t.getOperando1().lastIndexOf("]"));
+                                t1 = administradorTerceto.getTerceto(Integer.parseInt(nroTerceto));
 
-                                code += "MOV _varRet"+ t.getNumero() +", EAX"+  '\n'; // Muevo a la variable.
+                                code += "MOV EBX, _" + t1.getResultado() + '\n'; // Muevo a la variable.
+                                code += "MOV _varRet"+ t.getNumero() +", EBX" + '\n'; // Muevo a la variable.
                                 t.setResultado("varRet" + t.getNumero()); // Seteo el resultado en el terceto.
                                 Main.tablaSimbolos.agregarSimbolo("varRet" + t.getNumero(), Lexico.IDENTIFICADOR, "ULONG", "Variable"); // Agrego la variable a tabla de simbolos.
 
-                           // }
+                           }
 
-                            //if (t.getTipo().equals("DOUBLE")) {
+                            if (t.getTipo().equals("DOUBLE")) {
+                                nroTerceto = t.getOperando1().substring(1, t.getOperando1().lastIndexOf("]"));
+                                t1 = administradorTerceto.getTerceto(Integer.parseInt(nroTerceto));
 
-                           //     }
+                                code += "FLD _var" + t1.getNumero() + '\n';
+                                code += "FSTP _" + "varRet" + t1.getNumero() + '\n';
+                                t.setResultado("varRet" + t1.getNumero());
+                                Main.tablaSimbolos.agregarSimbolo("varRet" + t1.getNumero(), Lexico.IDENTIFICADOR, "DOUBLE", "Variable");
+                                }
                             }
 
                         break;

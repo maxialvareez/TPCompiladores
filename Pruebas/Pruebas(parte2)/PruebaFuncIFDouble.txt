@@ -6,12 +6,12 @@ DOUBLE FUNC f (DOUBLE b)
 BEGIN
 b := b+1.0;
 PRINT(%HOLA%);
-RETURN (b+1.0);
+RETURN (b);
 END;
 
 BEGIN
 
-b:= 1.0;
+b:= 2.0;
 b := f(b);
 
 IF (b < 3.0) THEN

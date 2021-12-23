@@ -1,27 +1,27 @@
 pruebaFuncIf
 
-DOUBLE b;
+ULONG b;
 
-DOUBLE FUNC f (DOUBLE b)
+ULONG FUNC f (ULONG b)
 BEGIN
-b := b+1.0;
+b := b-1;
 PRINT(%HOLA%);
-RETURN (b+1.0);
+RETURN (b);
 END;
 
 BEGIN
 
-b:= 1.0;
+b:= 2;
 b := f(b);
 
-IF (b < 3.0) THEN
+IF (b < 3) THEN
 BEGIN
-b := 1.0;
+b := 1;
 PRINT(%MENOR%);
 END;
 ELSE
 BEGIN
-b:= 1.0;
+b:= 1;
 PRINT(%MAYOR%);
 END;
 ENDIF;
