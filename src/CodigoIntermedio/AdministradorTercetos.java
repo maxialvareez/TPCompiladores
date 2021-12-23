@@ -138,8 +138,9 @@ public class AdministradorTercetos {
             Terceto t = tercetos.get(i);
             System.out.println(t.getOperador()+ " , "+ t.getOperando1() + " , " + t.getOperando2() );
             String operando1 = t.getOperando1();
-            if (operando1.contains("@"))
-                operando1 = operando1.substring(0,operando1.indexOf("@") );
+            if (!t.getOperador().contains("Label"))
+                if (operando1.contains("@"))
+                    operando1 = operando1.substring(0,operando1.indexOf("@"));
             String func = funcion;
             if (func.contains("@"))
                 func = func.substring(0,func.indexOf("@") );

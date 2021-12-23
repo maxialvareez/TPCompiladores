@@ -729,20 +729,21 @@ public class Assembler {
                         break;
 
                     case "ComienzaFuncion":
-                        if (funcionActual.equals("main")) {
+                        /*if (funcionActual.equals("main")) {
                             code += "FINIT\n";
                             code += "invoke ExitProcess, 0 \n";
-                        }
+                        }*/
+                        code += "CALL " + t.getOperando1() + "\n";
                         code += t.getOperando1() + ": \n";
                         funcionActual = t.getOperando1().substring(0, t.getOperando1().indexOf("@"));
                         break;
 
                     case "FinFuncion":
-                        code += "RET \n";
+                        code += "MOV " + "EAX \n"; //TODO
                         break;
 
                     case "InvocacionFuncion":
-                        code += "CALL " + t.getOperando1() + "\n";
+                        //code += "CALL " + t.getOperando1() + "\n";
                         break;
 
                     case "Impresion":
@@ -877,6 +878,32 @@ public class Assembler {
 
                     case "BI":
                         code += "JMP Label" + t.getOperando1() + '\n';
+                        break;
+
+                    case "RetornoFuncion":
+                        if (t.esVariable(1)) {
+                            //if (t.getResultado().equals("ULONG")) {
+                                code += "MOV _varRet"+ t.getNumero() +", EAX"+  '\n'; // Muevo a la variable.
+                                t.setResultado("varRet" + t.getNumero()); // Seteo el resultado en el terceto.
+                                Main.tablaSimbolos.agregarSimbolo("varRet" + t.getNumero(), Lexico.IDENTIFICADOR, "ULONG", "Variable"); // Agrego la variable a tabla de simbolos.
+                            //}
+
+                        }
+
+                        if (!t.esVariable(1)) {
+                            //if (t.getTipo().equals("ULONG")) {
+
+                                code += "MOV _varRet"+ t.getNumero() +", EAX"+  '\n'; // Muevo a la variable.
+                                t.setResultado("varRet" + t.getNumero()); // Seteo el resultado en el terceto.
+                                Main.tablaSimbolos.agregarSimbolo("varRet" + t.getNumero(), Lexico.IDENTIFICADOR, "ULONG", "Variable"); // Agrego la variable a tabla de simbolos.
+
+                           // }
+
+                            //if (t.getTipo().equals("DOUBLE")) {
+
+                           //     }
+                            }
+
                         break;
 
                     default: //Para terceto (Label..., , )

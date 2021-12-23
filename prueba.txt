@@ -4,24 +4,25 @@ ULONG a,b;
 
 ULONG FUNC f (ULONG b)
 BEGIN
+b:= b + 2;
+
+IF (b < 6) THEN
+BEGIN
 b:= 2;
-RETURN (b);
+PRINT (%MENOR%);
+END;
+ENDIF;
+RETURN(b);
 END;
 
 BEGIN
+b:=3;
+b := f(b);
 
-b:= 3;
-a := f(b);
-
-IF  (a < 3) THEN
+IF (b < 6) THEN
 BEGIN
-a := a;
-PRINT(%MENOR%);
-END;
-ELSE
-BEGIN
-a := a;
-PRINT(%MAYOR%);
+b:= 2;
+PRINT (%ENTREENFUNCION%);
 END;
 ENDIF;
 
