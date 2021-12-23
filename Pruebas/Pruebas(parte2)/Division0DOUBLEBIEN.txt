@@ -1,0 +1,10 @@
+pruebaTipos
+
+DOUBLE a;
+
+BEGIN
+
+a:= 2.0/2.0;
+
+
+END

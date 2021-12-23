@@ -1,0 +1,10 @@
+pruebaTipos
+
+ULONG a;
+
+BEGIN
+
+a:= 500000000+500000000;
+
+
+END

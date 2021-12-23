@@ -1,9 +1,9 @@
 pruebaTypeDef
 
+ULONG a,b,c;
+
 TYPEDEF f1 = ULONG FUNC (ULONG);
 f1 x,y,z;
-
-ULONG a,b,c;
 
 ULONG FUNC f(ULONG p)
 BEGIN

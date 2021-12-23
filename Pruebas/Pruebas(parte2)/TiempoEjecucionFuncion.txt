@@ -1,0 +1,25 @@
+pruebaTipos
+
+DOUBLE a,z;
+ULONG b,c,i;
+
+ULONG FUNC f1 (ULONG u)
+ULONG s;
+
+ULONG FUNC f (ULONG g)
+ULONG j;
+BEGIN
+f1(j);
+RETURN (g);
+END;
+
+BEGIN
+f(s);
+RETURN (u);
+END;
+
+BEGIN
+b := c;
+f1(b);
+
+END

@@ -1,0 +1,24 @@
+pruebaTryCatch
+ULONG x,z;
+
+ULONG FUNC f (ULONG a)
+BEGIN
+PRE: (a < 9);
+PRINT(%CUMPLIO%);
+RETURN (a+1);
+END;
+
+BEGIN
+x:=11;
+z:= 10;
+TRY
+x := f(z) + 4;
+CATCH
+BEGIN
+PRINT(%CATCH%);
+x := 10;
+END;
+
+z:=6;
+
+END

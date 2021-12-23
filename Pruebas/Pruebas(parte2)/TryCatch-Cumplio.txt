@@ -1,21 +1,21 @@
-
 pruebaTryCatch
 ULONG x,z;
 
 ULONG FUNC f (ULONG a)
-ULONG y;
 BEGIN
-PRE: (a < 3);
+PRE: (a < 11);
+PRINT(%CUMPLIO%);
 RETURN (a+1);
 END;
 
 BEGIN
 x:=11;
-x:= 12;
+z:= 10;
 TRY
 x := f(z) + 4;
 CATCH
 BEGIN
+PRINT(%CATCH%);
 x := 10;
 END;
 

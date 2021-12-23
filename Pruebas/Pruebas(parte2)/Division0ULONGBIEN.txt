@@ -1,0 +1,10 @@
+pruebaTipos
+
+ULONG a;
+
+BEGIN
+
+a:= 2/2;
+
+
+END

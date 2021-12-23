@@ -8,66 +8,84 @@ includelib \masm32\lib\kernel32.lib
 includelib \masm32\lib\user32.lib
 
 .data
-_limiteSuperiorULONG DD 4294967295
+_limiteSuperiorULONG DD 1000000000
 _limiteInferiorULONG DD 0
 _divisorCeroULONG DD 0
 _divisorCeroDOUBLE DD 0.0
 _OverflowSuma DB "Overflow en suma", 0 
 _DivisionCero DB "Division por cero", 0 
-_HOLA DB 'HOLA', 0 
-_MENOR DB 'MENOR', 0 
-_var4 DQ ?
-_var1 DQ ?
-_1_0 DQ 1.0
-_MAYOR DB 'MAYOR', 0 
-_b@main DQ ?
-_varRet4 DQ ?
-_b@main@f DQ ?
-_var11_2bytes DW ?
-_3_0 DQ 3.0
+_f1@main DD ?
+_varRet4 DD ?
+_x@main DD ?
+_a@main DD ?
+_p@main@f DD ?
+_y@main DD ?
+_b@main DD ?
+_z@main DD ?
+_c@main DD ?
+_3 DD 3
+_var12 DD ?
+_2 DD 2
+_var3 DD ?
+_1 DD 1
+_var1 DD ?
 
 .code
 start: 
 FINIT 
-FLD _1_0
-FSTP _b@main
-FLD _b@main
-FSTP _b@main@f
+MOV EBX, _null
+MOV _x@main, EBX
+MOV EBX, _x@main
+MOV _z@main, EBX
+MOV EBX, _b@main
+MOV _p@main@f, EBX
 CALL f@main
 f@main: 
-FLD _b@main@f
-FADD _1_0
-FSTP _var1
-FLD _var1
-FSTP _b@main@f
-invoke MessageBox, NULL, addr _HOLA, addr _HOLA, MB_OK 
-FLD _b@main@f
-FADD _1_0
-FSTP _var4
-FLD _var4
-FSTP _varRet4
-FLD _varRet4
-FSTP _b@main
-FLD _b@main
-FCOMP _3_0
-FSTSW _var11_2bytes
-MOV AX , _var11_2bytes
-SAHF
-JAE Label16
-FLD _1_0
-FSTP _b@main
-invoke MessageBox, NULL, addr _MENOR, addr _MENOR, MB_OK 
-JMP Label19
-Label16: 
-FLD _1_0
-FSTP _b@main
-invoke MessageBox, NULL, addr _MAYOR, addr _MAYOR, MB_OK 
-Label19: 
+MOV EBX, _p@main@f
+ADD EBX, _1
+CMP EBX, _limiteSuperiorULONG
+JA LabelOverflowSuma
+MOV _var1, EBX
+MOV EBX, _var1
+MOV _p@main@f, EBX
+MOV EBX, _p@main@f
+ADD EBX, _2
+CMP EBX, _limiteSuperiorULONG
+JA LabelOverflowSuma
+MOV _var3, EBX
+MOV EBX, _var3
+MOV _varRet4, EBX
+MOV EBX, _3
+MOV _p@main@f, EBX
+CALL f@main
+f@main: 
+MOV EBX, _p@main@f
+ADD EBX, _1
+CMP EBX, _limiteSuperiorULONG
+JA LabelOverflowSuma
+MOV _var1, EBX
+MOV EBX, _var1
+MOV _p@main@f, EBX
+MOV EBX, _p@main@f
+ADD EBX, _2
+CMP EBX, _limiteSuperiorULONG
+JA LabelOverflowSuma
+MOV _var3, EBX
+MOV EBX, _var3
+MOV _varRet4, EBX
+MOV EBX, _varRet4
+ADD EBX, _varRet4
+CMP EBX, _limiteSuperiorULONG
+JA LabelOverflowSuma
+MOV _var12, EBX
+MOV EBX, _var12
+MOV _a@main, EBX
 FINIT
 invoke ExitProcess, 0 
 FINIT
 LabelOverflowSuma: 
 invoke MessageBox, NULL, addr _OverflowSuma, addr _OverflowSuma, MB_OK 
+invoke ExitProcess, 0 
 FINIT
 LabelDivisionCero: 
 invoke MessageBox, NULL, addr _DivisionCero, addr _DivisionCero, MB_OK 

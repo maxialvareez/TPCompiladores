@@ -13,7 +13,7 @@ public class Assembler {
     private ArrayList<ArrayList<Terceto>> codigoIntermedio; // ArrayList de ArrayList
     private AdministradorTercetos administradorTerceto;
     private static final int limiteInferiorULONG = 0;
-    private static final long limiteSuperiorULONG= Long.parseUnsignedLong("4294967295");
+    private static final long limiteSuperiorULONG= Long.parseUnsignedLong("1000000000");
     private static final int divisorCeroULONG = 0;
     private static final double divisorCeroDOUBLE = 0.0;
 
@@ -181,7 +181,7 @@ public class Assembler {
 
                                 code += "MOV EBX, _" + t1.getResultado() + '\n'; // Agrego el primer registro.
                                 code += "ADD EBX, _" + t2.getResultado() + '\n'; // Sumo con el segundo registro.
-                                code += "CMP EBX, _limiteSuperiorUint" + '\n';
+                                code += "CMP EBX, _limiteSuperiorULONG" + '\n';
                                 code += "JA " + "LabelOverflowSuma" + '\n';
                                 code += "MOV _var"+ t.getNumero() +", EBX"+  '\n'; // Muevo lo del registro a la variable.
                                 t.setResultado("var" + t.getNumero()); // Seteo la variable.
@@ -707,24 +707,24 @@ public class Assembler {
                         }
                         // Situacion b ( := , vble , vble )
                         if (t.esVariable(1) && t.esVariable(2)) {
-                            if (t.getTipo().equals("ULONG")) {
-                                code += "MOV EBX, _" + t.getOperando2() + '\n';
-                                code += "MOV _" + t.getOperando1() + ", EBX" + '\n';
-                            }
+                                if (t.getTipo().equals("ULONG")) {
+                                    code += "MOV EBX, _" + t.getOperando2() + '\n';
+                                    code += "MOV _" + t.getOperando1() + ", EBX" + '\n';
+                                }
 
-                            if (t.getTipo().equals("DOUBLE")) {
-                                String op1 = t.getOperando1();
-                                String op2 = t.getOperando2();
-                                op1 = t.getOperando1().replace('.', '_');
-                                op1 = op1.replace('-', '_');
-                                op1 = op1.replace("+", "__");
-                                op2 = t.getOperando2().replace('.', '_');
-                                op2 = op2.replace('-', '_');
-                                op2 = op2.replace("+", "__");
+                                if (t.getTipo().equals("DOUBLE")) {
+                                    String op1 = t.getOperando1();
+                                    String op2 = t.getOperando2();
+                                    op1 = t.getOperando1().replace('.', '_');
+                                    op1 = op1.replace('-', '_');
+                                    op1 = op1.replace("+", "__");
+                                    op2 = t.getOperando2().replace('.', '_');
+                                    op2 = op2.replace('-', '_');
+                                    op2 = op2.replace("+", "__");
 
-                                code += "FLD _" + op2 + '\n';
-                                code += "FSTP _" + op1 + '\n';
-                            }
+                                    code += "FLD _" + op2 + '\n';
+                                    code += "FSTP _" + op1 + '\n';
+                                }
                         }
                         break;
 
@@ -940,6 +940,7 @@ public class Assembler {
         code += "FINIT\n";
         code += "LabelOverflowSuma: \n";
         code += "invoke MessageBox, NULL, addr _OverflowSuma, addr _OverflowSuma, MB_OK \n";
+        code += "invoke ExitProcess, 0 \n";
         code += "FINIT\n";
         code += "LabelDivisionCero: \n";
         code += "invoke MessageBox, NULL, addr _DivisionCero, addr _DivisionCero, MB_OK \n";
