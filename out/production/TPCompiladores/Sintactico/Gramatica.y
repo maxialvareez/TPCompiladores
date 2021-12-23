@@ -486,7 +486,7 @@ invocacion : IDENTIFICADOR '(' CTE_ULONG ')' {System.out.println("[Sintáctico] 
                         }
                     }
                     else{
-                           //Main.listaErrores.add("[ERROR SEMÁNTICO] [Linea " + Lexico.linea+ "] {La función "+$1.sval+" esta fuera de alcance}");
+                           Main.listaErrores.add("[ERROR SEMÁNTICO] [Linea " + Lexico.linea+ "] {La función "+$1.sval+" esta fuera de alcance}");
                            $$ = new ParserVal(null);
                         }
                  }
@@ -565,7 +565,7 @@ funcion :  declaracion_funcion bloque_funcion
                     $$ = new ParserVal($1.sval);
 
             }
-           
+
             else
                  $$ = new ParserVal(null);
          }

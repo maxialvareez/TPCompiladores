@@ -1525,7 +1525,7 @@ case 92:
                         }
                     }
                     else{
-                           /*Main.listaErrores.add("[ERROR SEMÁNTICO] [Linea " + Lexico.linea+ "] {La función "+$1.sval+" esta fuera de alcance}");*/
+                           Main.listaErrores.add("[ERROR SEMÁNTICO] [Linea " + Lexico.linea+ "] {La función "+val_peek(3).sval+" esta fuera de alcance}");
                            yyval = new ParserVal(null);
                         }
                  }
@@ -1616,7 +1616,7 @@ case 113:
                     yyval = new ParserVal(val_peek(1).sval);
 
             }
-           
+
             else
                  yyval = new ParserVal(null);
          }
