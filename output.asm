@@ -14,51 +14,56 @@ _divisorCeroULONG DD 0
 _divisorCeroDOUBLE DD 0.0
 _OverflowSuma DB "Overflow en suma", 0 
 _DivisionCero DB "Division por cero", 0 
-_ENTREENFUNCION DB 'ENTREENFUNCION', 0 
-_MENOR DB 'MENOR', 0 
-_var1 DD ?
-_a@main DD ?
+_var10 DD ?
+_a@main@f DD ?
+_z@main DD ?
+_var3 DD ?
+_x@main DD ?
 _6 DD 6
-_varRet8 DD ?
+_4 DD 4
+_12 DD 12
 _3 DD 3
-_2 DD 2
-_b@main DD ?
-_b@main@f DD ?
+_11 DD 11
+_10 DD 10
+_1 DD 1
+_varRet4 DD ?
+_y@main@f DD ?
 
 .code
 start: 
 FINIT 
-MOV EBX, _3
-MOV _b@main, EBX
-MOV EBX, _b@main
-MOV _b@main@f, EBX
+MOV EBX, _11
+MOV _x@main, EBX
+MOV EBX, _12
+MOV _x@main, EBX
+MOV EBX, _z@main
+MOV _a@main@f, EBX
 CALL f@main
 f@main: 
-MOV EBX, _b@main@f
-ADD EBX, _2
+MOV EBX, _3
+CMP _a@main@f, EBX
+JAE Label13
+MOV EBX, _a@main@f
+ADD EBX, _1
 CMP EBX, _limiteSuperiorULONG
 JA LabelOverflowSuma
-MOV _var1, EBX
-MOV EBX, _var1
-MOV _b@main@f, EBX
+MOV _var3, EBX
+MOV _varRet4, EAX
+MOV EAX 
+MOV EBX, _varRet4
+ADD EBX, _4
+CMP EBX, _limiteSuperiorULONG
+JA LabelOverflowSuma
+MOV _var10, EBX
+MOV EBX, _var10
+MOV _x@main, EBX
+JMP Label15
+Label13: 
+MOV EBX, _10
+MOV _x@main, EBX
+Label15: 
 MOV EBX, _6
-CMP _b@main@f, EBX
-JAE Label7
-MOV EBX, _2
-MOV _b@main@f, EBX
-invoke MessageBox, NULL, addr _MENOR, addr _MENOR, MB_OK 
-Label7: 
-MOV EBX, _b@main@f
-MOV _varRet8, EBX
-MOV EBX, _varRet8
-MOV _b@main, EBX
-MOV EBX, _6
-CMP _b@main, EBX
-JAE Label18
-MOV EBX, _2
-MOV _b@main, EBX
-invoke MessageBox, NULL, addr _ENTREENFUNCION, addr _ENTREENFUNCION, MB_OK 
-Label18: 
+MOV _z@main, EBX
 FINIT
 invoke ExitProcess, 0 
 FINIT

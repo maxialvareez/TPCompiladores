@@ -77,8 +77,6 @@ public class Main {
             System.out.println(s);
         }
 
-        System.out.println("\n -----TABLA DE SIMBOLOS------");
-        tablaSimbolos.imprimirTablaSimbolos();
 
 
         if (listaErrores.isEmpty()) {

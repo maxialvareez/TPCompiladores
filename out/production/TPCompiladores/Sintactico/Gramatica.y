@@ -438,13 +438,6 @@ invocacion : IDENTIFICADOR '(' CTE_ULONG ')' {System.out.println("[Sintáctico] 
                     if(ambitoFuncion != null){
                         if (ambitoParametro != null){
                              String nombreParametro = Main.tablaSimbolos.getDatos(ambitoFuncion).getParametro();
-                                System.out.println("nombreParametro: " + nombreParametro);
-                                System.out.println("ambitoFuncion: " + ambitoFuncion);
-                                System.out.println("ambitoParametro: " + ambitoParametro);
-                                System.out.println("\n -----TABLA DE SIMBOLOS------");
-                                Main.tablaSimbolos.imprimirTablaSimbolos();
-                                System.out.println("ELPRIMERO: " + Main.tablaSimbolos.getDatos(nombreParametro).getTipo());
-                                System.out.println("ELsegundo: " + Main.tablaSimbolos.getDatos(ambitoParametro).getTipo());
                                 if (!nombreParametro.equals("")){
                                     if (Main.tablaSimbolos.getDatos(nombreParametro).getTipo().equals(Main.tablaSimbolos.getDatos(ambitoParametro).getTipo())){
                                          if (!Main.tablaSimbolos.getDatos(ambitoFuncion).getFuncionReferenciada().equals("")){
@@ -483,7 +476,6 @@ invocacion : IDENTIFICADOR '(' CTE_ULONG ')' {System.out.println("[Sintáctico] 
                                    Main.listaErrores.add("[ERROR SEMÁNTICO] [Linea " + Lexico.linea+ "] {Se invocó a la función "+$1.sval+" con un parámetro de otro tipo}");
                                    $$ = new ParserVal(null);
                                     }
-
                             }
                             else{
 
@@ -561,30 +553,20 @@ error_lista_de_variables: lista_de_variables IDENTIFICADOR {Main.listaErrores.ad
 
 funcion :  declaracion_funcion bloque_funcion
          {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Declaración de función llamada '"+ $1.sval +"'" );
-            if($1.sval != null && $2.sval != null ){ //si se declaró bien y se cumplen los PRE (en caso de haberlos)
-                if ($2.sval.equals("PRE")){
+            Operando op = (Operando)$2.obj;
+            if($1.sval != null && op != null ){ //si se declaró bien y se cumplen los PRE (en caso de haberlos)
+
                    ambito = ambito.substring(0,ambito.lastIndexOf("@"));
-
-                    Terceto t = new Terceto("RetornoFuncion", $2.sval, null);
+                    Terceto t = new Terceto("RetornoFuncion", op.getValor(), null);
+                    t.setTipo(op.getTipo());
                     adminTercetos.agregarTerceto(t);
                     t = new Terceto("FinFuncion", $1.sval, null);
                     adminTercetos.agregarTerceto(t);
-
                     $$ = new ParserVal($1.sval);
-            }
-                else {
-                    ambito = ambito.substring(0,ambito.lastIndexOf("@"));
 
-                    Terceto t = new Terceto("RetornoFuncion", $2.sval, null);
-                    adminTercetos.agregarTerceto(t);
-
-                    t = new Terceto("FinFuncion", $1.sval, null);
-                    adminTercetos.agregarTerceto(t);
-                    $$ = new ParserVal($1.sval);
             }
-           }
+           
             else
-
                  $$ = new ParserVal(null);
          }
         | error_funcion
@@ -675,14 +657,16 @@ funcion_type: FUNC '(' tipo ')' ';' IDENTIFICADOR lista_de_variables{
 
 
 bloque_funcion : bloque_declarativo bloque_ejecucion_funcion{
-                if ($2.sval != null)
-                    $$ = new ParserVal ($2.sval);
+                Operando op = (Operando)$2.obj;
+                if (op!= null)
+                    $$ = new ParserVal((Operando)$2.obj);
                 else
                     $$ = new ParserVal (null);
            }
            | bloque_ejecucion_funcion {
-                if ($1.sval != null)
-                    $$ = new ParserVal ($1.sval);
+                Operando op = (Operando)$1.obj;
+                if (op != null)
+                     $$ = new ParserVal((Operando)$1.obj);
                 else
                     $$ = new ParserVal (null);
            }
@@ -696,7 +680,7 @@ error_bloque_funcion : bloque_declarativo error {Main.listaErrores.add("[ERROR S
 bloque_ejecucion_funcion :  BEGIN RETURN '('condicion')' ';' END{
                              Operando op = (Operando)$4.obj;
                              if (op != null){
-                                  $$ = new ParserVal(op.getValor());
+                                  $$ = new ParserVal((Operando)$4.obj);
                               }
                                  else
                                      $$ = new ParserVal (null);
@@ -705,7 +689,7 @@ bloque_ejecucion_funcion :  BEGIN RETURN '('condicion')' ';' END{
                 |BEGIN bloque_sentencias RETURN '('condicion')' ';' END{
                         Operando op = (Operando)$5.obj;
                         if (op != null){
-                             $$ = new ParserVal(op.getValor());
+                             $$ = new ParserVal((Operando)$5.obj);
                          }
                             else
                                 $$ = new ParserVal (null);
@@ -714,7 +698,7 @@ bloque_ejecucion_funcion :  BEGIN RETURN '('condicion')' ';' END{
 			 | BEGIN pre_condicion ';' bloque_sentencias RETURN '('condicion')' ';' END {
 			            Operando op = (Operando)$7.obj;
 			            if ($2.sval != null && op != null){
-			                $$ = new ParserVal (op.getValor());
+			                $$ = new ParserVal((Operando)$7.obj);
 			            }
 			            else
 			                $$ = new ParserVal (null);
@@ -722,7 +706,7 @@ bloque_ejecucion_funcion :  BEGIN RETURN '('condicion')' ';' END{
 			 | BEGIN pre_condicion ';' RETURN '('condicion')' ';' END{
                         Operando op = (Operando)$6.obj;
                         if ($2.sval != null && op != null){
-                            $$ = new ParserVal (op.getValor());
+                            $$ = new ParserVal((Operando)$6.obj);
                         }
                         else
                              $$ = new ParserVal (null);
