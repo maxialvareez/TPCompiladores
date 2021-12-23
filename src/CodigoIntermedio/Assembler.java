@@ -16,6 +16,7 @@ public class Assembler {
     private static final long limiteSuperiorULONG= Long.parseUnsignedLong("1000000000");
     private static final int divisorCeroULONG = 0;
     private static final double divisorCeroDOUBLE = 0.0;
+    private static int contador = 0;
 
     public Assembler(AdministradorTercetos administradorTerceto) {
         this.codigoIntermedio = administradorTerceto.getCodigoIntermedio();
@@ -685,28 +686,31 @@ public class Assembler {
                     case ":=":
                         // Situacion a ( := , vble , reg )
                         if (t.esVariable(1) && !t.esVariable(2)) {
-                            if (t.getTipo().equals("ULONG")) {
-                                String nroTerceto = t.getOperando2().substring(1, t.getOperando2().lastIndexOf("]"));
-                                Terceto t1 = administradorTerceto.getTerceto(Integer.parseInt(nroTerceto));
-                                code += "MOV EBX, _" + t1.getResultado() + '\n';
-                                code += "MOV _" + t.getOperando1() + ", EBX" + '\n';
+                            if(Main.tablaSimbolos.getDatos(t.getOperando1()).getFuncionReferenciada().equals("")) {
+                                if (t.getTipo().equals("ULONG")) {
+                                    String nroTerceto = t.getOperando2().substring(1, t.getOperando2().lastIndexOf("]"));
+                                    Terceto t1 = administradorTerceto.getTerceto(Integer.parseInt(nroTerceto));
+                                    code += "MOV EBX, _" + t1.getResultado() + '\n';
+                                    code += "MOV _" + t.getOperando1() + ", EBX" + '\n';
 
-                            }
+                                }
 
-                            if (t.getTipo().equals("DOUBLE")) {
-                                String op1 = t.getOperando1();
-                                op1 = t.getOperando1().replace('.', '_');
-                                op1 = op1.replace('-', '_');
-                                op1 = op1.replace("+", "__");
+                                if (t.getTipo().equals("DOUBLE")) {
+                                    String op1 = t.getOperando1();
+                                    op1 = t.getOperando1().replace('.', '_');
+                                    op1 = op1.replace('-', '_');
+                                    op1 = op1.replace("+", "__");
 
-                                String nroTerceto = t.getOperando2().substring(1, t.getOperando2().lastIndexOf("]"));
-                                Terceto t1 = administradorTerceto.getTerceto(Integer.parseInt(nroTerceto));
-                                code += "FLD _" + t1.getResultado() + '\n';
-                                code += "FSTP _" + op1 + '\n';
+                                    String nroTerceto = t.getOperando2().substring(1, t.getOperando2().lastIndexOf("]"));
+                                    Terceto t1 = administradorTerceto.getTerceto(Integer.parseInt(nroTerceto));
+                                    code += "FLD _" + t1.getResultado() + '\n';
+                                    code += "FSTP _" + op1 + '\n';
+                                }
                             }
                         }
                         // Situacion b ( := , vble , vble )
                         if (t.esVariable(1) && t.esVariable(2)) {
+                            if(Main.tablaSimbolos.getDatos(t.getOperando1()).getFuncionReferenciada().equals("")) {
                                 if (t.getTipo().equals("ULONG")) {
                                     code += "MOV EBX, _" + t.getOperando2() + '\n';
                                     code += "MOV _" + t.getOperando1() + ", EBX" + '\n';
@@ -725,6 +729,7 @@ public class Assembler {
                                     code += "FLD _" + op2 + '\n';
                                     code += "FSTP _" + op1 + '\n';
                                 }
+                            }
                         }
                         break;
 
@@ -733,8 +738,9 @@ public class Assembler {
                             code += "FINIT\n";
                             code += "invoke ExitProcess, 0 \n";
                         }*/
-                        code += "CALL " + t.getOperando1() + "\n";
-                        code += t.getOperando1() + ": \n";
+                        code += "CALL " + t.getOperando1() + contador + "\n";
+                        code += t.getOperando1() + contador + ": \n";
+                        this.contador++;
                         funcionActual = t.getOperando1().substring(0, t.getOperando1().indexOf("@"));
                         break;
 
@@ -884,9 +890,9 @@ public class Assembler {
                             if (t.getTipo().equals("ULONG")) {
 
                                 code += "MOV EBX, _" + t.getOperando1() + '\n'; // Muevo a la variable.
-                                code += "MOV _varRet"+ t.getNumero() +", EBX" + '\n'; // Muevo a la variable.
-                                t.setResultado("varRet" + t.getNumero()); // Seteo el resultado en el terceto.
-                                Main.tablaSimbolos.agregarSimbolo("varRet" + t.getNumero(), Lexico.IDENTIFICADOR, "ULONG", "Variable"); // Agrego la variable a tabla de simbolos.
+                                code += "MOV _varRet" + contador + t.getNumero() +", EBX" + '\n'; // Muevo a la variable.
+                                t.setResultado("varRet" + contador + t.getNumero()); // Seteo el resultado en el terceto.
+                                Main.tablaSimbolos.agregarSimbolo("varRet" + contador + t.getNumero(), Lexico.IDENTIFICADOR, "ULONG", "Variable"); // Agrego la variable a tabla de simbolos.
                             }
 
                             if (t.getTipo().equals("DOUBLE")) {
@@ -896,9 +902,9 @@ public class Assembler {
                                 op1 = op1.replace("+", "__");
 
                                 code += "FLD _" + op1 + '\n';
-                                code += "FSTP _" + "varRet" + t.getNumero() + '\n';
-                                t.setResultado("varRet" + t.getNumero());
-                                Main.tablaSimbolos.agregarSimbolo("varRet" + t.getNumero(), Lexico.IDENTIFICADOR, "DOUBLE", "Variable");
+                                code += "FSTP _" + "varRet" + contador + t.getNumero() + '\n';
+                                t.setResultado("varRet" + contador + t.getNumero());
+                                Main.tablaSimbolos.agregarSimbolo("varRet" + contador + t.getNumero(), Lexico.IDENTIFICADOR, "DOUBLE", "Variable");
                             }
 
                         }
@@ -909,9 +915,9 @@ public class Assembler {
                                 t1 = administradorTerceto.getTerceto(Integer.parseInt(nroTerceto));
 
                                 code += "MOV EBX, _" + t1.getResultado() + '\n'; // Muevo a la variable.
-                                code += "MOV _varRet"+ t.getNumero() +", EBX" + '\n'; // Muevo a la variable.
-                                t.setResultado("varRet" + t.getNumero()); // Seteo el resultado en el terceto.
-                                Main.tablaSimbolos.agregarSimbolo("varRet" + t.getNumero(), Lexico.IDENTIFICADOR, "ULONG", "Variable"); // Agrego la variable a tabla de simbolos.
+                                code += "MOV _varRet" + contador + t.getNumero() +", EBX" + '\n'; // Muevo a la variable.
+                                t.setResultado("varRet" + contador + t.getNumero()); // Seteo el resultado en el terceto.
+                                Main.tablaSimbolos.agregarSimbolo("varRet" + contador + t.getNumero(), Lexico.IDENTIFICADOR, "ULONG", "Variable"); // Agrego la variable a tabla de simbolos.
 
                            }
 
@@ -920,9 +926,9 @@ public class Assembler {
                                 t1 = administradorTerceto.getTerceto(Integer.parseInt(nroTerceto));
 
                                 code += "FLD _var" + t1.getNumero() + '\n';
-                                code += "FSTP _" + "varRet" + t1.getNumero() + '\n';
-                                t.setResultado("varRet" + t1.getNumero());
-                                Main.tablaSimbolos.agregarSimbolo("varRet" + t1.getNumero(), Lexico.IDENTIFICADOR, "DOUBLE", "Variable");
+                                code += "FSTP _" + "varRet" + contador + t1.getNumero() + '\n';
+                                t.setResultado("varRet" + contador + t1.getNumero());
+                                Main.tablaSimbolos.agregarSimbolo("varRet" + contador + t1.getNumero(), Lexico.IDENTIFICADOR, "DOUBLE", "Variable");
                                 }
                             }
 
