@@ -340,10 +340,8 @@ error_seleccion :     condicion_if  THEN  bloque_if ENDIF {Main.listaErrores.add
                 | IF  condicion_if        bloque_if ENDIF {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {IF mal declarado, falta el THEN}");}
                 | IF  condicion_if  THEN            ENDIF {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {IF mal declarado, falta el bloque de sentencias}");}
                 | IF  condicion_if  THEN  bloque_if error {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {IF mal declarado, falta el bloque de sentencias}");}
-
                 | IF  condicion_if  THEN  bloque_if bloque_if ELSE           ENDIF {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {IF mal declarado, falta el ENDIF o ELSE}");}
 	            | IF  condicion_if  THEN  bloque_if bloque_if ELSE bloque_if error {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {IF mal declarado, falta el ENDIF o ELSE}");}
-
 	            ;
 
 
@@ -367,6 +365,11 @@ invocacion : IDENTIFICADOR '(' CTE_ULONG ')' {System.out.println("[Sintáctico] 
                         if (!Main.tablaSimbolos.getDatos(ambitoFuncion).getFuncionReferenciada().equals("")){
                             String funcionRef = Main.tablaSimbolos.getDatos(ambitoFuncion).getFuncionReferenciada();
                             Terceto t = new Terceto("InvocacionFuncion", funcionRef, null);
+                             if (ambito.contains("@")){
+                                String ambitoInvocacion = ambito;
+                                ambitoInvocacion = ambitoInvocacion.substring(ambitoInvocacion.lastIndexOf("@") +1);
+                                t.setAmbitoInvocacion(ambitoInvocacion);
+                            }
                             adminTercetos.agregarTerceto(t);
                             t = new Terceto(":=", Main.tablaSimbolos.getDatos(funcionRef).getParametro(), $3.sval);
                             t.setTipo(Main.tablaSimbolos.getDatos(funcionRef).getTipo());
@@ -402,6 +405,13 @@ invocacion : IDENTIFICADOR '(' CTE_ULONG ')' {System.out.println("[Sintáctico] 
                           if (!Main.tablaSimbolos.getDatos(ambitoFuncion).getFuncionReferenciada().equals("")){
                             String funcionRef = Main.tablaSimbolos.getDatos(ambitoFuncion).getFuncionReferenciada();
                             Terceto t = new Terceto("InvocacionFuncion", funcionRef, null);
+                             if (ambito.contains("@")){
+                                String ambitoInvocacion = ambito;
+                                ambitoInvocacion = ambitoInvocacion.substring(ambitoInvocacion.lastIndexOf("@") +1);
+                                t.setAmbitoInvocacion(ambitoInvocacion);
+                            }
+
+
                             adminTercetos.agregarTerceto(t);
                             t = new Terceto(":=", Main.tablaSimbolos.getDatos(funcionRef).getParametro(), $3.sval);
                              t.setTipo(Main.tablaSimbolos.getDatos(funcionRef).getTipo());
