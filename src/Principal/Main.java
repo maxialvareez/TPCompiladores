@@ -64,8 +64,16 @@ public class Main {
         p.run();
 
 
+
         tablaSimbolos.eliminarVariablesRepetidas();
         adminTercetos.generarCodigoIntermedio();
+        System.out.println("\n------ CÓDIGO INTERMEDIO1 ------");
+        adminTercetos.printCodigoIntermedio();
+        System.out.println("\n------ CÓD INTER ------");
+        adminTercetos.imprimirCodInter();
+        adminTercetos.cambiarReturns();
+        System.out.println("\n------ CÓD INTER 2 ------");
+        adminTercetos.imprimirCodInter();
 /*
         Token t = l1.getToken();
         while (t.getId() != 0){

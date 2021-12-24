@@ -14,17 +14,17 @@ _divisorCeroULONG DD 0
 _divisorCeroDOUBLE DD 0.0
 _OverflowSuma DB "Overflow en suma", 0 
 _DivisionCero DB "Division por cero", 0 
-_varRet13 DD ?
 _MENOR DB 'MENOR', 0 
-_varRet23 DD ?
+_varRet21002 DD ?
 _f1@main DD ?
 _x@main DD ?
 _MAYOR DB 'MAYOR', 0 
 _a@main DD ?
+_varRet11001 DD ?
 _p@main@f DD ?
-_10 DD 10
 _y@main DD ?
 _b@main DD ?
+_9 DD 9
 _z@main DD ?
 _5 DD 5
 _c@main DD ?
@@ -51,7 +51,7 @@ CMP EBX, _limiteSuperiorULONG
 JA LabelOverflowSuma
 MOV _var2, EBX
 MOV EBX, _var2
-MOV _varRet13, EBX
+MOV _varRet11001, EBX
 MOV EBX, _3
 MOV _p@main@f, EBX
 CALL f@main1
@@ -64,15 +64,15 @@ CMP EBX, _limiteSuperiorULONG
 JA LabelOverflowSuma
 MOV _var2, EBX
 MOV EBX, _var2
-MOV _varRet23, EBX
-MOV EBX, _varRet13
-ADD EBX, _varRet23
+MOV _varRet21002, EBX
+MOV EBX, _varRet11001
+ADD EBX, _varRet21002
 CMP EBX, _limiteSuperiorULONG
 JA LabelOverflowSuma
 MOV _var12, EBX
 MOV EBX, _var12
 MOV _a@main, EBX
-MOV EBX, _10
+MOV EBX, _9
 CMP _a@main, EBX
 JAE Label19
 MOV EBX, _5

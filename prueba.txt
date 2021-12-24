@@ -18,7 +18,7 @@ x:=f;
 z:=x;
 a:= x(b) + z(3);
 
-IF (a < 10) THEN
+IF (a < 9) THEN
 BEGIN
 a := 5;
 PRINT(%MENOR%);

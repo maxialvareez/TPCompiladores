@@ -19,11 +19,19 @@ public class AdministradorTercetos {
     private ArrayList<ArrayList<Terceto>> codigoIntermedio = new ArrayList<>();
     private List<String> invocaciones = new ArrayList<>();
 
+    private ArrayList<Terceto> codIntermedio = new ArrayList<Terceto>();
+
     public AdministradorTercetos() {
     }
 
     public Terceto getTerceto(int nroTerceto) {
-        return tercetos.get(nroTerceto);
+        for (Terceto t: codIntermedio){
+            if (t.getNumero() == nroTerceto)
+                return t;
+        }
+
+
+        return codIntermedio.get(nroTerceto);
     }
 
     public void agregarTerceto(Terceto t) {
@@ -85,7 +93,7 @@ public class AdministradorTercetos {
         ArrayList<Terceto> aux = new ArrayList<>();
         codigoIntermedio.add(index, new ArrayList<>());
         Hashtable<String, Integer> funcs = new Hashtable<>();
-
+        Terceto t3;
         for (int i = inicio; i <= finalFuncion; i++) {
             Terceto t = tercetos.get(i);
 
@@ -93,8 +101,20 @@ public class AdministradorTercetos {
             if (t.getOperador().equals("InvocacionFuncion") ) {
                 String funcionInvocada = t.getOperando1();
                 aux.add(t);
+                t3 = new Terceto(t.getOperador(), t.getOperando1(), t.getOperando2());
+                t3.setNumero(t.getNumero());
+                t3.setTipo(t.getTipo());
+                t3.setAmbitoInvocacion(t.getAmbitoInvocacion());
+
+                codIntermedio.add(t3);
                 i++;
                 aux.add(tercetos.get(i));
+                Terceto t4 = tercetos.get(i);
+                t3 = new Terceto(t4.getOperador(), t4.getOperando1(), t4.getOperando2());
+                t3.setNumero(t4.getNumero());
+                t3.setTipo(t4.getTipo());
+                t3.setAmbitoInvocacion(t4.getAmbitoInvocacion());
+                codIntermedio.add(t3);
                 addFuncion(funciones.get(funcionInvocada), this.buscarFinFuncion(funcionInvocada), funcionInvocada, index + 1, aux);
                 System.out.println("\n------ CÓDIGO INTERMEDIO ------");
                 System.out.println("---INVOCA---");
@@ -126,6 +146,11 @@ public class AdministradorTercetos {
             }
            if (i <= finalFuncion && !t.getOperador().equals("InvocacionFuncion")) {
                 aux.add(t);
+               t3 = new Terceto(t.getOperador(), t.getOperando1(), t.getOperando2());
+               t3.setNumero(t.getNumero());
+               t3.setTipo(t.getTipo());
+               t3.setAmbitoInvocacion(t.getAmbitoInvocacion());
+               codIntermedio.add(t3);
             }
         }
         codigoIntermedio.set(index, aux);
@@ -134,6 +159,7 @@ public class AdministradorTercetos {
     public void addFuncion(int inicio, int fin, String funcion, int index,ArrayList<Terceto> aux ){
         int finfunc = -1;
         int comienzafunc = -1;
+        Terceto t3 ;
         for(int i =inicio; i <= fin ; i++){
             Terceto t = tercetos.get(i);
             System.out.println(t.getOperador()+ " , "+ t.getOperando1() + " , " + t.getOperando2() );
@@ -152,8 +178,18 @@ public class AdministradorTercetos {
                         invocaciones.add(t.getAmbitoInvocacion());
                 }
                     aux.add(t);
+                    t3 = new Terceto(t.getOperador(), t.getOperando1(), t.getOperando2());
+                    t3.setNumero(t.getNumero());
+                    t3.setTipo(t.getTipo());
+                    t3.setAmbitoInvocacion(t.getAmbitoInvocacion());
+                    codIntermedio.add(t3);
                     Terceto t1 = tercetos.get(i+1);
                     aux.add(t1);
+                    t3 = new Terceto(t1.getOperador(), t1.getOperando1(), t1.getOperando2());
+                    t3.setNumero(t1.getNumero());
+                    t3.setTipo(t1.getTipo());
+                    t3.setAmbitoInvocacion(t1.getAmbitoInvocacion());
+                    codIntermedio.add(t3);
                     i++;
                     finfunc = buscarFinFuncion(t.getOperando1());
                     comienzafunc = buscarComienzoFuncion(t.getOperando1());
@@ -173,8 +209,15 @@ public class AdministradorTercetos {
                 if (t.getOperador().equals("ComienzaFuncion") && !t.getOperando1().equals(funcion)){
                     i = buscarFinFuncion(t.getOperando1()) ;
                 }
-                else
+                else{
                     aux.add(t);
+                    t3 = new Terceto(t.getOperador(), t.getOperando1(), t.getOperando2());
+                    t3.setNumero(t.getNumero());
+                    t3.setTipo(t.getTipo());
+                    t3.setAmbitoInvocacion(t.getAmbitoInvocacion());
+                    codIntermedio.add(t3);
+                }
+
             }
         }
     }
@@ -202,5 +245,79 @@ public class AdministradorTercetos {
     public ArrayList<ArrayList<Terceto>> getCodigoIntermedio() {
         return codigoIntermedio;
     }
+
+
+    public void cambiarReturns() {
+        int contador = 1;
+            for (Terceto t : codIntermedio) {
+                String op1 = t.getOperando1();
+                String op2 = t.getOperando2();
+                if (op1 != null) {
+                    if (op1.contains("[")) {
+                            op1 = op1.substring(1, op1.indexOf("]"));
+                            int num = Integer.parseInt(op1);
+
+                                for (Terceto t1 : codIntermedio) {
+                                    if (t1.getNumero() == num) {
+                                        if (t1.getOperador().equals("RetornoFuncion")) {
+                                            t1.setNumero(1000 + contador);
+                                            t.setOperando1("[" + 100 + contador + "]");
+                                            contador++;
+                                            break;
+                                        }
+                                    }
+                                }
+
+                    }
+                }
+                if (op2 != null) {
+                    if (op2.contains("[")) {
+                        op2 = op2.substring(1, op2.indexOf("]"));
+                        int num2 = Integer.parseInt(op2);
+                        if (!t.getOperando1().contains("[")) {
+                            System.out.println("OPERANDOOOO"+t.getOperando1());
+                            if (Main.tablaSimbolos.getDatos(t.getOperando1()).getFuncionReferenciada().equals(""))
+                                for (Terceto t2 : codIntermedio) {
+                                    if (t2.getNumero() == num2) {
+                                        if (t2.getOperador().equals("RetornoFuncion")) {
+                                            t2.setNumero(1000 + contador);
+                                            t.setOperando2("[" + 100 + contador + "]");
+                                            contador++;
+                                            break;
+                                        }
+                                    }
+                                }
+                        }
+                        else{
+                            for (Terceto t2 : codIntermedio) {
+                                if (t2.getNumero() == num2) {
+                                    if (t2.getOperador().equals("RetornoFuncion")) {
+                                        t2.setNumero(1000 + contador);
+                                        t.setOperando2("[" + 100 + contador + "]");
+                                        contador++;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+
+                    }
+                }
+            }
+
+
+    }
+
+    public ArrayList<Terceto> getCodIntermedio() {
+        return codIntermedio;
+    }
+
+    public void imprimirCodInter(){
+        for (Terceto t : codIntermedio) {
+            System.out.println(t.getNumero() + ". (" + t.getOperador() + ", " + t.getOperando1() + ", " + t.getOperando2() + ", " + t.getAmbitoInvocacion() +")");
+        }
+    }
+
+
 
 }

@@ -102,8 +102,7 @@ public class Assembler {
         String code = "FINIT \n";
         String funcionActual = "main";
 
-        for (ArrayList<Terceto> lista : codigoIntermedio) {
-            for (Terceto t : lista) {
+            for (Terceto t : administradorTerceto.getCodIntermedio()) {
                 switch (t.getOperador()) {
                     case "+":
                         //Situación 1: Operación entre 2 variables y/o constantes
@@ -939,7 +938,6 @@ public class Assembler {
                         break;
                 }
             }
-        }
 
         code += "FINIT\n";
         code += "invoke ExitProcess, 0 \n";
