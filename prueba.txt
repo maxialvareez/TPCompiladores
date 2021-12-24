@@ -1,33 +1,25 @@
-pruebaTypeDef
+pruebaLlamadoFunciones
 
-ULONG a,b,c;
+DOUBLE a,z;
+ULONG b,c,i;
 
-TYPEDEF f1 = ULONG FUNC (ULONG);
-f1 x,y,z;
+ULONG FUNC f1 (DOUBLE u)
+ULONG s;
 
-ULONG FUNC f(ULONG p)
+ULONG FUNC f (DOUBLE g)
+ULONG j;
 BEGIN
-p:=p;
-RETURN (p+2);
+f1(a);
+RETURN (g);
 END;
+
 BEGIN
-
-b := 2;
-
-x:=f;
-z:=x;
-a:= x(b) + z(3);
-
-IF (a < 9) THEN
-BEGIN
-a := 5;
-PRINT(%MENOR%);
+f(a);
+RETURN (u);
 END;
-ELSE
+
 BEGIN
-a := 4;
-PRINT(%MAYOR%);
-END;
-ENDIF;
+b := c;
+f1(a);
 
 END

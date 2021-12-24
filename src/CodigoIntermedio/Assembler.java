@@ -752,7 +752,6 @@ public class Assembler {
 
                     case "Impresion":
                         String cadena = t.getOperando1();
-                        System.out.println(t.getOperando1());
                         code += "invoke MessageBox, NULL, addr _" + cadena + ", addr _" + cadena + ", MB_OK \n";
                         break;
 

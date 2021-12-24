@@ -103,11 +103,9 @@ public class TablaSimbolos {
         while (e.hasMoreElements()) {
             String key = e.nextElement();
             String lex = key;
-            System.out.println(key);
 
             if (lex.contains("@")) {
                 lex = lex.substring(0, lex.indexOf("@"));
-                System.out.println(lex);
                 if (lex.equals(lexema))
                     return true;
             }

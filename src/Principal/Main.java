@@ -67,24 +67,20 @@ public class Main {
 
         tablaSimbolos.eliminarVariablesRepetidas();
         adminTercetos.generarCodigoIntermedio();
-        System.out.println("\n------ CÓDIGO INTERMEDIO1 ------");
-        adminTercetos.printCodigoIntermedio();
-        System.out.println("\n------ CÓD INTER ------");
-        adminTercetos.imprimirCodInter();
         adminTercetos.cambiarReturns();
-        System.out.println("\n------ CÓD INTER 2 ------");
-        adminTercetos.imprimirCodInter();
+
 /*
         Token t = l1.getToken();
         while (t.getId() != 0){
             l1.getToken();
         }
  */
-        System.out.println("\n------WARNINGS ------");
-        for (String s: listaWarnings){
-            System.out.println(s);
+        if(!listaWarnings.isEmpty()) {
+            System.out.println("\n------WARNINGS ------");
+            for (String s : listaWarnings) {
+                System.out.println(s);
+            }
         }
-
 
 
         if (listaErrores.isEmpty()) {
@@ -103,7 +99,7 @@ public class Main {
         adminTercetos.imprimirTercetos();
 
         System.out.println("\n------ CÓDIGO INTERMEDIO ------");
-        adminTercetos.printCodigoIntermedio();
+        adminTercetos.imprimirCodInter();
 
 
         System.out.println("\n -----TABLA DE SIMBOLOS------");

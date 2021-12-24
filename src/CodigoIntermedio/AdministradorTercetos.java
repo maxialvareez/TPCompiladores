@@ -116,9 +116,6 @@ public class AdministradorTercetos {
                 t3.setAmbitoInvocacion(t4.getAmbitoInvocacion());
                 codIntermedio.add(t3);
                 addFuncion(funciones.get(funcionInvocada), this.buscarFinFuncion(funcionInvocada), funcionInvocada, index + 1, aux);
-                System.out.println("\n------ CÓDIGO INTERMEDIO ------");
-                System.out.println("---INVOCA---");
-                imprimirInvocaciones();
                 invocaciones.clear();
             }
             while ((t.getOperador().equals("ComienzaFuncion") && !t.getOperando1().equals(funcion)) && (i <= finalFuncion)) {
@@ -162,7 +159,6 @@ public class AdministradorTercetos {
         Terceto t3 ;
         for(int i =inicio; i <= fin ; i++){
             Terceto t = tercetos.get(i);
-            System.out.println(t.getOperador()+ " , "+ t.getOperando1() + " , " + t.getOperando2() );
             String operando1 = t.getOperando1();
             if (!t.getOperador().contains("Label"))
                 if (operando1.contains("@"))
@@ -170,11 +166,8 @@ public class AdministradorTercetos {
             String func = funcion;
             if (func.contains("@"))
                 func = func.substring(0,func.indexOf("@") );
-            System.out.println("Func: "+ func);
             if (t.getOperador().equals("InvocacionFuncion") && !invocaciones.contains(operando1)){
                 if (t.getAmbitoInvocacion() != null ) {
-                    System.out.println(func);
-                    System.out.println(t.getAmbitoInvocacion());
                         invocaciones.add(t.getAmbitoInvocacion());
                 }
                     aux.add(t);
@@ -199,10 +192,6 @@ public class AdministradorTercetos {
             }
             else {
                 if (invocaciones.contains(operando1) && !func.equals(operando1)) {
-                    System.out.println("Operando: "+ operando1);
-                    System.out.println("Func: "+ func);
-                    System.out.println("Funcion: " + funcion);
-                    System.out.println("ERROOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOR");
                     Main.listaErrores.add("ERROR POR INVOCACION");
 
                 }
@@ -275,7 +264,6 @@ public class AdministradorTercetos {
                         op2 = op2.substring(1, op2.indexOf("]"));
                         int num2 = Integer.parseInt(op2);
                         if (!t.getOperando1().contains("[")) {
-                            System.out.println("OPERANDOOOO"+t.getOperando1());
                             if (Main.tablaSimbolos.getDatos(t.getOperando1()).getFuncionReferenciada().equals(""))
                                 for (Terceto t2 : codIntermedio) {
                                     if (t2.getNumero() == num2) {
