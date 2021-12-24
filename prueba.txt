@@ -1,25 +1,25 @@
-pruebaLlamadoFunciones
+pruebaTipos
 
 DOUBLE a,z;
 ULONG b,c,i;
 
-ULONG FUNC f1 (DOUBLE u)
+ULONG FUNC f1 (ULONG u)
 ULONG s;
 
-ULONG FUNC f (DOUBLE g)
+ULONG FUNC f (ULONG g)
 ULONG j;
 BEGIN
-f1(a);
+f1(j);
 RETURN (g);
 END;
 
 BEGIN
-f(a);
+f(s);
 RETURN (u);
 END;
 
 BEGIN
 b := c;
-f1(a);
+f1(b);
 
 END

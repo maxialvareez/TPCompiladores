@@ -1,0 +1,24 @@
+pruebaTypeDefMal
+
+ULONG a,b,c;
+
+TYPEDEF f1 = ULONG FUNC (ULONG);
+f1 x,y,z;
+
+TYPEDEF f2 = DOUBLE FUNC (ULONG);
+f2 z,i;
+
+ULONG FUNC f(ULONG p)
+BEGIN
+p:=p+1;
+RETURN (p+2);
+END;
+BEGIN
+
+x:=f;
+z:=x;
+i:=x;
+
+a:= x(b) + z(3);
+
+END

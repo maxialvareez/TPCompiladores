@@ -192,7 +192,7 @@ public class AdministradorTercetos {
             }
             else {
                 if (invocaciones.contains(operando1) && !func.equals(operando1)) {
-                    Main.listaErrores.add("ERROR POR INVOCACION");
+                    Main.listaErrores.add("[ERROR EN EJECUCIÓN]  {Se detecto una recursion mutua en las invocaciones de las funciones '" + operando1 +"' y '"+ func + "'");
 
                 }
                 if (t.getOperador().equals("ComienzaFuncion") && !t.getOperando1().equals(funcion)){

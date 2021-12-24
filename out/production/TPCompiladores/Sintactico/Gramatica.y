@@ -115,7 +115,7 @@ declaracion : tipo lista_de_variables ';'{System.out.println("[Sintáctico] [Lin
                          Main.listaErrores.add("[ERROR SEMÁNTICO] [Linea " + Lexico.linea + "] { La funcion "+ $2.sval +" ya esta declarada}");
     	        }
                 else
-                    Main.listaErrores.add("[ERROR SEMÁNTICO] [Linea " + Lexico.linea + "] {" + $1.sval + " y " + $5.sval +" deben tener el mismo nombre}");
+                    Main.listaErrores.add("[ERROR SEMÁNTICO] [Linea " + Lexico.linea + "] {" + $2.sval + " y " + $5.sval +" deben tener el mismo nombre}");
 
     	        }
 
@@ -339,7 +339,7 @@ error_seleccion :     condicion_if  THEN  bloque_if ENDIF {Main.listaErrores.add
                 | IF                THEN  bloque_if ENDIF {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {IF mal declarado, falta la condición}");}
                 | IF  condicion_if        bloque_if ENDIF {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {IF mal declarado, falta el THEN}");}
                 | IF  condicion_if  THEN            ENDIF {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {IF mal declarado, falta el bloque de sentencias}");}
-                | IF  condicion_if  THEN  bloque_if error {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {IF mal declarado, falta el bloque de sentencias}");}
+                | IF  condicion_if  THEN  bloque_if error {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {IF mal declarado, falta el ENDIF al final}");}
                 | IF  condicion_if  THEN  bloque_if bloque_if ELSE           ENDIF {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {IF mal declarado, falta el ENDIF o ELSE}");}
 	            | IF  condicion_if  THEN  bloque_if bloque_if ELSE bloque_if error {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {IF mal declarado, falta el ENDIF o ELSE}");}
 	            ;
@@ -657,8 +657,12 @@ funcion_type: FUNC '(' tipo ')' ';' IDENTIFICADOR lista_de_variables{
                             }
                      }
                  }
-            }
+
+           }
+           lista_variables.clear();
             $$= new ParserVal($6.sval);
+
+
          }
          ;
 
