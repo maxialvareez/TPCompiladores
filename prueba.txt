@@ -3,23 +3,12 @@ pruebaTipos
 DOUBLE a,z;
 ULONG b,c,i;
 
-ULONG FUNC f1 (ULONG u)
-ULONG s;
-
-ULONG FUNC f (ULONG g)
-ULONG j;
 BEGIN
-f1(j);
-RETURN (g);
+
+REPEAT (i := 1; i<10; 1)
+BEGIN
+PRINT(%REPEAT%);
+BREAK;
 END;
-
-BEGIN
-f(s);
-RETURN (u);
-END;
-
-BEGIN
-b := c;
-f1(b);
 
 END

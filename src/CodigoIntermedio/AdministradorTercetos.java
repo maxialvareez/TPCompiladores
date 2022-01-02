@@ -245,7 +245,6 @@ public class AdministradorTercetos {
                     if (op1.contains("[")) {
                             op1 = op1.substring(1, op1.indexOf("]"));
                             int num = Integer.parseInt(op1);
-
                                 for (Terceto t1 : codIntermedio) {
                                     if (t1.getNumero() == num) {
                                         if (t1.getOperador().equals("RetornoFuncion")) {

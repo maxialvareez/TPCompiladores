@@ -146,10 +146,14 @@ control : REPEAT'(' asignacion_repeat ';'condicion_repeat';' CTE_ULONG')' bloque
             adminTercetos.agregarTerceto(t);
             t = new Terceto("BI", null, null);
             adminTercetos.agregarTerceto(t);
+             if ($9.sval != null)
+                   adminTercetos.desapilar();
             adminTercetos.desapilar(); //para completar BF
             adminTercetos.desapilarRepeat();
             t = new Terceto("Label"+adminTercetos.cantidadTercetos(),null,null);
             adminTercetos.agregarTerceto(t);
+
+
         }
         //TODO ELSE
     }
@@ -211,16 +215,40 @@ condicion_repeat: condicion_booleana{
 
 
 
-bloque_repeat: BEGIN bloque_control END
+bloque_repeat: BEGIN bloque_control END {$$ = new ParserVal($2.sval);}
+
             ;
 
-bloque_control : sentencia_control
-		  	| bloque_control sentencia_control
+bloque_control : sentencia_control {
+            if ($1.sval != null)
+                $$ = new ParserVal($1.sval);
+
+            else
+                $$ = new ParserVal(null);
+}
+
+		  	| bloque_control sentencia_control {
+		  	    if ($2.sval != null)
+                    $$ = new ParserVal($2.sval);
+
+                else
+                    $$ = new ParserVal(null);
+
+		  	}
+
+
 		  	;
 
 sentencia_control : sentencia_ejecucion 
-		    | BREAK ';'
-		    | error_sentencia_control
+		    | BREAK ';' {
+		     Terceto t = new Terceto("BREAK",null,null);
+             adminTercetos.agregarTerceto(t);
+		     Terceto t1 = new Terceto("BI", null, null);
+             adminTercetos.agregarTerceto(t1);
+             adminTercetos.apilar(t1.getNumero());
+             $$ = new ParserVal("BREAK");
+		    }
+		    | error_sentencia_control {$$ = new ParserVal(null);}
 		    ;
 
 error_sentencia_control : BREAK error {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Se detectó una sentencia mal declarada, falta ';' despues del BREAK}");}

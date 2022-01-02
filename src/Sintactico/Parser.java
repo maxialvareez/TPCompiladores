@@ -790,7 +790,7 @@ final static String yyrule[] = {
 "comparador : DISTINTO",
 };
 
-//#line 991 "Gramatica.y"
+//#line 1019 "Gramatica.y"
 
 private Lexico lexico;
 private AdministradorTercetos adminTercetos;
@@ -1130,48 +1130,52 @@ case 39:
             adminTercetos.agregarTerceto(t);
             t = new Terceto("BI", null, null);
             adminTercetos.agregarTerceto(t);
+             if (val_peek(0).sval != null)
+                   adminTercetos.desapilar();
             adminTercetos.desapilar(); /*para completar BF*/
             adminTercetos.desapilarRepeat();
             t = new Terceto("Label"+adminTercetos.cantidadTercetos(),null,null);
             adminTercetos.agregarTerceto(t);
+
+        
         }
         /*TODO ELSE*/
     }
 break;
 case 41:
-//#line 160 "Gramatica.y"
+//#line 164 "Gramatica.y"
 {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {REPEAT mal declarado, falta '('}");}
 break;
 case 42:
-//#line 161 "Gramatica.y"
+//#line 165 "Gramatica.y"
 {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {REPEAT mal declarado, falta la asignación}");}
 break;
 case 43:
-//#line 162 "Gramatica.y"
+//#line 166 "Gramatica.y"
 {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {REPEAT mal declarado, falta ';'}");}
 break;
 case 44:
-//#line 163 "Gramatica.y"
+//#line 167 "Gramatica.y"
 {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {REPEAT mal declarado, falta la condición}");}
 break;
 case 45:
-//#line 164 "Gramatica.y"
+//#line 168 "Gramatica.y"
 {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {REPEAT mal declarado, falta ';'}");}
 break;
 case 46:
-//#line 165 "Gramatica.y"
+//#line 169 "Gramatica.y"
 {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {REPEAT mal declarado, falta una constante CTE_ULONG}");}
 break;
 case 47:
-//#line 166 "Gramatica.y"
+//#line 170 "Gramatica.y"
 {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {REPEAT mal declarado, falta ')'}");}
 break;
 case 48:
-//#line 167 "Gramatica.y"
+//#line 171 "Gramatica.y"
 {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {REPEAT mal declarado, falta el bloque de sentencias}");}
 break;
 case 49:
-//#line 170 "Gramatica.y"
+//#line 174 "Gramatica.y"
 {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Asignacion del repeat: "+ val_peek(2).sval + " := "+ val_peek(0).sval + "}");
                     String ambitoVariable = Main.tablaSimbolos.verificarAmbito(val_peek(2).sval, ambito);
                     if(ambitoVariable != null) {
@@ -1194,23 +1198,23 @@ case 49:
                     }
 break;
 case 50:
-//#line 190 "Gramatica.y"
+//#line 194 "Gramatica.y"
 { yyval = new ParserVal(null); }
 break;
 case 51:
-//#line 193 "Gramatica.y"
+//#line 197 "Gramatica.y"
 {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {REPEAT mal declarado, falta el identificador }");}
 break;
 case 52:
-//#line 194 "Gramatica.y"
+//#line 198 "Gramatica.y"
 {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {REPEAT mal declarado, falta ':='}");}
 break;
 case 53:
-//#line 195 "Gramatica.y"
+//#line 199 "Gramatica.y"
 {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {REPEAT mal declarado, falta una constante ULONG}");}
 break;
 case 54:
-//#line 199 "Gramatica.y"
+//#line 203 "Gramatica.y"
 {
                                 Operando op = (Operando)val_peek(0).obj;
                                 if (op != null){
@@ -1223,12 +1227,52 @@ case 54:
                                     yyval = new ParserVal(null);
                                  }
 break;
+case 55:
+//#line 218 "Gramatica.y"
+{yyval = new ParserVal(val_peek(1).sval);}
+break;
+case 56:
+//#line 222 "Gramatica.y"
+{
+            if (val_peek(0).sval != null)
+                yyval = new ParserVal(val_peek(0).sval);
+
+            else
+                yyval = new ParserVal(null);
+}
+break;
+case 57:
+//#line 230 "Gramatica.y"
+{
+		  	    if (val_peek(0).sval != null)
+                    yyval = new ParserVal(val_peek(0).sval);
+
+                else
+                    yyval = new ParserVal(null);
+
+		  	}
+break;
+case 59:
+//#line 243 "Gramatica.y"
+{
+		     Terceto t = new Terceto("BREAK",null,null);
+             adminTercetos.agregarTerceto(t);
+		     Terceto t1 = new Terceto("BI", null, null);
+             adminTercetos.agregarTerceto(t1);
+             adminTercetos.apilar(t1.getNumero());
+             yyval = new ParserVal("BREAK");
+		    }
+break;
+case 60:
+//#line 251 "Gramatica.y"
+{yyval = new ParserVal(null);}
+break;
 case 61:
-//#line 226 "Gramatica.y"
+//#line 254 "Gramatica.y"
 {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Se detectó una sentencia mal declarada, falta ';' despues del BREAK}");}
 break;
 case 62:
-//#line 229 "Gramatica.y"
+//#line 257 "Gramatica.y"
 {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Asignacion de " + val_peek(3).sval +"}");
             String ambitoVariable = Main.tablaSimbolos.verificarAmbito(val_peek(3).sval, ambito);
             /*TODO MUCHOS ELSE*/
@@ -1269,23 +1313,23 @@ case 62:
         }
 break;
 case 64:
-//#line 271 "Gramatica.y"
+//#line 299 "Gramatica.y"
 {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Falta el identificador del lado izquierdo de la asignación}");}
 break;
 case 65:
-//#line 272 "Gramatica.y"
+//#line 300 "Gramatica.y"
 {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Falta ':=' en la asignación}");}
 break;
 case 66:
-//#line 273 "Gramatica.y"
+//#line 301 "Gramatica.y"
 {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Falta una expresión aritmética del lado derecho de la asignación}");}
 break;
 case 67:
-//#line 274 "Gramatica.y"
+//#line 302 "Gramatica.y"
 {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Sentencia mal declarada, falta ';'}");}
 break;
 case 68:
-//#line 278 "Gramatica.y"
+//#line 306 "Gramatica.y"
 {
             if(val_peek(3).sval != null){
                 adminTercetos.desapilar();
@@ -1296,7 +1340,7 @@ case 68:
             }
 break;
 case 69:
-//#line 287 "Gramatica.y"
+//#line 315 "Gramatica.y"
 {
 	        if(val_peek(2).sval != null){
                 Terceto t = new Terceto("BI", null, null);
@@ -1310,7 +1354,7 @@ case 69:
             }
 break;
 case 70:
-//#line 298 "Gramatica.y"
+//#line 326 "Gramatica.y"
 {
                 if(val_peek(6).sval != null) {
                    adminTercetos.desapilar();
@@ -1321,7 +1365,7 @@ case 70:
        }
 break;
 case 72:
-//#line 311 "Gramatica.y"
+//#line 339 "Gramatica.y"
 {
                 Operando op = (Operando)val_peek(1).obj;
                 if(op != null){
@@ -1335,65 +1379,65 @@ case 72:
               }
 break;
 case 74:
-//#line 325 "Gramatica.y"
+//#line 353 "Gramatica.y"
 {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {IF mal declarado, falta un parentesis en la condicion'}");}
 break;
 case 78:
-//#line 333 "Gramatica.y"
+//#line 361 "Gramatica.y"
 {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Selección mal declarada, si hay una sola sentencia de ejecución no debe estar entre BEGIN y END}");}
 break;
 case 79:
-//#line 334 "Gramatica.y"
+//#line 362 "Gramatica.y"
 {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Selección mal declarada, falta ';' después del END}");}
 break;
 case 80:
-//#line 335 "Gramatica.y"
+//#line 363 "Gramatica.y"
 {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Selección mal declarada: una sola sentencia de ejecución entre un BEGIN y END, y falta ';' después del END}");}
 break;
 case 81:
-//#line 338 "Gramatica.y"
+//#line 366 "Gramatica.y"
 {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Selección mal declarada, falta el IF}");}
 break;
 case 82:
-//#line 339 "Gramatica.y"
+//#line 367 "Gramatica.y"
 {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {IF mal declarado, falta la condición}");}
 break;
 case 83:
-//#line 340 "Gramatica.y"
+//#line 368 "Gramatica.y"
 {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {IF mal declarado, falta el THEN}");}
 break;
 case 84:
-//#line 341 "Gramatica.y"
+//#line 369 "Gramatica.y"
 {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {IF mal declarado, falta el bloque de sentencias}");}
 break;
 case 85:
-//#line 342 "Gramatica.y"
+//#line 370 "Gramatica.y"
 {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {IF mal declarado, falta el ENDIF al final}");}
 break;
 case 86:
-//#line 343 "Gramatica.y"
+//#line 371 "Gramatica.y"
 {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {IF mal declarado, falta el ENDIF o ELSE}");}
 break;
 case 87:
-//#line 344 "Gramatica.y"
+//#line 372 "Gramatica.y"
 {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {IF mal declarado, falta el ENDIF o ELSE}");}
 break;
 case 88:
-//#line 348 "Gramatica.y"
+//#line 376 "Gramatica.y"
 {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Impresión : '" + val_peek(1).sval  + "'}");
            Terceto t = new Terceto("Impresion", val_peek(1).sval, null);
            adminTercetos.agregarTerceto(t);
            }
 break;
 case 89:
-//#line 353 "Gramatica.y"
+//#line 381 "Gramatica.y"
 {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Impresión : '" + val_peek(0).sval  + "'}");
             Terceto t = new Terceto("Impresion", "", null);
             adminTercetos.agregarTerceto(t);
            }
 break;
 case 90:
-//#line 360 "Gramatica.y"
+//#line 388 "Gramatica.y"
 {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Invocación a la función '" + val_peek(3).sval + "'}");
 
                if (val_peek(1).sval != null){
@@ -1436,7 +1480,7 @@ case 90:
             }
 break;
 case 91:
-//#line 401 "Gramatica.y"
+//#line 429 "Gramatica.y"
 {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Invocación a la función '" + val_peek(3).sval + "'}");
                  if (val_peek(1).sval != null){
                     String ambitoFuncion= Main.tablaSimbolos.verificarAmbito(val_peek(3).sval, ambito);
@@ -1480,7 +1524,7 @@ case 91:
             }
 break;
 case 92:
-//#line 443 "Gramatica.y"
+//#line 471 "Gramatica.y"
 {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Invocación a la función '" + val_peek(3).sval + "'}");
 
                  if (val_peek(1).sval != null && val_peek(3).sval != null){
@@ -1546,29 +1590,29 @@ case 92:
             }
 break;
 case 94:
-//#line 509 "Gramatica.y"
+//#line 537 "Gramatica.y"
 {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Invocación de función mal declarada, falta el parámetro}");}
 break;
 case 95:
-//#line 510 "Gramatica.y"
+//#line 538 "Gramatica.y"
 {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Invocación de función mal declarada, falta el ')'}");}
 break;
 case 96:
-//#line 511 "Gramatica.y"
+//#line 539 "Gramatica.y"
 {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Invocación de función mal declarada, falta el ')'}");}
 break;
 case 97:
-//#line 512 "Gramatica.y"
+//#line 540 "Gramatica.y"
 {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Invocación de función mal declarada, falta el ')'}");}
 break;
 case 98:
-//#line 515 "Gramatica.y"
+//#line 543 "Gramatica.y"
 {adminTercetos.desapilar();
                                         Terceto t = new Terceto("Label"+Integer.toString(adminTercetos.cantidadTercetos()), null, null);
                                         adminTercetos.agregarTerceto(t);}
 break;
 case 100:
-//#line 522 "Gramatica.y"
+//#line 550 "Gramatica.y"
 {
                                       Terceto t = new Terceto("BI", null, null);
                                       adminTercetos.agregarTerceto(t);
@@ -1579,23 +1623,23 @@ case 100:
 }
 break;
 case 102:
-//#line 533 "Gramatica.y"
+//#line 561 "Gramatica.y"
 {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Falta la  sentencia ejecutable después del TRY}");}
 break;
 case 103:
-//#line 536 "Gramatica.y"
+//#line 564 "Gramatica.y"
 {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Falta la palabra CATCH}");}
 break;
 case 104:
-//#line 537 "Gramatica.y"
+//#line 565 "Gramatica.y"
 {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Falta el bloque de sentencias ejecutables despues del CATCH}");}
 break;
 case 105:
-//#line 538 "Gramatica.y"
+//#line 566 "Gramatica.y"
 {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {No se permiten Try y Catch anidados}");}
 break;
 case 109:
-//#line 548 "Gramatica.y"
+//#line 576 "Gramatica.y"
 {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Se leyo el Identificador -> " + val_peek(0).sval);
 			        lista_variables = (ArrayList<String>) val_peek(2).obj;
 			        lista_variables.add(val_peek(0).sval);
@@ -1603,18 +1647,18 @@ case 109:
 			        }
 break;
 case 110:
-//#line 553 "Gramatica.y"
+//#line 581 "Gramatica.y"
 {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Identificador :" + val_peek(0).sval + "}");
 			                        lista_variables.add(val_peek(0).sval);
                                     yyval = new ParserVal(lista_variables);
                                     }
 break;
 case 112:
-//#line 561 "Gramatica.y"
+//#line 589 "Gramatica.y"
 {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Sentencia mal declarada, falta ',' entre los identificadores}");}
 break;
 case 113:
-//#line 565 "Gramatica.y"
+//#line 593 "Gramatica.y"
 {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Declaración de función llamada '"+ val_peek(1).sval +"'" );
             Operando op = (Operando)val_peek(0).obj;
             if(val_peek(1).sval != null && op != null ){ /*si se declaró bien y se cumplen los PRE (en caso de haberlos)*/
@@ -1634,11 +1678,11 @@ case 113:
          }
 break;
 case 115:
-//#line 585 "Gramatica.y"
+//#line 613 "Gramatica.y"
 {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Función mal declarada, falta bloque de sentencias}");}
 break;
 case 116:
-//#line 588 "Gramatica.y"
+//#line 616 "Gramatica.y"
 {
                     parametroCopiaValor = val_peek(1).sval;
                     if (!parametroCopiaValor.equals("")){
@@ -1669,31 +1713,31 @@ case 116:
                     }
 break;
 case 118:
-//#line 619 "Gramatica.y"
+//#line 647 "Gramatica.y"
 {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Función mal declarada, falta indicar el tipo}");}
 break;
 case 119:
-//#line 620 "Gramatica.y"
+//#line 648 "Gramatica.y"
 {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Función mal declarada, falta la palabra FUNC}");}
 break;
 case 120:
-//#line 621 "Gramatica.y"
+//#line 649 "Gramatica.y"
 {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Función mal declarada, falta el nombre}");}
 break;
 case 121:
-//#line 622 "Gramatica.y"
+//#line 650 "Gramatica.y"
 {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Función mal declarada, falta '(' }");}
 break;
 case 122:
-//#line 623 "Gramatica.y"
+//#line 651 "Gramatica.y"
 {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Función mal declarada, falta el parámetro}");}
 break;
 case 123:
-//#line 624 "Gramatica.y"
+//#line 652 "Gramatica.y"
 {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Función mal declarada, falta ')'}");}
 break;
 case 124:
-//#line 627 "Gramatica.y"
+//#line 655 "Gramatica.y"
 {
                 DatosSimbolo ds = Main.tablaSimbolos.getDatos(val_peek(0).sval); /* el identificador ya esta agregado en la tabla de simbolos (se hace en el lexico)*/
                 ds.setUso("NombreParametro");
@@ -1703,11 +1747,11 @@ case 124:
                 }
 break;
 case 126:
-//#line 637 "Gramatica.y"
+//#line 665 "Gramatica.y"
 {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Parámetro mal declarado, falta el nombre identificador}");}
 break;
 case 127:
-//#line 641 "Gramatica.y"
+//#line 669 "Gramatica.y"
 {
             if (val_peek(4).sval != null){
                  lista_variables = (ArrayList<String>)val_peek(0).obj;
@@ -1736,7 +1780,7 @@ case 127:
          }
 break;
 case 128:
-//#line 673 "Gramatica.y"
+//#line 701 "Gramatica.y"
 {
                 Operando op = (Operando)val_peek(0).obj;
                 if (op!= null)
@@ -1746,7 +1790,7 @@ case 128:
            }
 break;
 case 129:
-//#line 680 "Gramatica.y"
+//#line 708 "Gramatica.y"
 {
                 Operando op = (Operando)val_peek(0).obj;
                 if (op != null)
@@ -1756,15 +1800,15 @@ case 129:
            }
 break;
 case 130:
-//#line 687 "Gramatica.y"
+//#line 715 "Gramatica.y"
 { yyval = new ParserVal(null);}
 break;
 case 131:
-//#line 690 "Gramatica.y"
+//#line 718 "Gramatica.y"
 {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Funcion mal declarada, falta el bloque de sentencias ejecutables}");}
 break;
 case 132:
-//#line 694 "Gramatica.y"
+//#line 722 "Gramatica.y"
 {
                              Operando op = (Operando)val_peek(3).obj;
                              if (op != null){
@@ -1775,7 +1819,7 @@ case 132:
                       }
 break;
 case 133:
-//#line 703 "Gramatica.y"
+//#line 731 "Gramatica.y"
 {
                         Operando op = (Operando)val_peek(3).obj;
                         if (op != null){
@@ -1786,7 +1830,7 @@ case 133:
                  }
 break;
 case 134:
-//#line 712 "Gramatica.y"
+//#line 740 "Gramatica.y"
 {
 			            Operando op = (Operando)val_peek(3).obj;
 			            if (val_peek(8).sval != null && op != null){
@@ -1797,7 +1841,7 @@ case 134:
 			 }
 break;
 case 135:
-//#line 720 "Gramatica.y"
+//#line 748 "Gramatica.y"
 {
                         Operando op = (Operando)val_peek(3).obj;
                         if (val_peek(7).sval != null && op != null){
@@ -1808,79 +1852,79 @@ case 135:
              }
 break;
 case 136:
-//#line 729 "Gramatica.y"
+//#line 757 "Gramatica.y"
 { yyval = new ParserVal (null);}
 break;
 case 137:
-//#line 732 "Gramatica.y"
+//#line 760 "Gramatica.y"
 {Main.listaErrores.add("Error sintáctico: Linea " + Lexico.linea + " se detectó un error en una funcion, falta el BEGIN");}
 break;
 case 138:
-//#line 733 "Gramatica.y"
+//#line 761 "Gramatica.y"
 {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Error en una funcion, falta el RETURN");}
 break;
 case 139:
-//#line 734 "Gramatica.y"
+//#line 762 "Gramatica.y"
 {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Error en una funcion, falta '(' ");}
 break;
 case 140:
-//#line 735 "Gramatica.y"
+//#line 763 "Gramatica.y"
 {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Error en una funcion, falta indicar el retorno");}
 break;
 case 141:
-//#line 736 "Gramatica.y"
+//#line 764 "Gramatica.y"
 {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Error en una funcion, falta ')' ");}
 break;
 case 142:
-//#line 737 "Gramatica.y"
+//#line 765 "Gramatica.y"
 {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Error en una funcion, falta ';' ");}
 break;
 case 143:
-//#line 738 "Gramatica.y"
+//#line 766 "Gramatica.y"
 {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Error en una función, falta indicar el retorno ");}
 break;
 case 144:
-//#line 739 "Gramatica.y"
+//#line 767 "Gramatica.y"
 {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Error en una funcion, falta el END ");}
 break;
 case 145:
-//#line 741 "Gramatica.y"
+//#line 769 "Gramatica.y"
 {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Error en una funcion, falta el BEGIN}");}
 break;
 case 146:
-//#line 742 "Gramatica.y"
+//#line 770 "Gramatica.y"
 {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Error en una funcion, ';' después se la sentencia PRE}");}
 break;
 case 147:
-//#line 743 "Gramatica.y"
+//#line 771 "Gramatica.y"
 {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Error en una funcion, falta el RETURN}");}
 break;
 case 148:
-//#line 744 "Gramatica.y"
+//#line 772 "Gramatica.y"
 {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Error en una funcion, falta '(' }");}
 break;
 case 149:
-//#line 745 "Gramatica.y"
+//#line 773 "Gramatica.y"
 {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Error en una funcion, falta indicar el retorno}");}
 break;
 case 150:
-//#line 746 "Gramatica.y"
+//#line 774 "Gramatica.y"
 {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Error en una funcion, falta ')' }");}
 break;
 case 151:
-//#line 747 "Gramatica.y"
+//#line 775 "Gramatica.y"
 {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Error en una funcion, falta ';' }");}
 break;
 case 152:
-//#line 748 "Gramatica.y"
+//#line 776 "Gramatica.y"
 {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Error en una funcion, falta el END }");}
 break;
 case 153:
-//#line 749 "Gramatica.y"
+//#line 777 "Gramatica.y"
 {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Error en una funcion, falta indicar un retorno }");}
 break;
 case 154:
-//#line 753 "Gramatica.y"
+//#line 781 "Gramatica.y"
 {
                       Operando op = (Operando)val_peek(1).obj;
                       if (op != null){
@@ -1894,27 +1938,27 @@ case 154:
                    }
 break;
 case 156:
-//#line 767 "Gramatica.y"
+//#line 795 "Gramatica.y"
 {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Error en una funcion, falta la palabra 'PRE' }");}
 break;
 case 157:
-//#line 768 "Gramatica.y"
+//#line 796 "Gramatica.y"
 {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Error en una funcion, falta ':' }");}
 break;
 case 158:
-//#line 769 "Gramatica.y"
+//#line 797 "Gramatica.y"
 {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Error en una funcion, falta '(' }");}
 break;
 case 159:
-//#line 770 "Gramatica.y"
+//#line 798 "Gramatica.y"
 {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Error en una funcion, falta la condicion del PRE}");}
 break;
 case 160:
-//#line 771 "Gramatica.y"
+//#line 799 "Gramatica.y"
 {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Error en una funcion, falta ')'}");}
 break;
 case 161:
-//#line 776 "Gramatica.y"
+//#line 804 "Gramatica.y"
 {
                             Operando op = (Operando)val_peek(0).obj;
                             if(op != null)
@@ -1927,11 +1971,11 @@ case 161:
                 }
 break;
 case 162:
-//#line 788 "Gramatica.y"
+//#line 816 "Gramatica.y"
 { yyval = new ParserVal((Operando)val_peek(0).obj);}
 break;
 case 163:
-//#line 790 "Gramatica.y"
+//#line 818 "Gramatica.y"
 {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Se realizó la operación OR }");
 
 	                    Operando op1 = (Operando)val_peek(2).obj;
@@ -1955,11 +1999,11 @@ case 163:
         }
 break;
 case 164:
-//#line 813 "Gramatica.y"
+//#line 841 "Gramatica.y"
 { yyval = new ParserVal((Operando)val_peek(0).obj);}
 break;
 case 165:
-//#line 815 "Gramatica.y"
+//#line 843 "Gramatica.y"
 {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Se realizó la operación: AND}");
 	                    Operando op1 = (Operando)val_peek(2).obj;
                         Operando op2 = (Operando)val_peek(0).obj;
@@ -1981,7 +2025,7 @@ case 165:
         }
 break;
 case 166:
-//#line 836 "Gramatica.y"
+//#line 864 "Gramatica.y"
 {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Se realizó la operación: " +  val_peek(1).sval + "}");
 
 		                            Operando op1 = (Operando)val_peek(2).obj;
@@ -2004,15 +2048,15 @@ case 166:
                    }
 break;
 case 167:
-//#line 856 "Gramatica.y"
+//#line 884 "Gramatica.y"
 { yyval = new ParserVal((Operando)val_peek(0).obj);}
 break;
 case 168:
-//#line 860 "Gramatica.y"
+//#line 888 "Gramatica.y"
 { yyval = new ParserVal((Operando)val_peek(0).obj);}
 break;
 case 169:
-//#line 863 "Gramatica.y"
+//#line 891 "Gramatica.y"
 {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Se realizó la operación: SUMA }");
 	    Operando op1 = (Operando)val_peek(2).obj;
                         Operando op2 = (Operando)val_peek(0).obj;
@@ -2034,7 +2078,7 @@ case 169:
       }
 break;
 case 170:
-//#line 883 "Gramatica.y"
+//#line 911 "Gramatica.y"
 {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Se realizó la operación: RESTA}");
 	    Operando op1 = (Operando)val_peek(2).obj;
                         Operando op2 = (Operando)val_peek(0).obj;
@@ -2056,7 +2100,7 @@ case 170:
         }
 break;
 case 171:
-//#line 905 "Gramatica.y"
+//#line 933 "Gramatica.y"
 {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Se realizó la operación: MULTIPLICACIÓN}");
                 Operando op1 = (Operando)val_peek(2).obj;
                         Operando op2 = (Operando)val_peek(0).obj;
@@ -2078,7 +2122,7 @@ case 171:
                     }
 break;
 case 172:
-//#line 925 "Gramatica.y"
+//#line 953 "Gramatica.y"
 {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Se realizó la operación: DIVISION}");
                 Operando op1 = (Operando)val_peek(2).obj;
                 Operando op2 = (Operando)val_peek(0).obj;
@@ -2100,11 +2144,11 @@ case 172:
             }
 break;
 case 173:
-//#line 945 "Gramatica.y"
+//#line 973 "Gramatica.y"
 { yyval = new ParserVal((Operando)val_peek(0).obj);}
 break;
 case 174:
-//#line 949 "Gramatica.y"
+//#line 977 "Gramatica.y"
 { if (chequearFactorNegado()){
                                   Operando operando = (Operando) val_peek(0).obj;
                                   yyval = new ParserVal(new Operando(operando.getTipo(), "-" + operando.getValor())) ;
@@ -2112,19 +2156,19 @@ case 174:
                             }
 break;
 case 175:
-//#line 954 "Gramatica.y"
+//#line 982 "Gramatica.y"
 {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Constante DOUBLE: " + val_peek(0).sval + "}");
             yyval = new ParserVal(new Operando("DOUBLE", val_peek(0).sval));
         }
 break;
 case 176:
-//#line 957 "Gramatica.y"
+//#line 985 "Gramatica.y"
 {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Constante ULONG: " + val_peek(0).sval + "}");
          yyval = new ParserVal(new Operando("ULONG", val_peek(0).sval));
          }
 break;
 case 177:
-//#line 960 "Gramatica.y"
+//#line 988 "Gramatica.y"
 {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Identificador: " + val_peek(0).sval +"}");
 	            String ambitoVariable = Main.tablaSimbolos.verificarAmbito(val_peek(0).sval, ambito);
                 	if(ambitoVariable != null)
@@ -2136,7 +2180,7 @@ case 177:
 	          }
 break;
 case 178:
-//#line 969 "Gramatica.y"
+//#line 997 "Gramatica.y"
 {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Invocacion de funcion}");
                        if(val_peek(0).sval != null){
                            String ambitoVariable = Main.tablaSimbolos.verificarAmbito(val_peek(0).sval, ambito);
@@ -2148,30 +2192,30 @@ case 178:
                      }
 break;
 case 179:
-//#line 981 "Gramatica.y"
+//#line 1009 "Gramatica.y"
 { yyval = new ParserVal("<");}
 break;
 case 180:
-//#line 982 "Gramatica.y"
+//#line 1010 "Gramatica.y"
 { yyval = new ParserVal(">");}
 break;
 case 181:
-//#line 983 "Gramatica.y"
+//#line 1011 "Gramatica.y"
 { yyval = new ParserVal("==");}
 break;
 case 182:
-//#line 984 "Gramatica.y"
+//#line 1012 "Gramatica.y"
 { yyval = new ParserVal(">=");}
 break;
 case 183:
-//#line 985 "Gramatica.y"
+//#line 1013 "Gramatica.y"
 { yyval = new ParserVal("<=");}
 break;
 case 184:
-//#line 986 "Gramatica.y"
+//#line 1014 "Gramatica.y"
 { yyval = new ParserVal("<>");}
 break;
-//#line 2098 "Parser.java"
+//#line 2142 "Parser.java"
 //########## END OF USER-SUPPLIED ACTIONS ##########
     }//switch
     //#### Now let's reduce... ####
