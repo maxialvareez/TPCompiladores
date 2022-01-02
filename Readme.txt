@@ -7,4 +7,4 @@ Y desde la consola ejecutar:
 java -jar "TPCompiladores.jar"
 
 La ruta de pruebas es:
-..\TPCompiladores\PruebasLexico
+..\TPCompiladores\PruebasPruebas(parte2)
