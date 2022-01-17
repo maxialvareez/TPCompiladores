@@ -57,7 +57,6 @@ sentencia_ejecutable: control ';'
 error_ejecutable: control error {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Sentencia mal declarada, falta ';'}");}
                 | seleccion error {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Sentencia mal declarada, falta ';'}");}
                 | impresion error {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Sentencia mal declarada, falta ';'}");}
-
              	| invocacion error {Main.listaErrores.add("[ERROR SINTÁCTICO] [Linea " + Lexico.linea + "] {Sentencia mal declarada, falta ';'}");}
                	;
 
@@ -262,7 +261,7 @@ asignacion : IDENTIFICADOR ASIGNACION expresion ';' {System.out.println("[Sintá
                 Operando op = (Operando)$3.obj;
                 if(op != null && tipoIdentificador != null){
                      String valorOp = op.getValor();
-                        if(valorOp!= null && !valorOp.contains("[")){
+                        if(valorOp!= null && !valorOp.contains("[") && (!valorOp.contains("var_"))){
                             if(Main.tablaSimbolos.getDatos(valorOp).getUso() != null && Main.tablaSimbolos.getDatos(ambitoVariable).getUso() != null)
                                 if(Main.tablaSimbolos.getDatos(valorOp).getUso().equals("NombreFuncion") && Main.tablaSimbolos.getDatos(ambitoVariable).getUso().equals("VariableTypeDef")){
                                     Main.tablaSimbolos.getDatos(ambitoVariable).setFuncionReferenciada(valorOp);
@@ -386,13 +385,13 @@ impresion: PRINT '(' CADENA ')'  {System.out.println("[Sintáctico] [Linea " + L
 
 
 invocacion : IDENTIFICADOR '(' CTE_ULONG ')' {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Invocación a la función '" + $1.sval + "'}");
-
+              String s = "var_";
                if ($3.sval != null){
                     String ambitoFuncion= Main.tablaSimbolos.verificarAmbito($1.sval, ambito);
                     if(ambitoFuncion != null && Main.tablaSimbolos.getDatos(ambitoFuncion).getTipo() == "ULONG"){
                         if (!Main.tablaSimbolos.getDatos(ambitoFuncion).getFuncionReferenciada().equals("")){
                             String funcionRef = Main.tablaSimbolos.getDatos(ambitoFuncion).getFuncionReferenciada();
-                             Terceto t = new Terceto(":=", Main.tablaSimbolos.getDatos(funcionRef).getParametro(), $3.sval);
+                            Terceto t = new Terceto(":=", Main.tablaSimbolos.getDatos(funcionRef).getParametro(), $3.sval);
                             t.setTipo(Main.tablaSimbolos.getDatos(funcionRef).getTipo());
                             adminTercetos.agregarTerceto(t);
                             t = new Terceto("InvocacionFuncion", funcionRef, ambitoFuncion);
@@ -403,7 +402,8 @@ invocacion : IDENTIFICADOR '(' CTE_ULONG ')' {System.out.println("[Sintáctico] 
                             }
                             adminTercetos.agregarTerceto(t);
                             funcionRef = funcionRef.substring(0, funcionRef.lastIndexOf("@"));
-                            $$ = new ParserVal(funcionRef);
+                            s +=adminTercetos.cantidadTercetos() -1;
+                            $$ = new ParserVal(new Operando(Main.tablaSimbolos.getDatos(ambitoFuncion).getTipo(), s));
                         }
                         else{
                             Terceto t = new Terceto(":=", Main.tablaSimbolos.getDatos(ambitoFuncion).getParametro(), $3.sval);
@@ -411,7 +411,8 @@ invocacion : IDENTIFICADOR '(' CTE_ULONG ')' {System.out.println("[Sintáctico] 
                             adminTercetos.agregarTerceto(t);
                             t = new Terceto("InvocacionFuncion", ambitoFuncion, null);
                             adminTercetos.agregarTerceto(t);
-                            $$ = new ParserVal($1.sval);
+                            s += adminTercetos.cantidadTercetos() -1;
+                            $$ = new ParserVal(new Operando(Main.tablaSimbolos.getDatos(ambitoFuncion).getTipo(), s));
                         }
                     }
                     else
@@ -427,6 +428,7 @@ invocacion : IDENTIFICADOR '(' CTE_ULONG ')' {System.out.println("[Sintáctico] 
             }
 
             | IDENTIFICADOR '(' CTE_DOUBLE ')' {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Invocación a la función '" + $1.sval + "'}");
+                 String s = "var_";
                  if ($3.sval != null){
                     String ambitoFuncion= Main.tablaSimbolos.verificarAmbito($1.sval, ambito);
                     if(ambitoFuncion != null && Main.tablaSimbolos.getDatos(ambitoFuncion).getTipo() == "DOUBLE"){
@@ -447,7 +449,8 @@ invocacion : IDENTIFICADOR '(' CTE_ULONG ')' {System.out.println("[Sintáctico] 
                             adminTercetos.agregarTerceto(t);
 
                             funcionRef = funcionRef.substring(0, funcionRef.lastIndexOf("@"));
-                            $$ = new ParserVal(funcionRef);
+                            s += adminTercetos.cantidadTercetos() -1;
+                            $$ = new ParserVal(new Operando(Main.tablaSimbolos.getDatos(ambitoFuncion).getTipo(), s));
                         }
                         else{
                              Terceto t = new Terceto(":=",  Main.tablaSimbolos.getDatos(ambitoFuncion).getParametro(),$3.sval);
@@ -456,7 +459,8 @@ invocacion : IDENTIFICADOR '(' CTE_ULONG ')' {System.out.println("[Sintáctico] 
                              t = new Terceto("InvocacionFuncion", ambitoFuncion, null);
                              adminTercetos.agregarTerceto(t);
 
-                             $$ = new ParserVal($1.sval);
+                             s += adminTercetos.cantidadTercetos() -1;
+                            $$ = new ParserVal(new Operando(Main.tablaSimbolos.getDatos(ambitoFuncion).getTipo(), s));
                         }
                     }
                     else
@@ -472,7 +476,7 @@ invocacion : IDENTIFICADOR '(' CTE_ULONG ')' {System.out.println("[Sintáctico] 
             }
 
             |IDENTIFICADOR '(' IDENTIFICADOR ')' {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Invocación a la función '" + $1.sval + "'}");
-
+                 String s = "var_";
                  if ($3.sval != null && $1.sval != null){
                     String ambitoFuncion= Main.tablaSimbolos.verificarAmbito($1.sval, ambito);
                     String ambitoParametro = Main.tablaSimbolos.verificarAmbito($3.sval, ambito);
@@ -496,7 +500,8 @@ invocacion : IDENTIFICADOR '(' CTE_ULONG ')' {System.out.println("[Sintáctico] 
                                             adminTercetos.agregarTerceto(t);
 
                                             funcionRef = funcionRef.substring(0, funcionRef.lastIndexOf("@"));
-                                            $$ = new ParserVal(funcionRef);
+                                            s += adminTercetos.cantidadTercetos() -1;
+                                             $$ = new ParserVal(new Operando(Main.tablaSimbolos.getDatos(ambitoFuncion).getTipo(), s));
                                         }
                                         else{
                                              String variableFuncion = Main.tablaSimbolos.getDatos(ambitoFuncion).getParametro();
@@ -512,7 +517,8 @@ invocacion : IDENTIFICADOR '(' CTE_ULONG ')' {System.out.println("[Sintáctico] 
 
                                              adminTercetos.agregarTerceto(t);
 
-                                             $$ = new ParserVal($1.sval);
+                                            s += adminTercetos.cantidadTercetos() -1;
+                                            $$ = new ParserVal(new Operando(Main.tablaSimbolos.getDatos(ambitoFuncion).getTipo(), s));
                                         }
                                 }
                                 else{
@@ -999,13 +1005,24 @@ factor 	:  '-' factor  { if (chequearFactorNegado()){
 	                }
 	          }
 	    | invocacion   {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Invocacion de funcion}");
-                       if($1.sval != null){
-                           String ambitoVariable = Main.tablaSimbolos.verificarAmbito($1.sval, ambito);
-                           if (ambitoVariable != null)
-                                $$ = new ParserVal(new Operando(Main.tablaSimbolos.getDatos(ambitoVariable).getTipo(), ambitoVariable));
-                           else
-                           Main.listaErrores.add("[ERROR SEMÁNTICO] [Linea " + Lexico.linea + "] {La Funcion " + $1.sval +" no fue declarada}");
-                       }
+                       Operando op = (Operando)$1.obj;
+
+                       String nombre = op.getValor();
+                       String tipo = op.getTipo();
+                       System.out.println("*********TIPO: "+ tipo);
+                       System.out.println("********NOMBRE: "+ nombre);
+                       if(nombre != null){
+                           String ambitoVariable = Main.tablaSimbolos.verificarAmbito(nombre, ambito);
+                           if (!nombre.contains("var_")){
+                               if (ambitoVariable != null)
+                                    $$ = new ParserVal(new Operando(tipo, ambitoVariable));
+                               else
+                               Main.listaErrores.add("[ERROR SEMÁNTICO] [Linea " + Lexico.linea + "] {La Funcion " + nombre +" no fue declarada}");
+                           }
+                         else
+                            $$ = new ParserVal(new Operando(tipo, nombre));
+                        }
+
                      }
         ;
 

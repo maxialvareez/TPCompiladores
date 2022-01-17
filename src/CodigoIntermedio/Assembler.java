@@ -766,14 +766,12 @@ public class Assembler {
                         break;
 
                     case "InvocacionFuncion":
-                        if (t.getOperando2() != null) {
-                            retorno = t.getOperando2();
+
+                            Main.tablaSimbolos.agregarSimbolo("var_" + t.getNumero() , Lexico.IDENTIFICADOR,Main.tablaSimbolos.getDatos(t.getOperando1()).getTipo(), "Variable");
                             code += "CALL " + t.getOperando1() + "\n";
                             code += "MOV EBX, _" + t.getOperando1() + '\n'; // Muevo a la variable.
-                            code += "MOV _" + retorno + ", EBX" + '\n'; // Muevo a la variable.
-                        }
-                        else
-                            code += "CALL " + t.getOperando1() + "\n";
+                            code += "MOV _var_" + t.getNumero() + ", EBX" + '\n'; // Muevo a la variable.
+
 
                         break;
 
