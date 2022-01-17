@@ -10,6 +10,7 @@ public class Terceto {
     private String resultado; // resultado de la operación del terceto
     private String tipo;  // tipo del resultado de la operación (por ejemplo si es la suma de dos enteros, será entero)
     private String ambitoInvocacion;
+    private String varibleAuxiliar;
 
     public Terceto(String operador, String operando1, String operando2) {
         this.operador = operador;
@@ -18,9 +19,18 @@ public class Terceto {
         this.resultado = null;
         this.tipo = null;
         this.ambitoInvocacion = null;
+        this.varibleAuxiliar = null;
 
     }
 
+    public String getVaribleAuxiliar() {
+        return varibleAuxiliar;
+    }
+
+    public Terceto setVaribleAuxiliar(String varibleAuxiliar) {
+        this.varibleAuxiliar = varibleAuxiliar;
+        return this;
+    }
 
     public String getAmbitoInvocacion() {
         return ambitoInvocacion;

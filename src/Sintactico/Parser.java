@@ -1281,7 +1281,7 @@ case 62:
                 Operando op = (Operando)val_peek(1).obj;
                 if(op != null && tipoIdentificador != null){
                      String valorOp = op.getValor();
-                        if(valorOp!= null && !valorOp.contains("[") && (!valorOp.contains("var_"))){
+                        if(valorOp!= null && !valorOp.contains("[")){
                             if(Main.tablaSimbolos.getDatos(valorOp).getUso() != null && Main.tablaSimbolos.getDatos(ambitoVariable).getUso() != null)
                                 if(Main.tablaSimbolos.getDatos(valorOp).getUso().equals("NombreFuncion") && Main.tablaSimbolos.getDatos(ambitoVariable).getUso().equals("VariableTypeDef")){
                                     Main.tablaSimbolos.getDatos(ambitoVariable).setFuncionReferenciada(valorOp);
@@ -1439,7 +1439,7 @@ break;
 case 90:
 //#line 387 "Gramatica.y"
 {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Invocación a la función '" + val_peek(3).sval + "'}");
-              String s = "var_";
+              String s = "[";
                if (val_peek(1).sval != null){
                     String ambitoFuncion= Main.tablaSimbolos.verificarAmbito(val_peek(3).sval, ambito);
                     if(ambitoFuncion != null && Main.tablaSimbolos.getDatos(ambitoFuncion).getTipo() == "ULONG"){
@@ -1456,7 +1456,7 @@ case 90:
                             }
                             adminTercetos.agregarTerceto(t);
                             funcionRef = funcionRef.substring(0, funcionRef.lastIndexOf("@"));
-                            s +=adminTercetos.cantidadTercetos() -1;
+                            s +=adminTercetos.cantidadTercetos() -1 + "]";
 
                             yyval = new ParserVal(new Operando(Main.tablaSimbolos.getDatos(ambitoFuncion).getTipo(), s));
 
@@ -1467,7 +1467,7 @@ case 90:
                             adminTercetos.agregarTerceto(t);
                             t = new Terceto("InvocacionFuncion", ambitoFuncion, null);
                             adminTercetos.agregarTerceto(t);
-                            s += adminTercetos.cantidadTercetos() -1;
+                            s += adminTercetos.cantidadTercetos() -1+ "]";
 
                             yyval = new ParserVal(new Operando(Main.tablaSimbolos.getDatos(ambitoFuncion).getTipo(), s));
 
@@ -1488,7 +1488,7 @@ break;
 case 91:
 //#line 434 "Gramatica.y"
 {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Invocación a la función '" + val_peek(3).sval + "'}");
-                 String s = "var_";
+                 String s = "[";
                  if (val_peek(1).sval != null){
                     String ambitoFuncion= Main.tablaSimbolos.verificarAmbito(val_peek(3).sval, ambito);
                     if(ambitoFuncion != null && Main.tablaSimbolos.getDatos(ambitoFuncion).getTipo() == "DOUBLE"){
@@ -1509,7 +1509,7 @@ case 91:
                             adminTercetos.agregarTerceto(t);
 
                             funcionRef = funcionRef.substring(0, funcionRef.lastIndexOf("@"));
-                            s += adminTercetos.cantidadTercetos() -1;
+                            s += adminTercetos.cantidadTercetos() -1 + "]";
 
                             yyval = new ParserVal(new Operando(Main.tablaSimbolos.getDatos(ambitoFuncion).getTipo(), s));
 
@@ -1522,7 +1522,7 @@ case 91:
                              t = new Terceto("InvocacionFuncion", ambitoFuncion, null);
                              adminTercetos.agregarTerceto(t);
 
-                            s += adminTercetos.cantidadTercetos() -1;
+                            s += adminTercetos.cantidadTercetos() -1 + "]";
 
                                 yyval = new ParserVal(new Operando(Main.tablaSimbolos.getDatos(ambitoFuncion).getTipo(), s));
 
@@ -1543,7 +1543,7 @@ break;
 case 92:
 //#line 487 "Gramatica.y"
 {System.out.println("[Sintáctico] [Linea " + Lexico.linea + "] {Invocación a la función '" + val_peek(3).sval + "'}");
-                 String s = "var_";
+                 String s = "[";
                  if (val_peek(1).sval != null && val_peek(3).sval != null){
                     String ambitoFuncion= Main.tablaSimbolos.verificarAmbito(val_peek(3).sval, ambito);
                     String ambitoParametro = Main.tablaSimbolos.verificarAmbito(val_peek(1).sval, ambito);
@@ -1567,7 +1567,7 @@ case 92:
                                             adminTercetos.agregarTerceto(t);
 
                                             funcionRef = funcionRef.substring(0, funcionRef.lastIndexOf("@"));
-                                             s += adminTercetos.cantidadTercetos() -1;
+                                             s += adminTercetos.cantidadTercetos() -1 + "]";
 
                                                 yyval = new ParserVal(new Operando(Main.tablaSimbolos.getDatos(ambitoFuncion).getTipo(), s));
 
@@ -1587,7 +1587,7 @@ case 92:
 
                                              adminTercetos.agregarTerceto(t);
 
-                                            s += adminTercetos.cantidadTercetos() -1;
+                                            s += adminTercetos.cantidadTercetos() -1 + "]";
 
                                                yyval = new ParserVal(new Operando(Main.tablaSimbolos.getDatos(ambitoFuncion).getTipo(), s));
 
@@ -2217,7 +2217,7 @@ case 178:
                        if(nombre != null){
 
                            String ambitoVariable = Main.tablaSimbolos.verificarAmbito(nombre, ambito);
-                           if (!nombre.contains("var_")){
+                           if (!nombre.contains("[")){
                                if (ambitoVariable != null)
                                     yyval = new ParserVal(new Operando(tipo, ambitoVariable));
                                else

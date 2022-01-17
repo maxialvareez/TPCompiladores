@@ -1,28 +1,33 @@
-pruebaFuncIf
+pruebaTypeDef
 
-DOUBLE b;
+ULONG a,b,c;
 
-DOUBLE FUNC f (DOUBLE b)
+TYPEDEF f1 = ULONG FUNC (ULONG);
+f1 x,y,z;
+
+ULONG FUNC f(ULONG p)
 BEGIN
-b := b+1.0;
-PRINT(%HOLA%);
-RETURN (b);
+p:=p;
+RETURN (p+2);
 END;
-
 BEGIN
 
-b:= 1.0;
-b := f(b) + f(4.0);
+b := 2;
 
-IF (b < 7.0) THEN
+x:=f;
+z:=x;
+a:= x(b) + z(3);
+
+IF (a < 9) THEN
 BEGIN
-b := 1.0;
+a := 5;
 PRINT(%MENOR%);
 END;
 ELSE
 BEGIN
-b:= 1.0;
+a := 4;
 PRINT(%MAYOR%);
 END;
 ENDIF;
+
 END

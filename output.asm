@@ -14,67 +14,73 @@ _divisorCeroULONG DD 0
 _divisorCeroDOUBLE DD 0.0
 _OverflowSuma DB "Overflow en suma", 0 
 _DivisionCero DB "Division por cero", 0 
-_var11 DQ ?
-_f@main DD ?
-_HOLA DB 'HOLA', 0 
 _MENOR DB 'MENOR', 0 
-_4_0 DQ 4.0
-_var1 DQ ?
-_var_10 DQ ?
-_1_0 DQ 1.0
+_f@main DD ?
+_f1@main DD ?
+_x@main DD ?
 _MAYOR DB 'MAYOR', 0 
-_var13_2bytes DW ?
-_var_8 DQ ?
-_7_0 DQ 7.0
-_b@main DQ ?
-_b@main@f DQ ?
+_a@main DD ?
+_p@main@f DD ?
+_y@main DD ?
+_b@main DD ?
+_9 DD 9
+_z@main DD ?
+_var9 DD ?
+_5 DD 5
+_c@main DD ?
+_4 DD 4
+_3 DD 3
+_var12 DD ?
+_2 DD 2
+_var11 DD ?
+_var2 DD ?
 
 .code
  f@main:
 FINIT 
-FLD _b@main@f
-FADD _1_0
-FSTP _var1
-FLD _var1
-FSTP _b@main@f
-invoke MessageBox, NULL, addr _HOLA, addr _HOLA, MB_OK 
-FLD _b@main@f
-FSTP _f@main
+MOV EBX, _p@main@f
+MOV _p@main@f, EBX
+MOV EBX, _p@main@f
+ADD EBX, _2
+CMP EBX, _limiteSuperiorULONG
+JA LabelOverflowSuma
+MOV _var2, EBX
+MOV EBX, _var2
+MOV _f@main, EBX
 RET 
 start: 
 FINIT 
-FLD _1_0
-FSTP _b@main
-FLD _b@main
-FSTP _b@main@f
+MOV EBX, _2
+MOV _b@main, EBX
+MOV EBX, _b@main
+MOV _p@main@f, EBX
 CALL f@main
-FLD _f@main
-FSTP _var_8
-FLD _4_0
-FSTP _b@main@f
+MOV EBX, _f@main
+MOV _var9, EBX
+MOV EBX, _3
+MOV _p@main@f, EBX
 CALL f@main
-FLD _f@main
-FSTP _var_10
-FLD _var_8
-FADD _var_10
-FSTP _var11
-FLD _var11
-FSTP _b@main
-FLD _b@main
-FCOMP _7_0
-FSTSW _var13_2bytes
-MOV AX , _var13_2bytes
-SAHF
-JAE Label18
-FLD _1_0
-FSTP _b@main
+MOV EBX, _f@main
+MOV _var11, EBX
+MOV EBX, _var9
+ADD EBX, _var11
+CMP EBX, _limiteSuperiorULONG
+JA LabelOverflowSuma
+MOV _var12, EBX
+MOV EBX, _var12
+MOV _a@main, EBX
+MOV EBX, _9
+CMP _a@main, EBX
+JAE Label19
+MOV EBX, _5
+MOV _a@main, EBX
 invoke MessageBox, NULL, addr _MENOR, addr _MENOR, MB_OK 
-JMP Label21
-Label18: 
-FLD _1_0
-FSTP _b@main
+JMP Label22
+Label19: 
+MOV EBX, _4
+MOV _a@main, EBX
 invoke MessageBox, NULL, addr _MAYOR, addr _MAYOR, MB_OK 
-Label21: 
+Label22: 
 FINIT
 invoke ExitProcess, 0 
 FINIT

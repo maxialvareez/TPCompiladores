@@ -18,6 +18,7 @@ public class Assembler {
     private static final long limiteSuperiorULONG= Long.parseUnsignedLong("1000000000");
     private static final int divisorCeroULONG = 0;
     private static final double divisorCeroDOUBLE = 0.0;
+    private ArrayList<String> invocaciones = new ArrayList<>();
 
     public Assembler(AdministradorTercetos administradorTerceto) {
         this.administradorTerceto = administradorTerceto;
@@ -767,16 +768,18 @@ public class Assembler {
 
                     case "InvocacionFuncion":
                             if (Main.tablaSimbolos.getDatos(t.getOperando1()).getTipo().equals("ULONG")) {
-                                Main.tablaSimbolos.agregarSimbolo("var_" + t.getNumero(), Lexico.IDENTIFICADOR, Main.tablaSimbolos.getDatos(t.getOperando1()).getTipo(), "Variable");
+                                Main.tablaSimbolos.agregarSimbolo("var" + t.getNumero(), Lexico.IDENTIFICADOR, Main.tablaSimbolos.getDatos(t.getOperando1()).getTipo(), "Variable");
                                 code += "CALL " + t.getOperando1() + "\n";
                                 code += "MOV EBX, _" + t.getOperando1() + '\n'; // Muevo a la variable.
-                                code += "MOV _var_" + t.getNumero() + ", EBX" + '\n'; // Muevo a la variable.
+                                code += "MOV _var" + t.getNumero() + ", EBX" + '\n'; // Muevo a la variable.
+                                t.setResultado("var" + t.getNumero());
                             }
                             else {
-                                Main.tablaSimbolos.agregarSimbolo("var_" + t.getNumero(), Lexico.IDENTIFICADOR, Main.tablaSimbolos.getDatos(t.getOperando1()).getTipo(), "Variable");
+                                Main.tablaSimbolos.agregarSimbolo("var" + t.getNumero(), Lexico.IDENTIFICADOR, Main.tablaSimbolos.getDatos(t.getOperando1()).getTipo(), "Variable");
                                 code += "CALL " + t.getOperando1() + "\n";
                                 code += "FLD _" + t.getOperando1() + "\n";
-                                code += "FSTP _var_" + t.getNumero() + "\n";
+                                code += "FSTP _var" + t.getNumero() + "\n";
+                                t.setResultado("var" + t.getNumero());
                             }
                         break;
 
