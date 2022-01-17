@@ -766,13 +766,18 @@ public class Assembler {
                         break;
 
                     case "InvocacionFuncion":
-
-                            Main.tablaSimbolos.agregarSimbolo("var_" + t.getNumero() , Lexico.IDENTIFICADOR,Main.tablaSimbolos.getDatos(t.getOperando1()).getTipo(), "Variable");
-                            code += "CALL " + t.getOperando1() + "\n";
-                            code += "MOV EBX, _" + t.getOperando1() + '\n'; // Muevo a la variable.
-                            code += "MOV _var_" + t.getNumero() + ", EBX" + '\n'; // Muevo a la variable.
-
-
+                            if (Main.tablaSimbolos.getDatos(t.getOperando1()).getTipo().equals("ULONG")) {
+                                Main.tablaSimbolos.agregarSimbolo("var_" + t.getNumero(), Lexico.IDENTIFICADOR, Main.tablaSimbolos.getDatos(t.getOperando1()).getTipo(), "Variable");
+                                code += "CALL " + t.getOperando1() + "\n";
+                                code += "MOV EBX, _" + t.getOperando1() + '\n'; // Muevo a la variable.
+                                code += "MOV _var_" + t.getNumero() + ", EBX" + '\n'; // Muevo a la variable.
+                            }
+                            else {
+                                Main.tablaSimbolos.agregarSimbolo("var_" + t.getNumero(), Lexico.IDENTIFICADOR, Main.tablaSimbolos.getDatos(t.getOperando1()).getTipo(), "Variable");
+                                code += "CALL " + t.getOperando1() + "\n";
+                                code += "FLD _" + t.getOperando1() + "\n";
+                                code += "FSTP _var_" + t.getNumero() + "\n";
+                            }
                         break;
 
                     case "Impresion":
