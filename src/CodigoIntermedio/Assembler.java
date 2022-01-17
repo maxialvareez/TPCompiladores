@@ -1,5 +1,6 @@
 package CodigoIntermedio;
 
+import Principal.DatosSimbolo;
 import Principal.Lexico;
 import Principal.Main;
 import java.io.*;
@@ -7,6 +8,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.List;
 
 public class Assembler {
 
@@ -16,18 +18,16 @@ public class Assembler {
     private static final long limiteSuperiorULONG= Long.parseUnsignedLong("1000000000");
     private static final int divisorCeroULONG = 0;
     private static final double divisorCeroDOUBLE = 0.0;
-    private static int contador = 0;
 
     public Assembler(AdministradorTercetos administradorTerceto) {
-        this.codigoIntermedio = administradorTerceto.getCodigoIntermedio();
         this.administradorTerceto = administradorTerceto;
     }
 
     public void generarAssembler() throws IOException {
 
-        String code = this.generarCodeAssembler();
+        String code = this.generarCodeAssembler(administradorTerceto.getCodigoIntermedio());
+        String funciones = this.generarFunciones();
         String data = this.generarDataAssembler();
-
         FileOutputStream fos = new FileOutputStream(new File("output.asm"));
 
         BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));
@@ -42,8 +42,18 @@ public class Assembler {
                 + "includelib \\masm32\\lib\\user32.lib" + '\n'
                 + '\n' + ".data" + '\n');
 
-        bw.write(data + "\n.code\nstart: \n" + code + "invoke ExitProcess, 0\nend start");
-
+        bw.write(data + "\n.code\n " + funciones +"start: \n" + code );
+        bw.write(  "FINIT\n"
+                    +"invoke ExitProcess, 0 \n"
+                    +"FINIT\n"
+                    +"LabelOverflowSuma: \n"
+                    + "invoke MessageBox, NULL, addr _OverflowSuma, addr _OverflowSuma, MB_OK \n"
+                    + "invoke ExitProcess, 0 \n"
+                    + "FINIT\n"
+                    + "LabelDivisionCero: \n"
+                    + "invoke MessageBox, NULL, addr _DivisionCero, addr _DivisionCero, MB_OK \n"
+                    + "FINIT\n"
+                    + "end start");
         bw.close();
     }
 
@@ -74,6 +84,8 @@ public class Assembler {
                                 data = data + "_" + lexema + " DQ ?" + '\n';
                         }
                     }
+                    else
+                        data = data + "_" + lexema + " DD ?" + '\n';
                     break;
 
                 case (Lexico.CADENA):
@@ -96,13 +108,26 @@ public class Assembler {
         return data;
     }
 
-    public String generarCodeAssembler() {
+    public String generarFunciones() {
+        String salida = "";
+        Enumeration iterador = this.administradorTerceto.getContenidoFunciones().keys();
+        while (iterador.hasMoreElements()) {
+            String clave = (String) iterador.nextElement();
+            ArrayList<Terceto> lista = this.administradorTerceto.getContenidoFunciones().get(clave);
+            salida += clave + ":" + '\n';
+            salida +=  this.generarCodeAssembler(lista);
+        }
+        return salida;
+    }
 
+
+    public String generarCodeAssembler(ArrayList<Terceto> lista) {
 
         String code = "FINIT \n";
         String funcionActual = "main";
+        String retorno = "";
 
-            for (Terceto t : administradorTerceto.getCodIntermedio()) {
+            for (Terceto t : lista) {
                 switch (t.getOperador()) {
                     case "+":
                         //Situación 1: Operación entre 2 variables y/o constantes
@@ -733,21 +758,23 @@ public class Assembler {
                         break;
 
                     case "ComienzaFuncion":
-                        /*if (funcionActual.equals("main")) {
-                            code += "FINIT\n";
-                            code += "invoke ExitProcess, 0 \n";
-                        }*/
-                        code += "CALL " + t.getOperando1() + contador + "\n";
-                        code += t.getOperando1() + contador + ": \n";
-                        this.contador++;
-                        funcionActual = t.getOperando1().substring(0, t.getOperando1().indexOf("@"));
                         break;
 
                     case "FinFuncion":
+
+                        code += "RET \n";
                         break;
 
                     case "InvocacionFuncion":
-                        //code += "CALL " + t.getOperando1() + "\n";
+                        if (t.getOperando2() != null) {
+                            retorno = t.getOperando2();
+                            code += "CALL " + t.getOperando1() + "\n";
+                            code += "MOV EBX, _" + t.getOperando1() + '\n'; // Muevo a la variable.
+                            code += "MOV _" + retorno + ", EBX" + '\n'; // Muevo a la variable.
+                        }
+                        else
+                            code += "CALL " + t.getOperando1() + "\n";
+
                         break;
 
                     case "Impresion":
@@ -886,11 +913,8 @@ public class Assembler {
                     case "RetornoFuncion":
                         if (t.esVariable(1)) {
                             if (t.getTipo().equals("ULONG")) {
-
                                 code += "MOV EBX, _" + t.getOperando1() + '\n'; // Muevo a la variable.
-                                code += "MOV _varRet" + contador + t.getNumero() +", EBX" + '\n'; // Muevo a la variable.
-                                t.setResultado("varRet" + contador + t.getNumero()); // Seteo el resultado en el terceto.
-                                Main.tablaSimbolos.agregarSimbolo("varRet" + contador + t.getNumero(), Lexico.IDENTIFICADOR, "ULONG", "Variable"); // Agrego la variable a tabla de simbolos.
+                                code += "MOV _" + t.getOperando2() + ", EBX" + '\n'; // Muevo a la variable.
                             }
 
                             if (t.getTipo().equals("DOUBLE")) {
@@ -899,37 +923,28 @@ public class Assembler {
                                 op1 = op1.replace('-', '_');
                                 op1 = op1.replace("+", "__");
 
-                                code += "FLD _" + op1 + '\n';
-                                code += "FSTP _" + "varRet" + contador + t.getNumero() + '\n';
-                                t.setResultado("varRet" + contador + t.getNumero());
-                                Main.tablaSimbolos.agregarSimbolo("varRet" + contador + t.getNumero(), Lexico.IDENTIFICADOR, "DOUBLE", "Variable");
+                                    code += "FLD _" + op1 + '\n';
+                                    code += "FSTP _" + t.getOperando2() + '\n';
                             }
-
                         }
 
                         if (!t.esVariable(1)) {
                             if (t.getTipo().equals("ULONG")) {
                                 nroTerceto = t.getOperando1().substring(1, t.getOperando1().lastIndexOf("]"));
                                 t1 = administradorTerceto.getTerceto(Integer.parseInt(nroTerceto));
-
                                 code += "MOV EBX, _" + t1.getResultado() + '\n'; // Muevo a la variable.
-                                code += "MOV _varRet" + contador + t.getNumero() +", EBX" + '\n'; // Muevo a la variable.
-                                t.setResultado("varRet" + contador + t.getNumero()); // Seteo el resultado en el terceto.
-                                Main.tablaSimbolos.agregarSimbolo("varRet" + contador + t.getNumero(), Lexico.IDENTIFICADOR, "ULONG", "Variable"); // Agrego la variable a tabla de simbolos.
+                                code += "MOV _" + t.getOperando2() + ", EBX" + '\n'; // Muevo a la variable.
 
                            }
 
                             if (t.getTipo().equals("DOUBLE")) {
                                 nroTerceto = t.getOperando1().substring(1, t.getOperando1().lastIndexOf("]"));
                                 t1 = administradorTerceto.getTerceto(Integer.parseInt(nroTerceto));
-
                                 code += "FLD _var" + t1.getNumero() + '\n';
-                                code += "FSTP _" + "varRet" + contador + t1.getNumero() + '\n';
-                                t.setResultado("varRet" + contador + t1.getNumero());
-                                Main.tablaSimbolos.agregarSimbolo("varRet" + contador + t1.getNumero(), Lexico.IDENTIFICADOR, "DOUBLE", "Variable");
+                                code += "FSTP _" + t.getOperando2() + '\n';
+
                                 }
                             }
-
                         break;
 
                     default: //Para terceto (Label..., , )
@@ -938,16 +953,6 @@ public class Assembler {
                 }
             }
 
-        code += "FINIT\n";
-        code += "invoke ExitProcess, 0 \n";
-        code += "FINIT\n";
-        code += "LabelOverflowSuma: \n";
-        code += "invoke MessageBox, NULL, addr _OverflowSuma, addr _OverflowSuma, MB_OK \n";
-        code += "invoke ExitProcess, 0 \n";
-        code += "FINIT\n";
-        code += "LabelDivisionCero: \n";
-        code += "invoke MessageBox, NULL, addr _DivisionCero, addr _DivisionCero, MB_OK \n";
-        code += "FINIT\n";
         return code;
     }
 

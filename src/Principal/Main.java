@@ -67,7 +67,6 @@ public class Main {
 
         tablaSimbolos.eliminarVariablesRepetidas();
         adminTercetos.generarCodigoIntermedio();
-        adminTercetos.cambiarReturns();
 
 /*
         Token t = l1.getToken();
@@ -82,6 +81,8 @@ public class Main {
             }
         }
 
+        System.out.println("\n------TERCETOS ------");
+        adminTercetos.imprimirTercetos();
 
         if (listaErrores.isEmpty()) {
             Assembler assembler = new Assembler(adminTercetos);
@@ -94,14 +95,15 @@ public class Main {
             }
         }
 
-
         System.out.println("\n------ CÓDIGO INTERMEDIO ------");
-        adminTercetos.imprimirCodInter();
-
+        adminTercetos.printCodigoIntermedio();
 
         System.out.println("\n -----TABLA DE SIMBOLOS------");
         tablaSimbolos.imprimirTablaSimbolos();
 
+
+        System.out.println("\n------TERCETOS ------");
+        adminTercetos.imprimirTercetos();
 
 
     }

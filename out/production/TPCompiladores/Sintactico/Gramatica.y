@@ -392,24 +392,24 @@ invocacion : IDENTIFICADOR '(' CTE_ULONG ')' {System.out.println("[Sintáctico] 
                     if(ambitoFuncion != null && Main.tablaSimbolos.getDatos(ambitoFuncion).getTipo() == "ULONG"){
                         if (!Main.tablaSimbolos.getDatos(ambitoFuncion).getFuncionReferenciada().equals("")){
                             String funcionRef = Main.tablaSimbolos.getDatos(ambitoFuncion).getFuncionReferenciada();
-                            Terceto t = new Terceto("InvocacionFuncion", funcionRef, null);
+                             Terceto t = new Terceto(":=", Main.tablaSimbolos.getDatos(funcionRef).getParametro(), $3.sval);
+                            t.setTipo(Main.tablaSimbolos.getDatos(funcionRef).getTipo());
+                            adminTercetos.agregarTerceto(t);
+                            t = new Terceto("InvocacionFuncion", funcionRef, ambitoFuncion);
                              if (ambito.contains("@")){
                                 String ambitoInvocacion = ambito;
                                 ambitoInvocacion = ambitoInvocacion.substring(ambitoInvocacion.lastIndexOf("@") +1);
                                 t.setAmbitoInvocacion(ambitoInvocacion);
                             }
                             adminTercetos.agregarTerceto(t);
-                            t = new Terceto(":=", Main.tablaSimbolos.getDatos(funcionRef).getParametro(), $3.sval);
-                            t.setTipo(Main.tablaSimbolos.getDatos(funcionRef).getTipo());
-                            adminTercetos.agregarTerceto(t);
                             funcionRef = funcionRef.substring(0, funcionRef.lastIndexOf("@"));
                             $$ = new ParserVal(funcionRef);
                         }
                         else{
-                            Terceto t = new Terceto("InvocacionFuncion", ambitoFuncion, null);
-                            adminTercetos.agregarTerceto(t);
-                            t = new Terceto(":=", Main.tablaSimbolos.getDatos(ambitoFuncion).getParametro(), $3.sval);
+                            Terceto t = new Terceto(":=", Main.tablaSimbolos.getDatos(ambitoFuncion).getParametro(), $3.sval);
                             t.setTipo(Main.tablaSimbolos.getDatos(ambitoFuncion).getTipo());
+                            adminTercetos.agregarTerceto(t);
+                            t = new Terceto("InvocacionFuncion", ambitoFuncion, null);
                             adminTercetos.agregarTerceto(t);
                             $$ = new ParserVal($1.sval);
                         }
@@ -432,7 +432,11 @@ invocacion : IDENTIFICADOR '(' CTE_ULONG ')' {System.out.println("[Sintáctico] 
                     if(ambitoFuncion != null && Main.tablaSimbolos.getDatos(ambitoFuncion).getTipo() == "DOUBLE"){
                           if (!Main.tablaSimbolos.getDatos(ambitoFuncion).getFuncionReferenciada().equals("")){
                             String funcionRef = Main.tablaSimbolos.getDatos(ambitoFuncion).getFuncionReferenciada();
-                            Terceto t = new Terceto("InvocacionFuncion", funcionRef, null);
+
+                             Terceto t = new Terceto(":=", Main.tablaSimbolos.getDatos(funcionRef).getParametro(), $3.sval);
+                             t.setTipo(Main.tablaSimbolos.getDatos(funcionRef).getTipo());
+                             adminTercetos.agregarTerceto(t);
+                             t = new Terceto("InvocacionFuncion", funcionRef, ambitoFuncion);
                              if (ambito.contains("@")){
                                 String ambitoInvocacion = ambito;
                                 ambitoInvocacion = ambitoInvocacion.substring(ambitoInvocacion.lastIndexOf("@") +1);
@@ -441,18 +445,17 @@ invocacion : IDENTIFICADOR '(' CTE_ULONG ')' {System.out.println("[Sintáctico] 
 
 
                             adminTercetos.agregarTerceto(t);
-                            t = new Terceto(":=", Main.tablaSimbolos.getDatos(funcionRef).getParametro(), $3.sval);
-                             t.setTipo(Main.tablaSimbolos.getDatos(funcionRef).getTipo());
-                            adminTercetos.agregarTerceto(t);
+
                             funcionRef = funcionRef.substring(0, funcionRef.lastIndexOf("@"));
                             $$ = new ParserVal(funcionRef);
                         }
                         else{
-                             Terceto t = new Terceto("InvocacionFuncion", ambitoFuncion, null);
+                             Terceto t = new Terceto(":=",  Main.tablaSimbolos.getDatos(ambitoFuncion).getParametro(),$3.sval);
+                              t.setTipo(Main.tablaSimbolos.getDatos(ambitoFuncion).getTipo());
+                              adminTercetos.agregarTerceto(t);
+                             t = new Terceto("InvocacionFuncion", ambitoFuncion, null);
                              adminTercetos.agregarTerceto(t);
-                             t = new Terceto(":=",  Main.tablaSimbolos.getDatos(ambitoFuncion).getParametro(),$3.sval);
-                             t.setTipo(Main.tablaSimbolos.getDatos(ambitoFuncion).getTipo());
-                             adminTercetos.agregarTerceto(t);
+
                              $$ = new ParserVal($1.sval);
                         }
                     }
@@ -480,22 +483,27 @@ invocacion : IDENTIFICADOR '(' CTE_ULONG ')' {System.out.println("[Sintáctico] 
                                     if (Main.tablaSimbolos.getDatos(nombreParametro).getTipo().equals(Main.tablaSimbolos.getDatos(ambitoParametro).getTipo())){
                                          if (!Main.tablaSimbolos.getDatos(ambitoFuncion).getFuncionReferenciada().equals("")){
                                             String funcionRef = Main.tablaSimbolos.getDatos(ambitoFuncion).getFuncionReferenciada();
-                                            Terceto t = new Terceto("InvocacionFuncion", funcionRef, null);
+                                            String variableFuncion = Main.tablaSimbolos.getDatos(funcionRef).getParametro();
+                                            Terceto t = new Terceto(":=", variableFuncion ,ambitoParametro );
+                                            t.setTipo(Main.tablaSimbolos.getDatos(variableFuncion).getTipo());
+                                            adminTercetos.agregarTerceto(t);
+                                            t = new Terceto("InvocacionFuncion", funcionRef, ambitoFuncion);
                                             if (ambito.contains("@")){
                                                 String ambitoInvocacion = ambito;
                                                 ambitoInvocacion = ambitoInvocacion.substring(ambitoInvocacion.lastIndexOf("@") +1);
                                                 t.setAmbitoInvocacion(ambitoInvocacion);
                                             }
                                             adminTercetos.agregarTerceto(t);
-                                            String variableFuncion = Main.tablaSimbolos.getDatos(funcionRef).getParametro();
-                                            t = new Terceto(":=", variableFuncion ,ambitoParametro );
-                                            t.setTipo(Main.tablaSimbolos.getDatos(variableFuncion).getTipo());
-                                            adminTercetos.agregarTerceto(t);
+
                                             funcionRef = funcionRef.substring(0, funcionRef.lastIndexOf("@"));
                                             $$ = new ParserVal(funcionRef);
                                         }
                                         else{
-                                             Terceto t = new Terceto("InvocacionFuncion", ambitoFuncion, null);
+                                             String variableFuncion = Main.tablaSimbolos.getDatos(ambitoFuncion).getParametro();
+                                              Terceto t = new Terceto(":=", variableFuncion ,ambitoParametro );
+                                              t.setTipo(Main.tablaSimbolos.getDatos(variableFuncion).getTipo());
+                                              adminTercetos.agregarTerceto(t);
+                                              t = new Terceto("InvocacionFuncion", ambitoFuncion, null);
                                              if (ambito.contains("@")){
                                                   String ambitoInvocacion = ambito;
                                                   ambitoInvocacion = ambitoInvocacion.substring(ambitoInvocacion.lastIndexOf("@") +1);
@@ -503,10 +511,7 @@ invocacion : IDENTIFICADOR '(' CTE_ULONG ')' {System.out.println("[Sintáctico] 
                                               }
 
                                              adminTercetos.agregarTerceto(t);
-                                             String variableFuncion = Main.tablaSimbolos.getDatos(ambitoFuncion).getParametro();
-                                             t = new Terceto(":=", variableFuncion ,ambitoParametro );
-                                             t.setTipo(Main.tablaSimbolos.getDatos(variableFuncion).getTipo());
-                                             adminTercetos.agregarTerceto(t);
+
                                              $$ = new ParserVal($1.sval);
                                         }
                                 }
@@ -595,7 +600,7 @@ funcion :  declaracion_funcion bloque_funcion
             if($1.sval != null && op != null ){ //si se declaró bien y se cumplen los PRE (en caso de haberlos)
 
                    ambito = ambito.substring(0,ambito.lastIndexOf("@"));
-                    Terceto t = new Terceto("RetornoFuncion", op.getValor(), null);
+                    Terceto t = new Terceto("RetornoFuncion", op.getValor(),$1.sval);
                     t.setTipo(op.getTipo());
                     adminTercetos.agregarTerceto(t);
                     t = new Terceto("FinFuncion", $1.sval, null);
@@ -627,7 +632,6 @@ declaracion_funcion: tipo FUNC IDENTIFICADOR'('parametro')'{
                             Main.tablaSimbolos.setDatosSimbolo(nuevoLexema, ds);
 
                             Main.tablaSimbolos.reemplazarLexema(parametroCopiaValor, parametroCopiaValor +"@"+ ambito); // Se agrega el ambito al parametro (nombre de la función)
-
                             Terceto t = new Terceto("ComienzaFuncion", nuevoLexema, null);
                             adminTercetos.agregarTerceto(t);
                             adminTercetos.agregarFuncion(nuevoLexema);
