@@ -12,13 +12,12 @@ import java.util.List;
 
 public class Assembler {
 
-    private ArrayList<ArrayList<Terceto>> codigoIntermedio; // ArrayList de ArrayList
     private AdministradorTercetos administradorTerceto;
     private static final int limiteInferiorULONG = 0;
     private static final long limiteSuperiorULONG= Long.parseUnsignedLong("1000000000");
     private static final int divisorCeroULONG = 0;
     private static final double divisorCeroDOUBLE = 0.0;
-    private ArrayList<String> invocaciones = new ArrayList<>();
+
 
     public Assembler(AdministradorTercetos administradorTerceto) {
         this.administradorTerceto = administradorTerceto;
@@ -781,7 +780,8 @@ public class Assembler {
                                 code += "FSTP _var" + t.getNumero() + "\n";
                                 t.setResultado("var" + t.getNumero());
                             }
-                        break;
+
+                            break;
 
                     case "Impresion":
                         String cadena = t.getOperando1();

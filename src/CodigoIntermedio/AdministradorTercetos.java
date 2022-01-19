@@ -87,13 +87,11 @@ public class AdministradorTercetos {
 
 
     public void generarCodigoIntermedio(int inicio, int finalFunc, String funcion, int index) {
-        ArrayList<String> invocados = new ArrayList<>();
         for (int i = inicio; i <= finalFunc; i++) {
             Terceto t = tercetos.get(i);
-            if (t.getOperador().equals("Invocacion") && !invocados.contains(t.getOperando1())) {
-                String funcionInvocada = t.getOperando1();
-                generarCodigoIntermedio(funciones.get(funcionInvocada), this.buscarFinFuncion(funcionInvocada), funcionInvocada, index + 1);
-                invocados.add(funcionInvocada);
+            if (t.getOperador().equals("InvocacionFuncion")) {
+                chequearInvocaciones(t.getOperando1());
+                invocaciones.clear();
             }
             while ((t.getOperador().equals("ComienzaFuncion") && !t.getOperando1().equals(funcion)) && (i <= finalFunc)) {
                 agregarContenidoFuncion (t.getNumero());
@@ -107,36 +105,43 @@ public class AdministradorTercetos {
         }
     }
 
-    public void agregarContenidoFuncion (int pos){
+    public int agregarContenidoFuncion (int pos){
         Terceto t = tercetos.get(pos);
         String nombreFunc = t.getOperando1();
         ArrayList<Terceto> funcs = new ArrayList<>();
+        funcs.add(t);
+        pos ++;
+        int posAct;
+        t = tercetos.get(pos);
         while (!t.getOperador().equals("FinFuncion")){
+            if (t.getOperador().equals("ComienzaFuncion")) {
+                posAct = agregarContenidoFuncion(pos);
+                pos = posAct;
+            }
             funcs.add(t);
             pos ++;
             t = tercetos.get(pos);
+
         }
         if (t.getOperador().equals("FinFuncion")){
             funcs.add(t);
         }
         contenidoFunciones.put(nombreFunc, funcs);
+        return pos;
     }
 
 
-    public int buscarComienzoFuncion(String funcion) {
-        for (Terceto t : tercetos) {
-            if (t.getOperador().equals("ComienzaFuncion") && t.getOperando1().equals(funcion)) {
-                return t.getNumero();
-            }
-        }
-        return 0;
-    }
 
     public void generarCodigoIntermedio(){
         this.generarCodigoIntermedio(0, tercetos.size() - 1, "main", 0);
     }
 
-
+    public void imprimirFuncion(String funcion){
+        ArrayList<Terceto> lista = this.contenidoFunciones.get(funcion);
+        for (Terceto t : lista){
+            System.out.println("( " + t.getOperador()+ " , " +  t.getOperando1()+ " , " + t.getOperando2()+ " , " + t.getAmbitoInvocacion()+ ")");
+        }
+    }
 
     public int buscarFinFuncion(String funcion) {
         for (Terceto t : tercetos) {
@@ -151,9 +156,23 @@ public class AdministradorTercetos {
     }
 
 
-
-
-
-
+    public void chequearInvocaciones(String funcion){
+        ArrayList<Terceto> lista = this.contenidoFunciones.get(funcion);
+        for (Terceto t : lista){
+            if (t.getOperador().equals("InvocacionFuncion")){
+                String nombreFuncion = funcion.substring(0, funcion.lastIndexOf("@"));
+                if (!invocaciones.contains(nombreFuncion)) {
+                    if (t.getAmbitoInvocacion() != null) {
+                        invocaciones.add(t.getAmbitoInvocacion());
+                        chequearInvocaciones(t.getOperando1());
+                    }
+                }
+                else
+                if (invocaciones.contains(nombreFuncion) && !funcion.equals(t.getOperando1())){
+                    Main.listaErrores.add("[ERROR EN EJECUCIÓN]  {Se detecto una recursion mutua en las invocaciones de las funciones '" + t.getOperando1() +"' y '"+ funcion + "'");
+                }
+            }
+        }
+    }
 
 }

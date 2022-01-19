@@ -1024,8 +1024,6 @@ factor 	:  '-' factor  { if (chequearFactorNegado()){
 
                        String nombre = op.getValor();
                        String tipo = op.getTipo();
-                       System.out.println("*********TIPO: "+ tipo);
-                       System.out.println("********NOMBRE: "+ nombre);
                        if(nombre != null){
 
                            String ambitoVariable = Main.tablaSimbolos.verificarAmbito(nombre, ambito);

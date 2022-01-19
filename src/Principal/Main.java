@@ -81,8 +81,8 @@ public class Main {
             }
         }
 
-        System.out.println("\n------TERCETOS ------");
-        adminTercetos.imprimirTercetos();
+//        System.out.println("\n------TERCETOS ------");
+//        adminTercetos.imprimirTercetos();
 
         if (listaErrores.isEmpty()) {
             Assembler assembler = new Assembler(adminTercetos);
@@ -94,6 +94,7 @@ public class Main {
                 System.out.println(s);
             }
         }
+
 
         System.out.println("\n------ CÓDIGO INTERMEDIO ------");
         adminTercetos.printCodigoIntermedio();

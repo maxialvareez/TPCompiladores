@@ -14,73 +14,45 @@ _divisorCeroULONG DD 0
 _divisorCeroDOUBLE DD 0.0
 _OverflowSuma DB "Overflow en suma", 0 
 _DivisionCero DB "Division por cero", 0 
-_MENOR DB 'MENOR', 0 
-_f@main DD ?
 _f1@main DD ?
-_x@main DD ?
-_MAYOR DB 'MAYOR', 0 
-_a@main DD ?
-_p@main@f DD ?
-_y@main DD ?
+_g@main@f1@f DD ?
+_j@main@f1@f DD ?
+_f@main@f1 DD ?
+_a@main DQ ?
+_i@main DD ?
 _b@main DD ?
-_9 DD 9
-_z@main DD ?
-_var9 DD ?
-_5 DD 5
+_u@main@f1 DD ?
+_z@main DQ ?
+_s@main@f1 DD ?
 _c@main DD ?
-_4 DD 4
-_3 DD 3
-_var12 DD ?
-_2 DD 2
-_var11 DD ?
-_var2 DD ?
+_var5 DD ?
+_var10 DD ?
 
 .code
- f@main:
+ f1@main:
 FINIT 
-MOV EBX, _p@main@f
-MOV _p@main@f, EBX
-MOV EBX, _p@main@f
-ADD EBX, _2
-CMP EBX, _limiteSuperiorULONG
-JA LabelOverflowSuma
-MOV _var2, EBX
-MOV EBX, _var2
-MOV _f@main, EBX
+MOV EBX, _s@main@f1
+MOV _g@main@f1@f, EBX
+CALL f@main@f1
+MOV EBX, _f@main@f1
+MOV _var5, EBX
+MOV EBX, _u@main@f1
+MOV _f1@main, EBX
+RET 
+f@main@f1:
+FINIT 
+MOV EBX, _g@main@f1@f
+MOV _f@main@f1, EBX
 RET 
 start: 
 FINIT 
-MOV EBX, _2
+MOV EBX, _c@main
 MOV _b@main, EBX
 MOV EBX, _b@main
-MOV _p@main@f, EBX
-CALL f@main
-MOV EBX, _f@main
-MOV _var9, EBX
-MOV EBX, _3
-MOV _p@main@f, EBX
-CALL f@main
-MOV EBX, _f@main
-MOV _var11, EBX
-MOV EBX, _var9
-ADD EBX, _var11
-CMP EBX, _limiteSuperiorULONG
-JA LabelOverflowSuma
-MOV _var12, EBX
-MOV EBX, _var12
-MOV _a@main, EBX
-MOV EBX, _9
-CMP _a@main, EBX
-JAE Label19
-MOV EBX, _5
-MOV _a@main, EBX
-invoke MessageBox, NULL, addr _MENOR, addr _MENOR, MB_OK 
-JMP Label22
-Label19: 
-MOV EBX, _4
-MOV _a@main, EBX
-invoke MessageBox, NULL, addr _MAYOR, addr _MAYOR, MB_OK 
-Label22: 
+MOV _u@main@f1, EBX
+CALL f1@main
+MOV EBX, _f1@main
+MOV _var10, EBX
 FINIT
 invoke ExitProcess, 0 
 FINIT
