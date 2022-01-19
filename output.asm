@@ -14,45 +14,37 @@ _divisorCeroULONG DD 0
 _divisorCeroDOUBLE DD 0.0
 _OverflowSuma DB "Overflow en suma", 0 
 _DivisionCero DB "Division por cero", 0 
-_f1@main DD ?
-_g@main@f1@f DD ?
-_j@main@f1@f DD ?
-_f@main@f1 DD ?
-_a@main DQ ?
-_i@main DD ?
-_b@main DD ?
-_u@main@f1 DD ?
-_z@main DQ ?
-_s@main@f1 DD ?
+_REPEAT DB 'REPEAT', 0 
 _c@main DD ?
-_var5 DD ?
-_var10 DD ?
+_z@main DQ ?
+_var7 DD ?
+_a@main DQ ?
+_10 DD 10
+_1 DD 1
+_b@main DD ?
+_i@main DD ?
 
 .code
- f1@main:
+ start: 
 FINIT 
-MOV EBX, _s@main@f1
-MOV _g@main@f1@f, EBX
-CALL f@main@f1
-MOV EBX, _f@main@f1
-MOV _var5, EBX
-MOV EBX, _u@main@f1
-MOV _f1@main, EBX
-RET 
-f@main@f1:
-FINIT 
-MOV EBX, _g@main@f1@f
-MOV _f@main@f1, EBX
-RET 
-start: 
-FINIT 
-MOV EBX, _c@main
-MOV _b@main, EBX
-MOV EBX, _b@main
-MOV _u@main@f1, EBX
-CALL f1@main
-MOV EBX, _f1@main
-MOV _var10, EBX
+MOV EBX, _1
+MOV _i@main, EBX
+Label1: 
+MOV EBX, _10
+CMP _i@main, EBX
+JAE Label10
+invoke MessageBox, NULL, addr _REPEAT, addr _REPEAT, MB_OK 
+BREAK: 
+JMP Label10
+MOV EBX, _i@main
+ADD EBX, _1
+CMP EBX, _limiteSuperiorULONG
+JA LabelOverflowSuma
+MOV _var7, EBX
+MOV EBX, _var7
+MOV _i@main, EBX
+JMP Label1
+Label10: 
 FINIT
 invoke ExitProcess, 0 
 FINIT
